@@ -1,0 +1,12 @@
+server:
+  port: 8888
+
+spring:
+  application:
+    name: config-server
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com/HotKeTok/hotketok-config.git
+          default-label: main
