@@ -1,5 +1,6 @@
 rootProject.name = 'hotketok'
 
 include(
+        "hotketok-config-server",
         "hotketok-eureka-server"
 )

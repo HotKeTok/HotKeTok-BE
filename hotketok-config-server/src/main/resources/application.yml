@@ -1,0 +1,26 @@
+server:
+  port: 8888
+
+spring:
+  application:
+    name: config-server
+  cloud:
+    config:
+      server:
+        git:
+          # Config Server가 설정값을 어디서 가져오는지 정의.
+          uri: https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com/HotKeTok/hotketok-config.git
+          default-label: main
+          skipSslValidation: true
+  # Spring Cloud Bus를 위한 RabbitMQ 연결 정보.
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: 5672
+    username: guest
+    password: guest
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,env,refresh,busrefresh
