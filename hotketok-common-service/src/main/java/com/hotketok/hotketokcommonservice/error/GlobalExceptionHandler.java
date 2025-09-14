@@ -25,8 +25,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 
 @Slf4j
-@RestControllerAdvice
-@RequiredArgsConstructor
+@RestControllerAdvice(basePackages = "com.hotketok")
 public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @Override
