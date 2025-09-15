@@ -11,7 +11,6 @@ spring:
           # Config Server가 설정값을 어디서 가져오는지 정의.
           uri: https://${GITHUB_USERNAME}:${GITHUB_TOKEN}@github.com/HotKeTok/hotketok-config.git
           default-label: main
-          skipSslValidation: true
   # Spring Cloud Bus를 위한 RabbitMQ 연결 정보.
   rabbitmq:
     host: ${RABBITMQ_HOST:localhost}
