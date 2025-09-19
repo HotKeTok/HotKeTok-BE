@@ -26,10 +26,6 @@ dependencies {
 	implementation project(':hotketok-common-service')
 	implementation project(':hotketok-jpa-service')
 
-	// Spring Cloud Config
-	implementation 'org.springframework.cloud:spring-cloud-starter-config'
-	annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
-
 	// Spring Cloud Eureka
 	implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
 
