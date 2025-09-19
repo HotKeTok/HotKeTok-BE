@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: requestform-service
+  cloud:
+    config:
+      name: ${REQUESTFORM_SERVICE_CONFIG_NAME:requestform-service}
+  config:
+    import: "configserver:http://${CONFIG_SERVER_NAME:localhost}:8888"
+
