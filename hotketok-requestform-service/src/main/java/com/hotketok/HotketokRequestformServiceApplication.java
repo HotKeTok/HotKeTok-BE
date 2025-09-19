@@ -1,4 +1,4 @@
-package com.hotketok.hotketokrequestformservice;
+package com.hotketok;
 
 
 import org.springframework.boot.SpringApplication;
