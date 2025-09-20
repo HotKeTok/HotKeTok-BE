@@ -2,8 +2,8 @@ package com.hotketok.config;
 
 import com.hotketok.exception.ImageErrorCode;
 import com.hotketok.hotketokcommonservice.error.exception.CustomException;
-import com.hotketok.hotketokcommonservice.error.exception.ErrorCode;
 import com.hotketok.service.ImageStorageService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -18,6 +18,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import java.io.IOException;
 import java.util.UUID;
 
+@Slf4j
 @Configuration
 @ConditionalOnProperty(name = "cloud.provider", havingValue = "aws")
 public class AwsS3Config {
@@ -45,12 +46,13 @@ public class AwsS3Config {
     public ImageStorageService awsImageStorageService(S3Client s3Client) {
         return new ImageStorageService() {
             @Override
-            public String uploadImage(MultipartFile file) throws IOException {
-                String fileName = UUID.randomUUID().toString() + "-" + file.getOriginalFilename();
+            public String uploadImage(MultipartFile file, String folderName) throws IOException {
+                String fileName = folderName+UUID.randomUUID().toString() + "-" + file.getOriginalFilename();
                 try {
                     PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                             .bucket(bucketName).key(fileName).contentType(file.getContentType()).build();
                     s3Client.putObject(putObjectRequest, software.amazon.awssdk.core.sync.RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
+                    log.info("upload image success");
                     return String.format("https://%s.s3.%s.amazonaws.com/%s", bucketName, region, fileName);
                 } catch (IOException e) {
                     throw new CustomException(ImageErrorCode.DELETE_FAILED);

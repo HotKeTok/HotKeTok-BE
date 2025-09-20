@@ -6,6 +6,7 @@ import com.hotketok.dto.DeleteImageResponse;
 import com.hotketok.dto.UploadImageResponse;
 import com.hotketok.service.ImageStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
@@ -23,12 +24,14 @@ public class ImageController {
         this.imageStorageService = imageStorageService;
     }
 
-    @PostMapping("/upload/imageList")
-    public UploadImageResponse uploadImages(@RequestParam("files") List<MultipartFile> files) throws IOException {
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE, value = "/upload/imageList")
+    public UploadImageResponse uploadImages(
+            @RequestPart(value = "images", required = true) List<MultipartFile> images,
+            @RequestParam String folderName) throws IOException {
         List<String> urls = new ArrayList<>();
 
-        for (MultipartFile file : files) {
-            String publicUrl = imageStorageService.uploadImage(file);
+        for (MultipartFile image : images) {
+            String publicUrl = imageStorageService.uploadImage(image,folderName);
             urls.add(publicUrl);
         }
         return new UploadImageResponse(urls);
