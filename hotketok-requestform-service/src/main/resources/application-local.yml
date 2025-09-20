@@ -46,3 +46,7 @@ logging:
   level:
     org.hibernate.SQL: debug
 
+client:
+  infra-service:
+    url: http://localhost:8081 # infra-service의 주소
+
