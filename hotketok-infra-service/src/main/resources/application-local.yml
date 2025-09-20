@@ -1,0 +1,33 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: infra-service
+
+cloud:
+  provider: aws # aws ?? ncloud ? ??? ???? ??
+
+aws:
+  s3:
+    bucket-name: hotketok-aws-s3
+    region: ap-northeast-2
+    credentials:
+      accessKey: ${S3_ACCESSKEY}
+      secretKey: ${S3_SECRETKEY}
+
+#ncloud:
+# endpoint: https://kr.object.ncloudstorage.com
+# region: kr-standard
+# bucket-name: your-ncloud-bucket-name
+
+eureka:
+  instance:
+    hostname: infra-service
+    preferIpAddress: true
+  client:
+    registry-fetch-interval-seconds: 3
+    registerWithEureka: true
+    fetchRegistry: true
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka
