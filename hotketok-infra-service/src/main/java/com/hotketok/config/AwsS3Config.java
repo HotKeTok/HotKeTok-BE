@@ -55,7 +55,7 @@ public class AwsS3Config {
                     log.info("upload image success");
                     return String.format("https://%s.s3.%s.amazonaws.com/%s", bucketName, region, fileName);
                 } catch (IOException e) {
-                    throw new CustomException(ImageErrorCode.DELETE_FAILED);
+                    throw new CustomException(ImageErrorCode.UPLOAD_FAILED);
                 }
             }
 

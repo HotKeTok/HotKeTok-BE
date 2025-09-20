@@ -9,7 +9,8 @@ import org.springframework.http.HttpStatus;
 @Getter
 @AllArgsConstructor
 public enum ImageErrorCode implements ErrorCode {
-    DELETE_FAILED(HttpStatus.BAD_REQUEST, "이미지 삭제에 실패했습니다.");
+    DELETE_FAILED(HttpStatus.BAD_REQUEST, "이미지 삭제에 실패했습니다."),
+    UPLOAD_FAILED(HttpStatus.BAD_REQUEST, "이미지 업로드에 실패했습니다.");
 
     private final HttpStatus httpStatus;
     private final String message;
