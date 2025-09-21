@@ -2,6 +2,8 @@ package com.hotketok.domain;
 
 import com.hotketok.hotketokjpaservice.entity.BaseTimeEntity;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -22,4 +24,13 @@ public class RequestFormImage extends BaseTimeEntity {
     @Column(nullable = false, length = 255)
     private String imageUrl;
 
+    @Builder(access = AccessLevel.PRIVATE)
+    public RequestFormImage(RequestForm requestForm, String imageUrl) {
+        this.requestForm = requestForm;
+        this.imageUrl = imageUrl;
+    }
+
+    public static RequestFormImage createRequestFormImage(RequestForm requestForm, String imageUrl) {
+        return new RequestFormImage(requestForm, imageUrl);
+    }
 }
