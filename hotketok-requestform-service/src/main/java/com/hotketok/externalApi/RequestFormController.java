@@ -18,12 +18,12 @@ public class RequestFormController {
 
     private final RequestFormService requestFormService;
 
-    @PostMapping(value = "/post", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    ResponseEntity<String> postRequestForm(
+    @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    ResponseEntity<String> createRequestForm(
             @RequestPart(value = "data") CreateRequestFormRequest createRequestFormRequest,
             @RequestPart(value = "images") List<MultipartFile> images){
 
-        requestFormService.post(createRequestFormRequest,images,1);
+        requestFormService.createRequestForm(createRequestFormRequest,images,1);
         return ResponseEntity.ok("요청이 전송되었습니다.");
     }
 
@@ -31,7 +31,7 @@ public class RequestFormController {
     ChatGPTResponse helpDescriptionByGPT(
             @RequestPart(value = "images") List<MultipartFile> images
     ) throws Exception {
-       return requestFormService.getGPTResponse(images);
+       return requestFormService.helpDescriptionByGPT(images);
     }
 
 }

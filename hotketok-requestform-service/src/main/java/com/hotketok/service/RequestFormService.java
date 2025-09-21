@@ -40,7 +40,7 @@ public class RequestFormService {
     private String model;
 
     @Transactional
-    public void post(
+    public void createRequestForm(
             CreateRequestFormRequest createRequestFormRequest,
             List<MultipartFile> images,
             long userId){
@@ -62,7 +62,7 @@ public class RequestFormService {
 
         boolean isImageSaved = false;
         List<Long> imageIds = new ArrayList<>();
-        // List<String> imageUrls = new ArrayList<>(); saga 패턴으로 인해 추후 이미지 전체 삭제API 개발 시 추가
+        // List<String> imageUrls = new ArrayList<>(); saga 패턴으로 인해 추후 이미지 전체 삭제 API 개발 시 추가
 
         try {
             UploadImageResponse uploadImageResponse = infraServiceClient.uploadImages(images, "requestform-image/");
@@ -85,7 +85,7 @@ public class RequestFormService {
         }
     }
 
-    public ChatGPTResponse getGPTResponse(List<MultipartFile> images) throws Exception {
+    public ChatGPTResponse helpDescriptionByGPT(List<MultipartFile> images) throws Exception {
         UploadImageResponse uploadImageResponse = infraServiceClient.uploadImages(images, "requestform-ai/");
 
         List<String> imageList = uploadImageResponse.imageList();
@@ -93,7 +93,7 @@ public class RequestFormService {
 
 
         List<Map<String, Object>> contents = new ArrayList<>();
-        // 4) OpenAI Responses payload를 Map으로 정확히 구성
+        // OpenAI Responses payload를 Map으로  구성
         Map<String, Object> textPart = Map.of(
                 "type", "input_text",
                 "text", prompt
@@ -116,7 +116,7 @@ public class RequestFormService {
         payload.put("model", model);
         payload.put("input", List.of(inputItem));
 
-        // 5) 호출 (에러바디 꼭 로그)
+        // 호출 (에러바디 꼭 로그)
         String json = null;
         try {
             json = openAiClient.createResponse(payload);
@@ -126,8 +126,8 @@ public class RequestFormService {
             throw e;
         }
 
-        // 6) 응답에서 text만 뽑아서 반환
-        String textOnly = OpenAIResponseParser.parse(json).text(); // 네 파서가 지원한다면
+        // 응답에서 text만 뽑아서 반환
+        String textOnly = OpenAIResponseParser.parse(json).text();
 
         return new ChatGPTResponse(textOnly);
     }
