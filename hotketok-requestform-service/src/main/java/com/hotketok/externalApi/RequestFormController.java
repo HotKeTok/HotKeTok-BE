@@ -1,5 +1,6 @@
 package com.hotketok.externalApi;
 
+import com.hotketok.dto.ChatGPTResponse;
 import com.hotketok.dto.CreateRequestFormRequest;
 import com.hotketok.service.RequestFormService;
 import lombok.RequiredArgsConstructor;
@@ -26,5 +27,11 @@ public class RequestFormController {
         return ResponseEntity.ok("요청이 전송되었습니다.");
     }
 
+    @PostMapping(value = "/gpt-service", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    ChatGPTResponse helpDescriptionByGPT(
+            @RequestPart(value = "images") List<MultipartFile> images
+    ) throws Exception {
+       return requestFormService.getGPTResponse(images);
+    }
 
 }
