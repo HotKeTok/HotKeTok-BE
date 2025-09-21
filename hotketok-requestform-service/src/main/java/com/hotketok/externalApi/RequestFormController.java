@@ -2,6 +2,7 @@ package com.hotketok.externalApi;
 
 import com.hotketok.dto.ChatGPTResponse;
 import com.hotketok.dto.CreateRequestFormRequest;
+import com.hotketok.dto.CreateRequestFormResponse;
 import com.hotketok.service.RequestFormService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -19,12 +20,11 @@ public class RequestFormController {
     private final RequestFormService requestFormService;
 
     @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    ResponseEntity<String> createRequestForm(
+    CreateRequestFormResponse createRequestForm(
             @RequestPart(value = "data") CreateRequestFormRequest createRequestFormRequest,
             @RequestPart(value = "images") List<MultipartFile> images){
 
-        requestFormService.createRequestForm(createRequestFormRequest,images,1);
-        return ResponseEntity.ok("요청이 전송되었습니다.");
+        return requestFormService.createRequestForm(createRequestFormRequest,images,1);
     }
 
     @PostMapping(value = "/gpt-service", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

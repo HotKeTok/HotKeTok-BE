@@ -1,6 +1,7 @@
 package com.hotketok.service;
 
 import com.hotketok.constant.GPTPrompt;
+import com.hotketok.dto.CreateRequestFormResponse;
 import com.hotketok.parser.OpenAIResponseParser;
 import com.hotketok.domain.RequestForm;
 import com.hotketok.domain.RequestFormImage;
@@ -40,15 +41,15 @@ public class RequestFormService {
     private String model;
 
     @Transactional
-    public void createRequestForm(
+    public CreateRequestFormResponse createRequestForm(
             CreateRequestFormRequest createRequestFormRequest,
             List<MultipartFile> images,
-            long userId){
+            long userId) {
 
         // 사용자 서비스에서 주택주소, authorId, payerId 가져오는 서비스 로직
         // GetUserInfoResponse getUserInfoResponse = memberClient.getUserInfoByPayType(userId,createRequestFormRequest.payType());
 
-        GetUserInfoResponse getUserInfoResponse = new GetUserInfoResponse(1L,2L,"동작 핫케톡 스테이 304호");
+        GetUserInfoResponse getUserInfoResponse = new GetUserInfoResponse(1L, 2L, "동작 핫케톡 스테이 304호");
 
         RequestForm requestForm = RequestForm.createRequestForm(
                 getUserInfoResponse.userId(),
@@ -58,7 +59,7 @@ public class RequestFormService {
                 createRequestFormRequest.requestSchedule(),
                 createRequestFormRequest.category(),
                 Status.CHOOSING
-          );
+        );
 
         boolean isImageSaved = false;
         List<Long> imageIds = new ArrayList<>();
@@ -68,7 +69,7 @@ public class RequestFormService {
             UploadImageResponse uploadImageResponse = infraServiceClient.uploadImages(images, "requestform-image/");
 
             List<RequestFormImage> imageList = uploadImageResponse.imageList().stream().map(image ->
-                 RequestFormImage.createRequestFormImage(requestForm, image)
+                    RequestFormImage.createRequestFormImage(requestForm, image)
             ).collect(Collectors.toList());
 
             requestFormImageRepository.saveAll(imageList);
@@ -77,11 +78,13 @@ public class RequestFormService {
             isImageSaved = true;
 
             requestFormRepository.save(requestForm);
-        } catch (Exception e){
-            if (isImageSaved){ // 이미지가 저장된 경우 보상 트랜잭션으로 DB 이미지 데이터 삭제
+            return new CreateRequestFormResponse(requestForm.getId());
+        } catch (Exception e) {
+            if (isImageSaved) { // 이미지가 저장된 경우 보상 트랜잭션으로 DB 이미지 데이터 삭제
                 this.requestFormImageRepository.deleteAllByIdIn(imageIds);
                 // this.infraServiceClient.deleteAll(imageUrls);
             }
+            return null;
         }
     }
 
