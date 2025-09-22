@@ -1,0 +1,47 @@
+server:
+  port: 8084
+
+spring:
+  application:
+    name: user-service
+  cloud:
+    kubernetes:
+      config:
+        enabled: false
+
+  # ===== H2 콘솔 =====
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  # ===== 데이터소스 =====
+  datasource:
+    url: jdbc:h2:tcp://localhost/~/user
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+
+  # ===== JPA =====
+  jpa:
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.H2Dialect
+
+eureka:
+  instance:
+    hostname: user-service
+    preferIpAddress: true
+  client:
+    registry-fetch-interval-seconds: 3
+    registerWithEureka: true
+    fetchRegistry: true
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka
+
+logging:
+  level:
+    org.hibernate.SQL: debug

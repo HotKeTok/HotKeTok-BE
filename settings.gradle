@@ -6,5 +6,6 @@ include(
         "hotketok-api-gateway",
         "hotketok-jpa-service",
         "hotketok-requestform-service",
-        "hotketok-infra-service"
+        "hotketok-infra-service",
+        "hotketok-user-service"
 )
