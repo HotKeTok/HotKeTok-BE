@@ -31,6 +31,12 @@ logging:
   level:
     org.hibernate.SQL: debug
 
+coolsms:
+  api:
+    key: ${SMS_API_KEY}
+    secret: ${SMS_API_SECRET_KEY}
+    number: ${SMS_PHONE_NUMBER}
+
 client:
   user-service:
     url: http://localhost:8084 # infra-service의 주소

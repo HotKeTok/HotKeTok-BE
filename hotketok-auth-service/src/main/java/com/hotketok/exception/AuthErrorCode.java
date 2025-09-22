@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 public enum AuthErrorCode implements ErrorCode {
     UNAUTHORIZED_PHONE_NUMBER(HttpStatus.UNAUTHORIZED, "휴대폰 인증이 필요합니다."),
     NOT_SEND_SMS_SERVICE(HttpStatus.BAD_REQUEST, "SMS 문자가 안보내졌습니다."),
+    NOT_EQUAL_SMS_NUMBER(HttpStatus.BAD_REQUEST, "인증번호가 일치하지 않아요"),
 
     FORBIDDEN_PASSWORD(HttpStatus.FORBIDDEN, "비밀번호는 8자 이상이어야 합니다."),
     BAD_REQUEST_PASSWORD(HttpStatus.BAD_REQUEST,"비밀번호 불일치"),
