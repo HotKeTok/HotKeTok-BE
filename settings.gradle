@@ -4,7 +4,7 @@ include(
         "hotketok-common-service",
         "hotketok-eureka-server",
         "hotketok-api-gateway",
-        "hotketok-chatting-server",
+        "hotketok-chatting-service",
         "hotketok-jpa-service",
         "hotketok-requestform-service",
         "hotketok-infra-service"
