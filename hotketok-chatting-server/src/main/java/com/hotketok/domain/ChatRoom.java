@@ -14,7 +14,7 @@ import java.util.List;
 @Table(name = "chat_rooms") // Table name updated for clarity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class ChatRoom extends BaseTimeEntity {
+public record ChatRoom extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

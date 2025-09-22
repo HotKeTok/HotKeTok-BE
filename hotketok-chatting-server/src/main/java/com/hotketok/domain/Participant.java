@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class) // @CreatedDate 위함
-public class Participant {
+public record Participant {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
