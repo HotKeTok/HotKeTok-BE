@@ -4,6 +4,12 @@ server:
 spring:
   application:
     name: requestform-service
+
+  servlet:
+    multipart:
+      max-file-size: 50MB    # 파일 하나의 최대 크기
+      max-request-size: 200MB # 전체 요청의 최대 크기
+
   cloud:
     kubernetes:
       config:
@@ -25,7 +31,7 @@ spring:
   # ===== JPA =====
   jpa:
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     properties:
       hibernate:
         format_sql: true
@@ -45,6 +51,15 @@ eureka:
 logging:
   level:
     org.hibernate.SQL: debug
+
+
+openai:
+  model: ${GPT_MODEL}
+  api:
+    key: ${GPT_API_KEY}
+    url: ${GPT_API_URL}
+
+
 
 client:
   infra-service:
