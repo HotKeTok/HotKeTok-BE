@@ -23,8 +23,8 @@ ext {
 }
 
 dependencies {
-//	implementation project(':hotketok-common-service')
-//	implementation project(':hotketok-chatting-service')
+	implementation project(':hotketok-common-service')
+	implementation project(':hotketok-chatting-service')
 
 	// Spring Cloud Eureka
 	implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
