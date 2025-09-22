@@ -56,6 +56,7 @@ public class ChatService {
         return chatRoom.getId();
     }
 
+    // 특정 유저의 채팅방 목록 조회
     public List<ChatRoomResponse> findChatRoomsByUserId(Long userId) {
         return participantRepository.findByUserId(userId).stream()
                 .map(participant -> new ChatRoomResponse(participant.getChatRoom()))

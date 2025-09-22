@@ -3,6 +3,7 @@ package com.hotketok.externalApi;
 import com.hotketok.dto.internalApi.ChatMessageResponse;
 import com.hotketok.dto.internalApi.ChatRoomResponse;
 import com.hotketok.dto.internalApi.CreateChatRoomRequest;
+// import com.hotketok.security.UserPrincipal; // 토큰 적용 후 도입
 import com.hotketok.service.ChatService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -23,8 +24,9 @@ public class ChatMessageController {
     }
 
     // 특정 유저의 채팅방 목록 조회
-    @GetMapping("/users/{userId}/rooms")
-    public List<ChatRoomResponse> findChatRoomsByUserId(@PathVariable Long userId) {
+    @GetMapping("/users/rooms")
+    public List<ChatRoomResponse> findChatRoomsByUserId() {
+        Long userId = 101L; // 임시 데이터
         return chatService.findChatRoomsByUserId(userId);
     }
 
