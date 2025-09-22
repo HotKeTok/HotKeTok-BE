@@ -7,7 +7,7 @@ import com.hotketok.domain.enums.SenderType;
 import com.hotketok.dto.internalApi.ChatMessageResponse;
 import com.hotketok.dto.internalApi.ChatRoomResponse;
 import com.hotketok.dto.internalApi.CreateChatRoomRequest;
-import com.hotketok.dto.internalApi.UserRoleInfoResponse;
+import com.hotketok.dto.internalApi.UserProfileResponse;
 import com.hotketok.internalApi.UserServiceClient;
 import com.hotketok.repository.ChatMessageRepository;
 import com.hotketok.repository.ChatRoomRepository;
@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -37,7 +38,7 @@ public class ChatService {
         List<Long> userIds = request.participantUserIds();
 
         Map<Long, SenderType> userRoles = userServiceClient.getUserRolesByIds(userIds).stream()
-                .collect(Collectors.toMap(UserRoleInfoResponse::userId, UserRoleInfoResponse::role));
+                .collect(Collectors.toMap(UserProfileResponse::userId, UserProfileResponse::role));
 
         // 채팅방 객체 먼저 생성 후 저장
         ChatRoom chatRoom = ChatRoom.createChatRoom();
@@ -58,12 +59,25 @@ public class ChatService {
 
     // 특정 유저의 채팅방 목록 조회
     public List<ChatRoomResponse> findChatRoomsByUserId(Long userId) {
-        return participantRepository.findByUserId(userId).stream()
-                .map(participant -> new ChatRoomResponse(participant.getChatRoom()))
+        List<ChatRoom> chatRooms = participantRepository.findByUserId(userId).stream()
+                .map(Participant::getChatRoom)
+                .toList();
+
+        return chatRooms.stream()
+                .map(chatRoom -> {
+                    // 마지막 메시지 조회
+                    Optional<ChatMessage> lastMessageOpt = chatMessageRepository.findTopByChatRoomOrderByCreatedAtDesc(chatRoom).toJavaUtil();
+                    ChatMessage lastMessage = lastMessageOpt.orElse(null);
+
+                    // 안 읽은 메시지 수 계산
+                    long unreadCount = 0; // 지금은 임시로 0으로 설정
+
+                    return new ChatRoomResponse(chatRoom, lastMessage, unreadCount, userId);
+                })
                 .collect(Collectors.toList());
     }
 
-    public List<ChatMessageResponse> findMessagesByRoomId(Long roomId) {
+public List<ChatMessageResponse> findMessagesByRoomId(Long roomId) {
         return chatMessageRepository.findByChatRoomIdOrderByCreatedAtAsc(roomId).stream()
                 .map(ChatMessageResponse::new)
                 .collect(Collectors.toList());

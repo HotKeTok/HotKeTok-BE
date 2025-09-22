@@ -1,6 +1,6 @@
 package com.hotketok.internalApi;
 
-import com.hotketok.dto.internalApi.UserRoleInfoResponse;
+import com.hotketok.dto.internalApi.UserProfileResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -11,5 +11,5 @@ import java.util.List;
 public interface UserServiceClient {
 
     @PostMapping("/internal/users/roles")
-    List<UserRoleInfoResponse> getUserRolesByIds(@RequestBody List<Long> userIds);
+    List<UserProfileResponse> getUserRolesByIds(@RequestBody List<Long> userIds);
 }
