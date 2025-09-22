@@ -11,10 +11,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "chat_rooms") // Table name updated for clarity
+@Table(name = "chat_rooms")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public record ChatRoom extends BaseTimeEntity {
+public class ChatRoom extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,11 +24,10 @@ public record ChatRoom extends BaseTimeEntity {
     @Column(nullable = false)
     private String name;
 
-    @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Participant> participants = new ArrayList<>();
 
-    // A ChatRoom can have many messages.
-    @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL)
     private List<ChatMessage> messages = new ArrayList<>();
 
 

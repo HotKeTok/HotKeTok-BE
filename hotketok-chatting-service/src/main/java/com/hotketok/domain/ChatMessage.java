@@ -7,13 +7,13 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Table(name = "chat_messages", indexes = {
-        @Index(name = "idx_chatroom_created_at", columnList = "chatroom_id, createdAt") // 인덱스 설정 추가
-})
 @Entity
+@Table(name = "chat_messages", indexes = {
+        @Index(name = "idx_chatroom_created_at", columnList = "chatroom_id, createdAt")
+})
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public record ChatMessage extends BaseTimeEntity {
+public class ChatMessage extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,7 +27,7 @@ public record ChatMessage extends BaseTimeEntity {
     @Column(name = "sender_id", nullable = false)
     private Long senderId;
 
-    @Column(length = 1000) // 메시지 내용 길이 1000 제한
+    @Column(length = 1000)
     private String content;
 
     @Builder(access = AccessLevel.PRIVATE)
