@@ -1,12 +1,8 @@
 package com.hotketok.dto.internalApi;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+public record MessageRequest(
+        Long roomId,
+        Long senderId,
+        String content
+) {}
 
-@Getter
-@NoArgsConstructor
-public class MessageRequest {
-    private Long roomId;
-    private Long senderId;
-    private String content;
-}

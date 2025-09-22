@@ -28,11 +28,10 @@ public class ChatService {
 
     @Transactional
     public Long createChatRoom(CreateChatRoomRequest request) {
-        ChatRoom chatRoom = ChatRoom.createChatRoom(request.getRoomName());
+        ChatRoom chatRoom = ChatRoom.createChatRoom(request.roomName());
         chatRoomRepository.save(chatRoom);
 
-        // 예시로 모든 참여자를 HOUSE_USER로 설정합니다. 실제로는 로직에 맞게 타입을 지정해야 합니다.
-        List<Participant> participants = request.getParticipantUserIds().stream()
+        List<Participant> participants = request.participantUserIds().stream()
                 .map(userId -> Participant.createParticipant(chatRoom, userId, SenderType.HOUSE_USER))
                 .collect(Collectors.toList());
         participantRepository.saveAll(participants);
@@ -61,4 +60,3 @@ public class ChatService {
         return chatMessageRepository.save(chatMessage);
     }
 }
-

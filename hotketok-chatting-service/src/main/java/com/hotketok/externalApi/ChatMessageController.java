@@ -1,31 +1,36 @@
 package com.hotketok.externalApi;
 
-import com.hotketok.domain.ChatMessage;
 import com.hotketok.dto.internalApi.ChatMessageResponse;
-import com.hotketok.dto.internalApi.MessageRequest;
+import com.hotketok.dto.internalApi.ChatRoomResponse;
+import com.hotketok.dto.internalApi.CreateChatRoomRequest;
 import com.hotketok.service.ChatService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
 
-@Slf4j
-@Controller
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/chat")
 @RequiredArgsConstructor
 public class ChatMessageController {
 
     private final ChatService chatService;
-    private final SimpMessagingTemplate messagingTemplate;
 
-    @MessageMapping("/chat/message")
-    public void message(MessageRequest message) {
-        log.info("Received Message (Sync): {}", message.getContent());
+    // 채팅방 생성
+    @PostMapping("/rooms")
+    public Long createChatRoom(@RequestBody CreateChatRoomRequest request) {
+        return chatService.createChatRoom(request);
+    }
 
-        ChatMessage savedMessage = chatService.saveMessage(message.getRoomId(), message.getSenderId(), message.getContent());
+    // 특정 유저의 채팅방 목록 조회
+    @GetMapping("/users/{userId}/rooms")
+    public List<ChatRoomResponse> findChatRoomsByUserId(@PathVariable Long userId) {
+        return chatService.findChatRoomsByUserId(userId);
+    }
 
-        ChatMessageResponse messageResponse = new ChatMessageResponse(savedMessage);
-
-        messagingTemplate.convertAndSend("/sub/chat/room/" + messageResponse.getRoomId(), messageResponse);
+    // 특정 채팅방의 메시지 목록 조회
+    @GetMapping("/rooms/{roomId}/messages")
+    public List<ChatMessageResponse> findMessagesByRoomId(@PathVariable Long roomId) {
+        return chatService.findMessagesByRoomId(roomId);
     }
 }

@@ -1,19 +1,23 @@
 package com.hotketok.domain;
 
 import com.hotketok.domain.enums.SenderType;
-import com.hotketok.hotketokjpaservice.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "participants")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@IdClass(ParticipantId.class)
-public class Participant extends BaseTimeEntity {
+@IdClass(ParticipantId.class) // 복합 키
+@EntityListeners(AuditingEntityListener.class) // @CreatedDate 를 위함
+public class Participant {
 
     @Id
     @ManyToOne(fetch = FetchType.LAZY)
@@ -25,8 +29,12 @@ public class Participant extends BaseTimeEntity {
     private Long userId;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "sender_type", nullable = false)
     private SenderType senderType;
+
+    @CreatedDate
+    @Column(name = "joined_at", updatable = false, nullable = false)
+    private LocalDateTime joinedAt;
 
     @Builder
     private Participant(ChatRoom chatRoom, Long userId, SenderType senderType) {

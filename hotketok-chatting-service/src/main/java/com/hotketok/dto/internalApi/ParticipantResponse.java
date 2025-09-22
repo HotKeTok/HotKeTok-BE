@@ -1,15 +1,20 @@
 package com.hotketok.dto.internalApi;
 
 import com.hotketok.domain.Participant;
-import lombok.Getter;
+import com.hotketok.domain.enums.SenderType;
 
-@Getter
-public class ParticipantResponse {
-    private final Long userId;
-    private final String userType;
+import java.time.LocalDateTime;
 
+public record ParticipantResponse(
+        Long userId,
+        SenderType senderType,
+        LocalDateTime joinedAt
+) {
     public ParticipantResponse(Participant participant) {
-        this.userId = participant.getUserId();
-        this.userType = participant.getSenderType().name();
+        this(
+                participant.getUserId(),
+                participant.getSenderType(),
+                participant.getJoinedAt()
+        );
     }
 }
