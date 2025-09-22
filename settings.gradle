@@ -2,8 +2,10 @@ rootProject.name = 'hotketok'
 
 include(
         "hotketok-common-service",
-        "hotketok-config-server",
         "hotketok-eureka-server",
         "hotketok-api-gateway",
         "hotketok-chatting-server",
+        "hotketok-jpa-service",
+        "hotketok-requestform-service",
+        "hotketok-infra-service"
 )

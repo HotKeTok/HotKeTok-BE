@@ -1,16 +1,3 @@
-server:
-  port: 8761
-
 spring:
-  application:
-    name: eureka-server
-  cloud:
-    config:
-      name: ${EUREKA_SERVER_CONFIG_NAME:eureka-server} # Spring Cloud Config Client가 Config Server에서 읽어올 설정 파일 이름(prefix) 을 지정.
-  config:
-    import: configserver:http://${CONFIG_SERVER_NAME:localhost}:8888 # Config Server 주소를 http://localhost:8888 으로 사용.
-
-eureka:
-  client:
-    register-with-eureka: false
-    fetch-registry: false
+  profiles:
+    active: local
