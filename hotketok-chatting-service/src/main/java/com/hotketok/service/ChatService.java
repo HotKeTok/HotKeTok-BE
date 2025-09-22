@@ -7,6 +7,8 @@ import com.hotketok.domain.enums.SenderType;
 import com.hotketok.dto.internalApi.ChatMessageResponse;
 import com.hotketok.dto.internalApi.ChatRoomResponse;
 import com.hotketok.dto.internalApi.CreateChatRoomRequest;
+import com.hotketok.dto.internalApi.UserRoleInfoResponse;
+import com.hotketok.internalApi.UserServiceClient;
 import com.hotketok.repository.ChatMessageRepository;
 import com.hotketok.repository.ChatRoomRepository;
 import com.hotketok.repository.ParticipantRepository;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,15 +29,27 @@ public class ChatService {
     private final ParticipantRepository participantRepository;
     private final ChatMessageRepository chatMessageRepository;
 
+    private final UserServiceClient userServiceClient;
+
     // 채팅방 생성 요청
     @Transactional
     public Long createChatRoom(CreateChatRoomRequest request) {
-        // 채팅방 객체 생성
+        List<Long> userIds = request.participantUserIds();
+
+        Map<Long, SenderType> userRoles = userServiceClient.getUserRolesByIds(userIds).stream()
+                .collect(Collectors.toMap(UserRoleInfoResponse::userId, UserRoleInfoResponse::role));
+
+        // 채팅방 객체 먼저 생성 후 저장
         ChatRoom chatRoom = ChatRoom.createChatRoom();
         chatRoomRepository.save(chatRoom);
 
-        List<Participant> participants = request.participantUserIds().stream()
-                .map(userId -> Participant.createParticipant(chatRoom, userId, SenderType.HOUSE_USER))
+        // 조회한 역할 정보를 사용하여 참여자 목록 생성
+        List<Participant> participants = userIds.stream()
+                .map(userId -> {
+                    // 역할 정보가 없을 경우 기본값(HOUSE_USER)을 사용
+                    SenderType userRole = userRoles.getOrDefault(userId, SenderType.HOUSE_USER);
+                    return Participant.createParticipant(chatRoom, userId, userRole);
+                })
                 .collect(Collectors.toList());
         participantRepository.saveAll(participants);
 
