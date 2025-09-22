@@ -26,9 +26,11 @@ public class ChatService {
     private final ParticipantRepository participantRepository;
     private final ChatMessageRepository chatMessageRepository;
 
+    // 채팅방 생성 요청
     @Transactional
     public Long createChatRoom(CreateChatRoomRequest request) {
-        ChatRoom chatRoom = ChatRoom.createChatRoom(request.roomName());
+        // 채팅방 객체 생성
+        ChatRoom chatRoom = ChatRoom.createChatRoom();
         chatRoomRepository.save(chatRoom);
 
         List<Participant> participants = request.participantUserIds().stream()

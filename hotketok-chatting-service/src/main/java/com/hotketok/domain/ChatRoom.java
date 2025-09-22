@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "chat_rooms")
@@ -21,7 +22,7 @@ public class ChatRoom extends BaseTimeEntity {
     @Column(name = "chatroom_id")
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String name;
 
     @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -31,14 +32,15 @@ public class ChatRoom extends BaseTimeEntity {
     private List<ChatMessage> messages = new ArrayList<>();
 
 
+    // 채팅방 생성 시 기본 이름 부여
     @Builder(access = AccessLevel.PRIVATE)
     private ChatRoom(String name) {
         this.name = name;
     }
 
-    public static ChatRoom createChatRoom(String name) {
+    public static ChatRoom createChatRoom() {
         return ChatRoom.builder()
-                .name(name)
+                .name("채팅방-" + UUID.randomUUID().toString().substring(0, 8))
                 .build();
     }
 }
