@@ -1,0 +1,32 @@
+server:
+  port: 8085
+
+spring:
+  application:
+    name: auth-service
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+
+jwt:
+  secret: ThisIsHotketokSecretKeyThisIsHotketokSecretKey
+  access-exp-ms: 3600 # 1h
+  refresh-exp-ms: 1209600000 # 14d
+
+eureka:
+  instance:
+    hostname: auth-service
+    preferIpAddress: true
+  client:
+    registry-fetch-interval-seconds: 3
+    registerWithEureka: true
+    fetchRegistry: true
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka
+
+logging:
+  level:
+    org.hibernate.SQL: debug

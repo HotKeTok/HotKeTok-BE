@@ -1,15 +1,9 @@
 server:
-  port: 8083
+  port: 8084
 
 spring:
   application:
-    name: requestform-service
-
-  servlet:
-    multipart:
-      max-file-size: 50MB    # 파일 하나의 최대 크기
-      max-request-size: 200MB # 전체 요청의 최대 크기
-
+    name: user-service
   cloud:
     kubernetes:
       config:
@@ -23,7 +17,7 @@ spring:
 
   # ===== 데이터소스 =====
   datasource:
-    url: jdbc:h2:tcp://localhost/~/requestform
+    url: jdbc:h2:tcp://localhost/~/user
     username: sa
     password:
     driver-class-name: org.h2.Driver
@@ -31,7 +25,7 @@ spring:
   # ===== JPA =====
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     properties:
       hibernate:
         format_sql: true
@@ -39,7 +33,7 @@ spring:
 
 eureka:
   instance:
-    hostname: requestform-service
+    hostname: user-service
     preferIpAddress: true
   client:
     registry-fetch-interval-seconds: 3
@@ -51,17 +45,3 @@ eureka:
 logging:
   level:
     org.hibernate.SQL: debug
-
-
-openai:
-  model: ${GPT_MODEL}
-  api:
-    key: ${GPT_API_KEY}
-    url: ${GPT_API_URL}
-
-
-
-client:
-  infra-service:
-    url: http://localhost:8081 # infra-service의 주소
-
