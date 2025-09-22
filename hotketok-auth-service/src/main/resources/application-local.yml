@@ -30,3 +30,7 @@ eureka:
 logging:
   level:
     org.hibernate.SQL: debug
+
+client:
+  user-service:
+    url: http://localhost:8084 # infra-service의 주소
