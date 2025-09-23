@@ -32,6 +32,9 @@ dependencies {
 	implementation project(':hotketok-common-service')
 	implementation project(':hotketok-jpa-service')
 
+	// SMS 서비스
+	implementation 'net.nurigo:sdk:4.3.0'
+
 	// Spring Cloud Eureka
 	implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
 

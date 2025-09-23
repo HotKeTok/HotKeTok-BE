@@ -15,12 +15,12 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/internal/infra-service")
-public class ImageController {
+public class ImageInternalController {
 
     private final ImageStorageService imageStorageService;
 
     @Autowired
-    public ImageController(ImageStorageService imageStorageService) {
+    public ImageInternalController(ImageStorageService imageStorageService) {
         this.imageStorageService = imageStorageService;
     }
 
