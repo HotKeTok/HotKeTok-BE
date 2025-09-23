@@ -46,8 +46,8 @@ public class ChatService {
         // 조회한 역할 정보를 사용하여 참여자 목록 생성
         List<Participant> participants = userIds.stream()
                 .map(userId -> {
-                    // 역할 정보가 없을 경우 기본값(HOUSE_USER)을 사용
-                    SenderType userRole = userRoles.getOrDefault(userId, SenderType.HOUSE_USER);
+                    // 역할 정보가 없을 경우 기본값(OWNER)을 사용
+                    SenderType userRole = userRoles.getOrDefault(userId, SenderType.OWNER);
                     return Participant.createParticipant(chatRoom, userId, userRole);
                 })
                 .collect(Collectors.toList());
@@ -91,7 +91,7 @@ public class ChatService {
                         // 마지막으로 읽은 시간 이후에 온, 내가 보내지 않은 메시지의 수 카운드
                         unreadCount = chatMessageRepository.countByChatRoomAndCreatedAtAfterAndSenderIdNot(chatRoom, lastReadAt, userId);
                     }
-                    
+
                     return new ChatRoomResponse(chatRoom, lastMessage, unreadCount, userProfiles);
                 })
                 .collect(Collectors.toList());
