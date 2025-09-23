@@ -6,6 +6,7 @@ import com.hotketok.dto.internalApi.CreateChatRoomRequest;
 // import com.hotketok.security.UserPrincipal; // 토큰 적용 후 도입
 import com.hotketok.service.ChatService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -28,6 +29,14 @@ public class ChatMessageController {
     public List<ChatRoomResponse> findChatRoomsByUserId() {
         Long userId = 101L; // 임시 데이터
         return chatService.findChatRoomsByUserId(userId);
+    }
+
+    // 채팅방 삭제
+    @DeleteMapping("/rooms")
+    public ResponseEntity<Void> deleteChatRoom(@RequestParam Long roomId) {
+        Long userId = 101L; // 임시 데이터
+        chatService.deleteChatRoom(userId, roomId);
+        return ResponseEntity.noContent().build(); // 성공적으로 삭제되었으면 204 No Content
     }
 
     // 특정 채팅방의 메시지 목록 조회

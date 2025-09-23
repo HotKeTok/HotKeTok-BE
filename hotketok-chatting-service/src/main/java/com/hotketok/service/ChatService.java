@@ -86,7 +86,19 @@ public class ChatService {
                 .collect(Collectors.toList());
     }
 
-public List<ChatMessageResponse> findMessagesByRoomId(Long roomId) {
+    // 채팅방 삭제
+    @Transactional
+    public void deleteChatRoom(Long userId, Long roomId) {
+
+        // 유저가 해당 채팅방의 참여자인지 확인
+        boolean isParticipant = participantRepository.existsByChatRoomIdAndUserId(roomId, userId);
+        if (!isParticipant) {
+            throw new IllegalArgumentException("사용자가 해당 채팅방에 참여하고 있지 않으므로 삭제할 권한이 없습니다.");
+        }
+        chatRoomRepository.deleteById(roomId);
+    }
+
+    public List<ChatMessageResponse> findMessagesByRoomId(Long roomId) {
         return chatMessageRepository.findByChatRoomIdOrderByCreatedAtAsc(roomId).stream()
                 .map(ChatMessageResponse::new)
                 .collect(Collectors.toList());
