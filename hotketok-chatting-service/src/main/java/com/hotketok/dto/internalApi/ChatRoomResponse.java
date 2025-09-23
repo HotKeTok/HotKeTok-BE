@@ -5,6 +5,8 @@ import com.hotketok.domain.ChatRoom;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public record ChatRoomResponse(
         Long roomId,
@@ -14,17 +16,18 @@ public record ChatRoomResponse(
         List<ParticipantResponse> participants
 ) {
 
-    public ChatRoomResponse(ChatRoom chatRoom, ChatMessage lastMessage, long unreadCount, Long currentUserId) {
+    public ChatRoomResponse(ChatRoom chatRoom, ChatMessage lastMessage, long unreadCount, Map<Long, UserProfileResponse> userProfiles) {
         this(
                 chatRoom.getId(),
                 lastMessage != null ? lastMessage.getContent() : "아직 메시지가 없습니다.",
                 lastMessage != null ? lastMessage.getCreatedAt() : chatRoom.getCreatedAt(),
                 unreadCount,
                 chatRoom.getParticipants().stream()
-                        // 채팅방 이름 등을 표시하기 위해 나를 제외한 다른 참여자 목록을 반환
-                        .filter(p -> !p.getUserId().equals(currentUserId))
-                        .map(ParticipantResponse::new)
-                        .toList()
+                        .map(participant -> {
+                            UserProfileResponse userProfile = userProfiles.get(participant.getUserId());
+                            return new ParticipantResponse(participant, userProfile);
+                        })
+                        .collect(Collectors.toList())
         );
     }
 }

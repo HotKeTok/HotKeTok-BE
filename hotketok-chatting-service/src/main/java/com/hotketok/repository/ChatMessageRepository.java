@@ -1,11 +1,11 @@
 package com.hotketok.repository;
 
-import com.google.common.base.Optional;
 import com.hotketok.domain.ChatMessage;
 import com.hotketok.domain.ChatRoom;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> {
     List<ChatMessage> findByChatRoomIdOrderByCreatedAtAsc(Long chatRoomId);

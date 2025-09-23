@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,7 +38,7 @@ public class ChatService {
     public Long createChatRoom(CreateChatRoomRequest request) {
         List<Long> userIds = request.participantUserIds();
 
-        Map<Long, SenderType> userRoles = userServiceClient.getUserRolesByIds(userIds).stream()
+        Map<Long, SenderType> userRoles = userServiceClient.getUserProfilesByIds(userIds).stream()
                 .collect(Collectors.toMap(UserProfileResponse::userId, UserProfileResponse::role));
 
         // 채팅방 객체 먼저 생성 후 저장
@@ -63,16 +64,24 @@ public class ChatService {
                 .map(Participant::getChatRoom)
                 .toList();
 
+        List<Long> allParticipantUserIds = chatRooms.stream()
+                .flatMap(chatRoom -> chatRoom.getParticipants().stream())
+                .map(Participant::getUserId)
+                .distinct() // id 중복 제거 후 모두 추출
+                .toList();
+
+        // 모든 참여자의 프로필 조회
+        Map<Long, UserProfileResponse> userProfiles = userServiceClient.getUserProfilesByIds(allParticipantUserIds).stream()
+                .collect(Collectors.toMap(UserProfileResponse::userId, Function.identity()));
+
         return chatRooms.stream()
                 .map(chatRoom -> {
-                    // 마지막 메시지 조회
-                    Optional<ChatMessage> lastMessageOpt = chatMessageRepository.findTopByChatRoomOrderByCreatedAtDesc(chatRoom).toJavaUtil();
+                    Optional<ChatMessage> lastMessageOpt = chatMessageRepository.findTopByChatRoomOrderByCreatedAtDesc(chatRoom);
                     ChatMessage lastMessage = lastMessageOpt.orElse(null);
 
-                    // 안 읽은 메시지 수 계산
-                    long unreadCount = 0; // 지금은 임시로 0으로 설정
+                    long unreadCount = 0; // 안 읽은 메시지 수 일단 0으로 고정
 
-                    return new ChatRoomResponse(chatRoom, lastMessage, unreadCount, userId);
+                    return new ChatRoomResponse(chatRoom, lastMessage, unreadCount, userProfiles);
                 })
                 .collect(Collectors.toList());
     }
