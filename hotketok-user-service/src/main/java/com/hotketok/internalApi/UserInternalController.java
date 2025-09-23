@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/internal/users")
 @RequiredArgsConstructor
-public class UserController {
+public class UserInternalController {
     private final UserService userService;
 
     @PostMapping("/save")
