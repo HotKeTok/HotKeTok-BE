@@ -26,8 +26,8 @@ public record UserProfileResponse(
         return switch (role.name()) {
             case "VENDOR" -> "VENDOR";
             case "TENANT" -> "TENANT";
-//            case "OWNER" -> "HOUSE_USER";
-            default -> "HOUSE_USER";
+//            case "OWNER" -> "OWNER";
+            default -> "OWNER";
         };
     }
 }
