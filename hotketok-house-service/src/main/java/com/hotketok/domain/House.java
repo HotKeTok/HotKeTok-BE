@@ -53,4 +53,8 @@ public class House {
                 .state(HouseState.NONE)
                 .build();
     }
+
+    public void changeState(HouseState state) {
+        this.state = state;
+    }
 }
