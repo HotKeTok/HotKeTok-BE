@@ -4,10 +4,7 @@ import com.hotketok.domain.ChatMessage;
 import com.hotketok.domain.ChatRoom;
 import com.hotketok.domain.Participant;
 import com.hotketok.domain.enums.SenderType;
-import com.hotketok.dto.internalApi.ChatMessageResponse;
-import com.hotketok.dto.internalApi.ChatRoomResponse;
-import com.hotketok.dto.internalApi.CreateChatRoomRequest;
-import com.hotketok.dto.internalApi.UserProfileResponse;
+import com.hotketok.dto.internalApi.*;
 import com.hotketok.internalApi.UserServiceClient;
 import com.hotketok.repository.ChatMessageRepository;
 import com.hotketok.repository.ChatRoomRepository;
@@ -104,12 +101,13 @@ public class ChatService {
                 .collect(Collectors.toList());
     }
 
+    // 채팅을 보냈을 때 저장
     @Transactional
-    public ChatMessage saveMessage(Long roomId, Long senderId, String content) {
-        ChatRoom chatRoom = chatRoomRepository.findById(roomId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 채팅방입니다. ID: " + roomId));
+    public ChatMessage saveMessage(MessageRequest request) {
+        ChatRoom chatRoom = chatRoomRepository.findById(request.roomId())
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 채팅방입니다. ID: " + request.roomId()));
 
-        ChatMessage chatMessage = ChatMessage.createChatMessage(chatRoom, senderId, content);
+        ChatMessage chatMessage = ChatMessage.createChatMessage(chatRoom, request.senderId(), request.content());
         return chatMessageRepository.save(chatMessage);
     }
 }
