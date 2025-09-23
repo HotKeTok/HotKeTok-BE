@@ -39,9 +39,10 @@ public class ChatRoomController {
         return ResponseEntity.noContent().build(); // 성공적으로 삭제되었으면 204 No Content
     }
 
-    // 특정 채팅방의 메시지 목록 조회
-    @GetMapping("/rooms/{roomId}/messages")
-    public List<ChatMessageResponse> findMessagesByRoomId(@PathVariable Long roomId) {
-        return chatService.findMessagesByRoomId(roomId);
+    // 특정 채팅방의 채팅 내용 조회
+    @GetMapping("/rooms/messages")
+    public List<ChatMessageResponse> findMessagesByRoomId(@RequestParam Long roomId) {
+        Long userId = 101L; // 임시 데이터
+        return chatService.findMessagesByRoomId(userId, roomId);
     }
 }

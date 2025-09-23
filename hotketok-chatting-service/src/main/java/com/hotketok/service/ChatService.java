@@ -95,7 +95,12 @@ public class ChatService {
         chatRoomRepository.deleteById(roomId);
     }
 
-    public List<ChatMessageResponse> findMessagesByRoomId(Long roomId) {
+    // 채팅 내용 조회
+    public List<ChatMessageResponse> findMessagesByRoomId(Long userId, Long roomId) {
+        boolean isParticipant = participantRepository.existsByChatRoomIdAndUserId(roomId, userId);
+        if (!isParticipant) {
+            throw new SecurityException("해당 채팅방에 접근할 권한이 없습니다.");
+        }
         return chatMessageRepository.findByChatRoomIdOrderByCreatedAtAsc(roomId).stream()
                 .map(ChatMessageResponse::new)
                 .collect(Collectors.toList());
