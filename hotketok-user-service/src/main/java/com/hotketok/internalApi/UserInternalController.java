@@ -10,6 +10,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import com.hotketok.dto.SignUpRequest;
+import com.hotketok.dto.UserInfo;
+import com.hotketok.service.UserService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/internal/users")
@@ -21,4 +26,14 @@ public class UserInternalController {
     public List<UserProfileResponse> getUserProfilesByIds(@RequestBody List<Long> userIds) {
         return userService.findUserProfilesByIds(userIds);
     }
+    private final UserService userService;
+
+    @PostMapping("/save")
+    public void save(@RequestBody SignUpRequest req){ userService.save(req); }
+
+    @GetMapping("/find-by-logInId")
+    public UserInfo findByLogInId(@RequestParam String logInId){ return userService.findByLogInId(logInId); }
+
+    @GetMapping("/find-by-id/{id}")
+    public UserInfo findById(@PathVariable Long id){ return userService.findById(id); }
 }
