@@ -2,11 +2,11 @@ package com.hotketok.domain;
 
 import com.hotketok.domain.enums.HouseState;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Table(name = "houses")
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 public class House {
@@ -30,4 +30,27 @@ public class House {
 
     @Enumerated(EnumType.STRING)
     private HouseState state; // 상태 enum (NONE, REGISTERED, TENANT_REQUEST, MATCHED)
+
+    @Builder(access = AccessLevel.PRIVATE)
+    private House(Long tenantId, Long ownerId, String address, String detailAddress, String floor, String number, HouseState state) {
+        this.tenantId = tenantId;
+        this.ownerId = ownerId;
+        this.address = address;
+        this.detailAddress = detailAddress;
+        this.floor = floor;
+        this.number = number;
+        this.state = state;
+    }
+
+    public static House createHouse(Long ownerId, String address, String detailAddress, String floor, String number) {
+        return House.builder()
+                .tenantId(null)
+                .ownerId(ownerId)
+                .address(address)
+                .detailAddress(detailAddress)
+                .floor(floor)
+                .number(number)
+                .state(HouseState.NONE)
+                .build();
+    }
 }
