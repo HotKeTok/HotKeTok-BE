@@ -15,6 +15,13 @@ spring:
                 - Path=/api/requestform-service/**
                 - Method=GET,POST,PUT,DELETE
 
+            - id: auth-service
+              uri: lb://auth-service
+              predicates:
+                - Path=/api/auth-service/**
+                - Method=GET,POST,PUT,DELETE
+
+
 eureka:
   instance:
     hostname: apigateway-service
