@@ -13,7 +13,7 @@ public class ParticipantId implements Serializable {
     public ParticipantId() {
     }
 
-    // 기본적ㅇ니 equals, hashCode 메서드
+    // 기본적인 equals, hashCode 메서드
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

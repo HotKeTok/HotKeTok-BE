@@ -36,6 +36,10 @@ public class Participant {
     @Column(name = "joined_at", updatable = false, nullable = false)
     private LocalDateTime joinedAt;
 
+    // 마지막으로 읽은 시간을 기록하기 위함
+    @Column(name = "last_read_at")
+    private LocalDateTime lastReadAt;
+
     @Builder
     private Participant(ChatRoom chatRoom, Long userId, SenderType senderType) {
         this.chatRoom = chatRoom;

@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.List;
 import java.util.Map;
@@ -57,27 +58,40 @@ public class ChatService {
 
     // 특정 유저의 채팅방 목록 조회
     public List<ChatRoomResponse> findChatRoomsByUserId(Long userId) {
-        List<ChatRoom> chatRooms = participantRepository.findByUserId(userId).stream()
+        List<Participant> participants = participantRepository.findByUserId(userId);
+
+        List<ChatRoom> chatRooms = participants.stream()
                 .map(Participant::getChatRoom)
                 .toList();
 
-        List<Long> allParticipantUserIds = chatRooms.stream()
-                .flatMap(chatRoom -> chatRoom.getParticipants().stream())
+        List<Long> allParticipantIds = chatRooms.stream()
+                .flatMap(room -> room.getParticipants().stream())
                 .map(Participant::getUserId)
-                .distinct() // id 중복 제거 후 모두 추출
+                .distinct() // 중복 제거 포함
                 .toList();
 
-        // 모든 참여자의 프로필 조회
-        Map<Long, UserProfileResponse> userProfiles = userServiceClient.getUserProfilesByIds(allParticipantUserIds).stream()
-                .collect(Collectors.toMap(UserProfileResponse::userId, Function.identity()));
+        Map<Long, UserProfileResponse> userProfiles = userServiceClient.getUserProfilesByIds(allParticipantIds).stream()
+                .collect(Collectors.toMap(UserProfileResponse::userId, profile -> profile));
 
-        return chatRooms.stream()
-                .map(chatRoom -> {
+        // 각 채팅방에 대해 안 읽은 메시지 수 계산
+        return participants.stream()
+                .map(participant -> {
+                    ChatRoom chatRoom = participant.getChatRoom();
+
+                    // 마지막 메시지를 조회
                     Optional<ChatMessage> lastMessageOpt = chatMessageRepository.findTopByChatRoomOrderByCreatedAtDesc(chatRoom);
                     ChatMessage lastMessage = lastMessageOpt.orElse(null);
 
-                    long unreadCount = 0; // 안 읽은 메시지 수 일단 0으로 고정
-
+                    // 안 읽은 메시지 수
+                    LocalDateTime lastReadAt = participant.getLastReadAt();
+                    long unreadCount;
+                    if (lastReadAt == null) {
+                        unreadCount = chatMessageRepository.countByChatRoomAndSenderIdNot(chatRoom, userId);
+                    } else {
+                        // 마지막으로 읽은 시간 이후에 온, 내가 보내지 않은 메시지의 수 카운드
+                        unreadCount = chatMessageRepository.countByChatRoomAndCreatedAtAfterAndSenderIdNot(chatRoom, lastReadAt, userId);
+                    }
+                    
                     return new ChatRoomResponse(chatRoom, lastMessage, unreadCount, userProfiles);
                 })
                 .collect(Collectors.toList());
