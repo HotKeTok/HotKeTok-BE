@@ -1,5 +1,6 @@
 package com.hotketok.internalApi;
 
+import com.hotketok.domain.enums.Role;
 import com.hotketok.dto.SignUpRequest;
 import com.hotketok.dto.UserInfo;
 import com.hotketok.service.UserService;
@@ -21,4 +22,6 @@ public class UserInternalController {
     @GetMapping("/find-by-id/{id}")
     public UserInfo findById(@PathVariable Long id){ return userService.findById(id); }
 
+    @PostMapping("/change-role/{userId}")
+    public void updateRole(@PathVariable("userId") Long userId, @RequestParam("role") Role role){ userService.updateRole(userId, role); };
 }
