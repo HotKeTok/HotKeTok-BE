@@ -5,6 +5,7 @@ import com.hotketok.dto.VerifyPhoneAuthResponse;
 import com.hotketok.exception.AuthErrorCode;
 import com.hotketok.hotketokcommonservice.error.exception.CustomException;
 import com.hotketok.repository.PhoneAuthRepository;
+import com.hotketok.util.SmsUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
