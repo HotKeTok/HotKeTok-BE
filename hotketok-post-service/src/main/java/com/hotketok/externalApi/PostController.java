@@ -1,10 +1,12 @@
 package com.hotketok.externalApi;
 
+import com.hotketok.dto.internalApi.PostDetailResponse;
 import com.hotketok.dto.internalApi.PostResponse;
 import com.hotketok.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -28,5 +30,12 @@ public class PostController {
     public List<PostResponse> getSendList() {
         Long userId = 101L; // 임시데이터
         return postService.getSendList(userId);
+    }
+
+    // 쪽지 내용 상세 조회
+    @GetMapping("/detail")
+    public PostDetailResponse getPostDetail(@RequestParam Long postId) {
+        Long userId = 101L;
+        return postService.getPostDetail(postId, userId);
     }
 }
