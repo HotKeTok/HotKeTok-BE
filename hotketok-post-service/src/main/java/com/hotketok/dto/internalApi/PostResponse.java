@@ -4,7 +4,7 @@ import com.hotketok.domain.Post;
 
 import java.time.LocalDateTime;
 
-public record PostReceiveResponse(
+public record PostResponse(
         Long postId,
         Long senderId,
         //String number, // 보낸 사람 호수
@@ -12,7 +12,7 @@ public record PostReceiveResponse(
         LocalDateTime createdAt,
         Boolean anonymous
 ) {
-    public PostReceiveResponse(Post post) {
+    public PostResponse(Post post) {
         this(
                 post.getId(),
                 post.getSenderId(),
