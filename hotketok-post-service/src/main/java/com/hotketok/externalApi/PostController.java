@@ -25,5 +25,8 @@ public class PostController {
 
     // 보낸 쪽지 목록 조회
     @GetMapping("/send-list")
-    public List<PostSend>
+    public List<PostResponse> getSendList() {
+        Long userId = 101L; // 임시데이터
+        return postService.getSendList(userId);
+    }
 }
