@@ -1,9 +1,9 @@
 server:
-  port: 8096
+  port: 8097
 
 spring:
   application:
-    name: chatting-service
+    name: post-service
 
   # ===== H2 콘솔 =====
   h2:
@@ -19,7 +19,7 @@ spring:
 #    driver-class-name: org.h2.Driver
 
   datasource:
-    url: jdbc:h2:file:~/chatting
+    url: jdbc:h2:file:~/post
     username: sa
     password:
     driver-class-name: org.h2.Driver
