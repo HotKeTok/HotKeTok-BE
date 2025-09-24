@@ -3,7 +3,9 @@ package com.hotketok.service;
 import com.hotketok.domain.User;
 import com.hotketok.domain.enums.Role;
 import com.hotketok.dto.SignUpRequest;
+import com.hotketok.dto.TenantInfoResponse;
 import com.hotketok.dto.UserInfo;
+import com.hotketok.exception.UserErrorCode;
 import com.hotketok.hotketokcommonservice.error.exception.CustomException;
 import com.hotketok.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -26,19 +28,25 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public UserInfo findByLogInId(String logInId){
-        System.out.println("[UserService] findByLogInId=" + logInId);
+        System.out.println("[UserService -> AuthService-signup] findByLogInId=" + logInId);
         return userRepository.findByLogInId(logInId).map(this::toDto).orElse(null);
     }
 
     @Transactional(readOnly = true)
     public UserInfo findById(Long id){
-        System.out.println("[UserService] findById=" + id);
+        System.out.println("[UserService -> AuthService-signup] findById=" + id);
         return userRepository.findById(id).map(this::toDto).orElse(null);
+    }
+
+    @Transactional(readOnly = true)
+    public TenantInfoResponse getTenantInfo(Long id){
+        User user = userRepository.findById(id).orElseThrow(()-> new CustomException(UserErrorCode.USER_NOT_FOUND));
+        return TenantInfoResponse.of(user);
     }
 
     @Transactional
     public void updateRole(Long id, Role role){
-        User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+        User user = userRepository.findById(id).orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
         user.changeRole(role);
     }
 

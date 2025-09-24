@@ -2,6 +2,7 @@ package com.hotketok.internalApi;
 
 import com.hotketok.domain.enums.Role;
 import com.hotketok.dto.SignUpRequest;
+import com.hotketok.dto.TenantInfoResponse;
 import com.hotketok.dto.UserInfo;
 import com.hotketok.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -24,4 +25,7 @@ public class UserInternalController {
 
     @PostMapping("/change-role/{userId}")
     public void updateRole(@PathVariable("userId") Long userId, @RequestParam("role") Role role){ userService.updateRole(userId, role); };
+
+    @GetMapping("/get-tenantInfo/{userId}")
+    public TenantInfoResponse getTenantInfo(@PathVariable("userId") Long userId){ return userService.getTenantInfo(userId); };
 }
