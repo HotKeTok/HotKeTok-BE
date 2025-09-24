@@ -5,6 +5,7 @@ import com.hotketok.dto.internalApi.DeleteImageResponse;
 import com.hotketok.dto.internalApi.UploadImageResponse;
 import com.hotketok.internalApi.InfraServiceClient;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -12,19 +13,25 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api/example-service")
 public class ExampleController {
 
     private final InfraServiceClient infraServiceClient;
 
 
-    @PostMapping("/example-service/upload")
+    @PostMapping("/upload")
     public UploadImageResponse uploadImages(@RequestPart(value = "images", required = true) List<MultipartFile> images) {
         // FeignClient를 통해 infra-service의 API를 호출
         return infraServiceClient.uploadImages(images, "requestform-image/");
     }
 
-    @DeleteMapping("/example-service/delete")
+    @DeleteMapping("/delete")
     public DeleteImageResponse deleteImage(@RequestBody DeleteImageRequest deleteImageRequest) {
         return infraServiceClient.deleteImage(deleteImageRequest);
+    }
+
+    @GetMapping("/test")
+    public ResponseEntity<String> test(@RequestHeader("userId") Long userId, @RequestHeader("role") String role) {
+        return ResponseEntity.ok(userId + ":" + role);
     }
 }
