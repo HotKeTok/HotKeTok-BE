@@ -8,6 +8,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Entity
 @Table(name = "post")
 @Getter
@@ -31,16 +34,22 @@ public class Post  extends BaseTimeEntity {
     @Column(name = "isAnonymous", nullable = true)
     private Boolean isAnonymous;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "posttag_id")
-    private PostTag postTag;
+    @Column(name = "silent_time")
+    private String silentTime;
+
+    // 태그 다중 선택 가능
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(name = "post_to_tag",
+            joinColumns = @JoinColumn(name = "post_id"),
+            inverseJoinColumns = @JoinColumn(name = "posttag_id"))
+    private Set<PostTag> tags = new HashSet<>();
 
     @Builder
-    private Post(Long receiverId, Long senderId, String content, Boolean isAnonymous, PostTag postTag) {
+    private Post(Long receiverId, Long senderId, String content, Boolean isAnonymous, Set<PostTag> tags) {
         this.receiverId = receiverId;
         this.senderId = senderId;
         this.content = content;
         this.isAnonymous = isAnonymous;
-        this.postTag = postTag;
+        this.tags = tags;
     }
 }
