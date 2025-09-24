@@ -1,15 +1,19 @@
 package com.hotketok.service;
 
 import com.hotketok.domain.Post;
+import com.hotketok.domain.PostTag;
 import com.hotketok.dto.internalApi.PostDetailResponse;
 import com.hotketok.dto.internalApi.PostResponse;
+import com.hotketok.dto.internalApi.SendPostRequest;
 import com.hotketok.repository.PostRepository;
+import com.hotketok.repository.PostTagRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -18,6 +22,7 @@ import java.util.stream.Collectors;
 public class PostService {
 
     private final PostRepository postRepository;
+    private final PostTagRepository postTagRepository;
 
     // 받은 쪽지 목록 조회
     public List<PostResponse> getReceiveList(Long userId) {
@@ -49,5 +54,28 @@ public class PostService {
         }
 
         return PostDetailResponse.of(post);
+    }
+
+    // 쪽지 쓰기
+    @Transactional
+    public void sendPost(Long senderId, SendPostRequest request) {
+        Set<PostTag> foundTags = Collections.emptySet();
+        List<String> tagNames = request.tags();
+
+        if (tagNames != null && !tagNames.isEmpty()) {
+            foundTags = postTagRepository.findByContentIn(tagNames);
+        }
+
+        Post post = Post.builder()
+                .senderId(senderId)
+                .receiverId(request.receiverId())
+                .content(request.detailContent())
+                .isAnonymous(request.isAnonymous())
+                .silentTime(request.silentTime())
+                .tags(foundTags) // 태그 연결
+                .build();
+
+        postRepository.save(post);
+        // Post에 Tag를 저장하면, Tag 테이블에서 찾아 중간 테이블에 조립하는 방식
     }
 }

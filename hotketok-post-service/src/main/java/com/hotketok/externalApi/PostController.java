@@ -2,12 +2,11 @@ package com.hotketok.externalApi;
 
 import com.hotketok.dto.internalApi.PostDetailResponse;
 import com.hotketok.dto.internalApi.PostResponse;
+import com.hotketok.dto.internalApi.SendPostRequest;
 import com.hotketok.service.PostService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -37,5 +36,13 @@ public class PostController {
     public PostDetailResponse getPostDetail(@RequestParam Long postId) {
         Long userId = 101L;
         return postService.getPostDetail(postId, userId);
+    }
+
+    // 쪽지 쓰기
+    @PostMapping("/write")
+    public ResponseEntity<Void> sendPost(@RequestBody SendPostRequest request) {
+        Long userId = 101L;
+        postService.sendPost(userId, request);
+        return ResponseEntity.accepted().build();
     }
 }
