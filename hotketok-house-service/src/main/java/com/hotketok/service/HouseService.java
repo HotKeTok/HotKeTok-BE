@@ -4,6 +4,7 @@ import com.hotketok.domain.House;
 import com.hotketok.domain.enums.HouseState;
 import com.hotketok.dto.RegisterHouseRequest;
 import com.hotketok.dto.RegisterHouseResponse;
+import com.hotketok.dto.TenantRequestResponse;
 import com.hotketok.dto.internalApi.Role;
 import com.hotketok.exception.HouseErrorCode;
 import com.hotketok.hotketokcommonservice.error.exception.CustomException;
@@ -21,6 +22,7 @@ import java.util.List;
 public class HouseService {
     private final HouseRepository houseRepository;
     private final UserServiceClient userServiceClient;
+
     // 집주인 등록 (state=0)
     @Transactional
     public RegisterHouseResponse registerHouse(Long ownerId, List<RegisterHouseRequest> requests) {
@@ -33,8 +35,8 @@ public class HouseService {
         return new RegisterHouseResponse(registedHouses);
     }
 
-    @Transactional
     // 관리자 승인 → OWNER로 승격
+    @Transactional
     public void approveHouse(Long houseId) {
         House house = houseRepository.findById(houseId).orElseThrow(() -> new CustomException(HouseErrorCode.HOUSE_NOT_FOUND));
         house.changeState(HouseState.REGISTERED);
@@ -42,11 +44,46 @@ public class HouseService {
         userServiceClient.updateRole(house.getOwnerId(), Role.OWNER);
     }
 
-    @Transactional
     // 관리자 거절 -> 삭제
+    @Transactional
     public void rejectHouse(Long houseId) {
         houseRepository.deleteById(houseId);
     }
 
+    // 집주인 요청 목록 조회 (state=2)
+    @Transactional
+    public List<TenantRequestResponse> getTenantRequestList(Long ownerId) {
+        List<House> houseList = houseRepository.findAllByOwnerIdAndState(ownerId, HouseState.TENANT_REQUEST);
+        List<TenantRequestResponse> response = houseList.stream()
+                .map(house -> TenantRequestResponse.of(house.getHouseId(),userServiceClient.getTenantInfo(house.getTenantId()), house.getNumber()))
+                .toList();
+        return response;
+    }
+
+    // 집주인 승인 → TENANT로 승격
+    @Transactional
+    public void approveTenant(Long houseId, Long ownerId) {
+        House house = houseRepository.findById(houseId).orElseThrow(() -> new CustomException(HouseErrorCode.HOUSE_NOT_FOUND));
+        if (!house.getOwnerId().equals(ownerId)) {
+            throw new CustomException(HouseErrorCode.HOUSE_NOT_EQUAL_OWNER);
+        }
+        if (house.getState() != HouseState.TENANT_REQUEST) {
+            throw new CustomException(HouseErrorCode.HOUSE_STATE_NOT_EQUAL_TENANT_REQUEST);
+        }
+        house.changeState(HouseState.MATCHED);
+
+        userServiceClient.updateRole(house.getTenantId(), Role.TENANT);
+    }
+
+    // 집주인 거절 -> tenantId null, state=1
+    @Transactional
+    public void rejectTenant(Long houseId, Long ownerId) {
+        House house = houseRepository.findById(houseId).orElseThrow(() -> new CustomException(HouseErrorCode.HOUSE_NOT_FOUND));
+        if (!house.getOwnerId().equals(ownerId)) {
+            throw new CustomException(HouseErrorCode.HOUSE_NOT_EQUAL_OWNER);
+        }
+        house.changeTenantId(null);
+        house.changeState(HouseState.REGISTERED);
+    }
 }
 

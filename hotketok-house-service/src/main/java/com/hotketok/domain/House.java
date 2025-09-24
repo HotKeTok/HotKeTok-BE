@@ -57,4 +57,9 @@ public class House {
     public void changeState(HouseState state) {
         this.state = state;
     }
+
+    public void changeTenantId(Long tenantId) {
+        this.tenantId = tenantId;
+    }
+
 }
