@@ -28,7 +28,7 @@ public class HouseService {
     public RegisterHouseResponse registerHouse(Long ownerId, List<RegisterHouseRequest> requests) {
         List<Long> registedHouses = new ArrayList<>();
         for (RegisterHouseRequest req : requests) {
-            House house = House.createHouse(ownerId, req.address(),req.detailAddress(),req.floor(),req.number());
+            House house = House.createHouse(ownerId, req.address(),req.detailAddress(),req.floor(),req.number(),req.alias(), req.houseType());
             houseRepository.save(house);
             registedHouses.add(house.getHouseId());
         }
@@ -49,6 +49,7 @@ public class HouseService {
     public void rejectHouse(Long houseId) {
         houseRepository.deleteById(houseId);
     }
+
 
     // 집주인 요청 목록 조회 (state=2)
     @Transactional

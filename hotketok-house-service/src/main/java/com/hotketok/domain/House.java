@@ -1,6 +1,7 @@
 package com.hotketok.domain;
 
 import com.hotketok.domain.enums.HouseState;
+import com.hotketok.domain.enums.HouseType;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -28,21 +29,28 @@ public class House {
 
     private String number; // 호수
 
+    private String alias; // 별칭
+
     @Enumerated(EnumType.STRING)
     private HouseState state; // 상태 enum (NONE, REGISTERED, TENANT_REQUEST, MATCHED)
 
+    @Enumerated(EnumType.STRING)
+    private HouseType type; // 상태 enum (HOME, COMPANY, ETC)
+
     @Builder(access = AccessLevel.PRIVATE)
-    private House(Long tenantId, Long ownerId, String address, String detailAddress, String floor, String number, HouseState state) {
+    private House(Long tenantId, Long ownerId, String address, String detailAddress, String floor, String number,String alias, HouseState state, HouseType type) {
         this.tenantId = tenantId;
         this.ownerId = ownerId;
         this.address = address;
         this.detailAddress = detailAddress;
         this.floor = floor;
         this.number = number;
+        this.alias = alias;
         this.state = state;
+        this.type = type;
     }
 
-    public static House createHouse(Long ownerId, String address, String detailAddress, String floor, String number) {
+    public static House createHouse(Long ownerId, String address, String detailAddress, String floor, String number,String alias, HouseType type) {
         return House.builder()
                 .tenantId(null)
                 .ownerId(ownerId)
@@ -50,7 +58,9 @@ public class House {
                 .detailAddress(detailAddress)
                 .floor(floor)
                 .number(number)
+                .alias(alias)
                 .state(HouseState.NONE)
+                .type(type)
                 .build();
     }
 
