@@ -30,21 +30,4 @@ public class Post  extends BaseTimeEntity {
 
     @Column(name = "isAnonymous", nullable = true)
     private Boolean isAnonymous;
-
-    @Builder(access = AccessLevel.PRIVATE)
-    private Post(Long id, Long senderId, Long receiverId, String content) {
-        this.id = id;
-        this.senderId = senderId;
-        this.receiverId = receiverId;
-        this.content = content;
-    }
-
-    public static Post createPost(Long id, Long senderId, Long receiverId, String content) {
-        return Post.builder()
-                .id(id)
-                .senderId(senderId)
-                .receiverId(receiverId)
-                .content(content)
-                .build();
-    }
 }
