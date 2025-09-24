@@ -34,5 +34,11 @@ public class AuthController {
         System.out.println("[AuthController] /login: " + req.logInId());
         return authService.login(req);
     }
+
+    @PostMapping("/token/refresh")
+    public JwtToken refresh(@RequestBody RefreshTokenRequest refreshTokenRequest){
+        System.out.println("[AuthController] /token/refresh");
+        return authService.refresh(refreshTokenRequest.refreshToken());
+    }
 }
 
