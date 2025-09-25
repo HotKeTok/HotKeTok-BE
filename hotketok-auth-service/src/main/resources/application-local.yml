@@ -1,5 +1,5 @@
 server:
-  port: 8085
+  port: 8087
 
 spring:
   application:
@@ -39,4 +39,4 @@ coolsms:
 
 client:
   user-service:
-    url: http://localhost:8084 # infra-service의 주소
+    url: http://localhost:8088 # infra-service의 주소

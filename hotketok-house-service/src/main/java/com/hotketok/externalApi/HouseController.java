@@ -20,9 +20,9 @@ public class HouseController {
 
     // 집주인 집 등록
     @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public RegisterHouseResponse registerHouse(/*@RequestHeader("userId")*/ @RequestParam Long ownerId,
-                                                                            @RequestPart("file") MultipartFile file,
-                                                                            @RequestPart("data") RegisterHouseRequest request) {
+    public RegisterHouseResponse registerHouse(@RequestHeader("userId") Long ownerId,
+                                               @RequestPart("file") MultipartFile file,
+                                               @RequestPart("data") RegisterHouseRequest request) {
         return houseService.registerHouse(ownerId, file, request);
     }
 
@@ -42,21 +42,21 @@ public class HouseController {
 
     // 입주민 요청 (주소/동/호수 기반)
     @PostMapping("/tenant-request")
-    public RegisterTenantResponse registerTenant(/*@RequestHeader("userId")*/ @RequestParam Long tenantId,
+    public RegisterTenantResponse registerTenant(@RequestHeader("userId") Long tenantId,
                                                  @RequestBody RegisterTenantRequest request) {
         return houseService.registerTenant(tenantId,request);
     }
 
     // 집주인 요청 목록
     @GetMapping("/tenant-requestList")
-    public List<TenantRequestResponse> getTenantRequestList(/*@RequestHeader("userId")*/ @RequestParam Long ownerId) {
+    public List<TenantRequestResponse> getTenantRequestList(@RequestHeader("userId") Long ownerId) {
         return houseService.getTenantRequestList(ownerId);
     }
 
     // 집주인 승인
     @PostMapping("/tenant-approve/{houseId}")
     public ResponseEntity<Void> tenantApprove(@PathVariable Long houseId,
-            /*@RequestHeader("userId")*/ @RequestParam Long ownerId) {
+            @RequestHeader("userId") Long ownerId) {
         houseService.approveTenant(houseId, ownerId);
         return ResponseEntity.ok().build();
     }
@@ -64,7 +64,7 @@ public class HouseController {
     // 집주인 거절
     @PostMapping("/tenant-reject/{houseId}")
     public ResponseEntity<Void> tenantReject(@PathVariable Long houseId,
-            /*@RequestHeader("userId")*/ @RequestParam Long ownerId) {
+            @RequestHeader("userId") Long ownerId) {
         houseService.rejectTenant(houseId, ownerId);
         return ResponseEntity.ok().build();
     }
