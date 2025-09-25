@@ -44,7 +44,7 @@ public class HouseController {
     @PostMapping("/tenant-request")
     public RegisterTenantResponse registerTenant(/*@RequestHeader("userId")*/ @RequestParam Long tenantId,
                                                  @RequestBody RegisterTenantRequest request) {
-        return houseService.registerTenant(tenantId,request.address(),request.floor(),request.number());
+        return houseService.registerTenant(tenantId,request);
     }
 
     // 집주인 요청 목록

@@ -76,4 +76,8 @@ public class House {
         this.tenantId = tenantId;
     }
 
+    public void registerTenant(String floor, String number) {
+        this.floor = floor;
+        this.number = number;
+    }
 }
