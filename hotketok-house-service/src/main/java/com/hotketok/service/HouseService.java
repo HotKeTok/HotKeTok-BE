@@ -4,6 +4,7 @@ import com.hotketok.domain.House;
 import com.hotketok.domain.enums.HouseState;
 import com.hotketok.dto.RegisterHouseRequest;
 import com.hotketok.dto.RegisterHouseResponse;
+import com.hotketok.dto.RegisterTenantResponse;
 import com.hotketok.dto.TenantRequestResponse;
 import com.hotketok.dto.internalApi.Role;
 import com.hotketok.exception.HouseErrorCode;
@@ -50,6 +51,20 @@ public class HouseService {
         houseRepository.deleteById(houseId);
     }
 
+    // 입주민 요청 -> 주소/동/호수로 검색해서 state=2
+    @Transactional
+    public RegisterTenantResponse registerTenant(Long tenantId, String address, String floor, String number) {
+        House house = houseRepository.findByAddressAndFloorAndNumber(address,floor,number)
+                .orElseThrow(() -> new CustomException(HouseErrorCode.HOUSE_NOT_FOUND));
+
+        if (house.getState() != HouseState.REGISTERED) {
+            throw new CustomException(HouseErrorCode.HOUSE_STATE_NOT_EQUAL_REGISTERED);
+        }
+
+        house.changeTenantId(tenantId);
+        house.changeState(HouseState.TENANT_REQUEST);
+        return new RegisterTenantResponse(tenantId, house.getHouseId());
+    }
 
     // 집주인 요청 목록 조회 (state=2)
     @Transactional

@@ -1,9 +1,7 @@
 package com.hotketok.externalApi;
 
 import com.hotketok.domain.House;
-import com.hotketok.dto.RegisterHouseRequest;
-import com.hotketok.dto.RegisterHouseResponse;
-import com.hotketok.dto.TenantRequestResponse;
+import com.hotketok.dto.*;
 import com.hotketok.service.HouseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -37,6 +35,13 @@ public class HouseController {
     public ResponseEntity<Void> adminReject(@PathVariable Long houseId) {
         houseService.rejectHouse(houseId);
         return ResponseEntity.ok().build();
+    }
+
+    // 입주민 요청 (주소/동/호수 기반)
+    @PostMapping("/tenant-request")
+    public RegisterTenantResponse registerTenant(/*@RequestHeader("userId")*/ @RequestParam Long tenantId,
+                                                 @RequestBody RegisterTenantRequest request) {
+        return houseService.registerTenant(tenantId,request.address(),request.floor(),request.number());
     }
 
     // 집주인 요청 목록

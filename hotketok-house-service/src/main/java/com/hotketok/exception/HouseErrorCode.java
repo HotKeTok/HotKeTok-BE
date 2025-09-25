@@ -13,6 +13,7 @@ public enum HouseErrorCode implements ErrorCode {
 
     HOUSE_REGISTERED(HttpStatus.CONFLICT, "이미 존재하는 주택입니다"),
     HOUSE_STATE_NOT_EQUAL_TENANT_REQUEST(HttpStatus.BAD_REQUEST,"입주민 요청 상태가 아닙니다."),
+    HOUSE_STATE_NOT_EQUAL_REGISTERED(HttpStatus.BAD_REQUEST,"집주인이 집 등록 상태가 아닙니다."),
     HOUSE_ALREADY_DELETED(HttpStatus.BAD_REQUEST, "이미 삭제된 주택입니다."),
     ;
 
