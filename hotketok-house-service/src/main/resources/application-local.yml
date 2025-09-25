@@ -49,3 +49,5 @@ logging:
 client:
   user-service:
     url: http://localhost:8084 # user-service의 주소
+  infra-service:
+    url: http://localhost:8081 # infra-service의 주소
