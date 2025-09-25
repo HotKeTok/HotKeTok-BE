@@ -7,13 +7,16 @@ import com.hotketok.dto.RegisterHouseResponse;
 import com.hotketok.dto.RegisterTenantResponse;
 import com.hotketok.dto.TenantRequestResponse;
 import com.hotketok.dto.internalApi.Role;
+import com.hotketok.dto.internalApi.UploadFileResponse;
 import com.hotketok.exception.HouseErrorCode;
 import com.hotketok.hotketokcommonservice.error.exception.CustomException;
+import com.hotketok.internalApi.InfraServiceClient;
 import com.hotketok.internalApi.UserServiceClient;
 import com.hotketok.repository.HouseRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,17 +26,19 @@ import java.util.List;
 public class HouseService {
     private final HouseRepository houseRepository;
     private final UserServiceClient userServiceClient;
-
+    private final InfraServiceClient infraServiceClient;
     // 집주인 등록 (state=0)
     @Transactional
-    public RegisterHouseResponse registerHouse(Long ownerId, List<RegisterHouseRequest> requests) {
-        List<Long> registedHouses = new ArrayList<>();
-        for (RegisterHouseRequest req : requests) {
-            House house = House.createHouse(ownerId, req.address(),req.detailAddress(),req.floor(),req.number(),req.alias(), req.houseType());
+    public RegisterHouseResponse registerHouse(Long ownerId, MultipartFile file, RegisterHouseRequest request) {
+        UploadFileResponse uploadFileResponse = infraServiceClient.uploadFile(file,"proveHouse/");
+
+        List<Long> registeredHouses = new ArrayList<>();
+        for (int i = 0 ; i < request.count(); i++) {
+            House house = House.createHouse(ownerId, request.address(),request.detailAddress(),null,null,null, uploadFileResponse.fileUrl(),request.houseType());
             houseRepository.save(house);
-            registedHouses.add(house.getHouseId());
+            registeredHouses.add(house.getHouseId());
         }
-        return new RegisterHouseResponse(registedHouses);
+        return new RegisterHouseResponse(registeredHouses);
     }
 
     // 관리자 승인 → OWNER로 승격

@@ -4,8 +4,10 @@ import com.hotketok.domain.House;
 import com.hotketok.dto.*;
 import com.hotketok.service.HouseService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 
 import java.util.List;
@@ -17,10 +19,11 @@ public class HouseController {
     private final HouseService houseService;
 
     // 집주인 집 등록
-    @PostMapping("/register")
+    @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public RegisterHouseResponse registerHouse(/*@RequestHeader("userId")*/ @RequestParam Long ownerId,
-                                                                            @RequestBody List<RegisterHouseRequest> requests) {
-        return houseService.registerHouse(ownerId, requests);
+                                                                            @RequestPart("file") MultipartFile file,
+                                                                            @RequestPart("data") RegisterHouseRequest request) {
+        return houseService.registerHouse(ownerId, file, request);
     }
 
     // 관리자 승인
