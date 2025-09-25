@@ -1,9 +1,9 @@
 server:
-  port: 8084
+  port: 8087
 
 spring:
   application:
-    name: user-service
+    name: house-service
   cloud:
     kubernetes:
       config:
@@ -17,15 +17,11 @@ spring:
 
   # ===== 데이터소스 =====
   datasource:
-    url: jdbc:h2:tcp://localhost/~/user
+    url: jdbc:h2:tcp://localhost/~/house
     username: sa
     password:
     driver-class-name: org.h2.Driver
-    #url: jdbc:h2:file:~/user
-    #username: sa
-    #password:
-    #driver-class-name: org.h2.Driver
-#
+
   # ===== JPA =====
   jpa:
     hibernate:
@@ -37,7 +33,7 @@ spring:
 
 eureka:
   instance:
-    hostname: user-service
+    hostname: house-service
     preferIpAddress: true
   client:
     registry-fetch-interval-seconds: 3
@@ -49,3 +45,9 @@ eureka:
 logging:
   level:
     org.hibernate.SQL: debug
+
+client:
+  user-service:
+    url: http://localhost:8084 # user-service의 주소
+  infra-service:
+    url: http://localhost:8081 # infra-service의 주소
