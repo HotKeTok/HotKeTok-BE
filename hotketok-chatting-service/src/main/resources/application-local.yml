@@ -1,13 +1,9 @@
 server:
-  port: 8084
+  port: 8086
 
 spring:
   application:
-    name: user-service
-  cloud:
-    kubernetes:
-      config:
-        enabled: false
+    name: chatting-service
 
   # ===== H2 콘솔 =====
   h2:
@@ -16,16 +12,18 @@ spring:
       path: /h2-console
 
   # ===== 데이터소스 =====
+#  datasource:
+#    url: jdbc:h2:tcp://localhost/~/chatting
+#    username: sa
+#    password:
+#    driver-class-name: org.h2.Driver
+
   datasource:
-    url: jdbc:h2:tcp://localhost/~/user
+    url: jdbc:h2:file:~/chatting
     username: sa
     password:
     driver-class-name: org.h2.Driver
-    #url: jdbc:h2:file:~/user
-    #username: sa
-    #password:
-    #driver-class-name: org.h2.Driver
-#
+
   # ===== JPA =====
   jpa:
     hibernate:
@@ -37,7 +35,7 @@ spring:
 
 eureka:
   instance:
-    hostname: user-service
+    hostname: chatting-service
     preferIpAddress: true
   client:
     registry-fetch-interval-seconds: 3

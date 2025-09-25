@@ -1,5 +1,10 @@
 package com.hotketok.service;
 
+import com.hotketok.dto.internalApi.UserProfileResponse;
+import com.hotketok.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import com.hotketok.domain.User;
 import com.hotketok.domain.enums.Role;
 import com.hotketok.dto.SignUpRequest;
@@ -13,12 +18,17 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class UserService {
-    private final UserRepository userRepository;
 
+    private final UserRepository userRepository;
+  
     @Transactional
     public void save(SignUpRequest req){
         log.info("[UserService] create user=" + req.logInId());
@@ -53,5 +63,11 @@ public class UserService {
     private UserInfo toDto(User u){
         return UserInfo.of(u.getId(),u.getLogInId(),u.getPassword(),u.getRole());
     }
-}
 
+    // 채팅 서비스에서 호출하는 여러 ID를 받아 사용자를 목록을 조회하는 메서드
+    public List<UserProfileResponse> findUserProfilesByIds(List<Long> userIds) {
+        return userRepository.findAllByIdIn(userIds).stream()
+                .map(UserProfileResponse::from)
+                .collect(Collectors.toList());
+    }
+}
