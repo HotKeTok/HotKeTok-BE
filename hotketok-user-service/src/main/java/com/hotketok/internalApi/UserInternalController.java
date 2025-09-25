@@ -14,8 +14,6 @@ import com.hotketok.domain.enums.Role;
 import com.hotketok.dto.SignUpRequest;
 import com.hotketok.dto.TenantInfoResponse;
 import com.hotketok.dto.UserInfo;
-import com.hotketok.service.UserService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 @RestController

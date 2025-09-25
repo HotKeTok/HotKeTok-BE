@@ -1,4 +1,4 @@
-package com.hotketok.service;
+package com.hotketok.util;
 
 import com.hotketok.exception.AuthErrorCode;
 import com.hotketok.hotketokcommonservice.error.exception.CustomException;

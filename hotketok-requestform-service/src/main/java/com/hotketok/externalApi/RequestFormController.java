@@ -13,7 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/requestform-service/")
+@RequestMapping("/api/requestform-service")
 @RequiredArgsConstructor
 public class RequestFormController {
 
@@ -21,10 +21,11 @@ public class RequestFormController {
 
     @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     CreateRequestFormResponse createRequestForm(
+            @RequestHeader("userId") Long userId,
             @RequestPart(value = "data") CreateRequestFormRequest createRequestFormRequest,
             @RequestPart(value = "images") List<MultipartFile> images){
 
-        return requestFormService.createRequestForm(createRequestFormRequest,images,1);
+        return requestFormService.createRequestForm(createRequestFormRequest,images,userId);
     }
 
     @PostMapping(value = "/gpt-service", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

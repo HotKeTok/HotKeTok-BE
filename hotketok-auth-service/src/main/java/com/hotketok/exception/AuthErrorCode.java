@@ -18,7 +18,9 @@ public enum AuthErrorCode implements ErrorCode {
     BAD_REQUEST_PASSWORD(HttpStatus.BAD_REQUEST,"비밀번호 불일치합니다."),
 
 
-    USER_NOT_FOUNT(HttpStatus.NOT_FOUND, "존재하지 않는 사용자입니다."),
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "존재하지 않는 사용자입니다."),
+
+    INVALID_REFRESH_TOKEN(HttpStatus.BAD_REQUEST, "유효하지 않은 리프레시 토큰입니다.")
     ;
 
     private final HttpStatus httpStatus;

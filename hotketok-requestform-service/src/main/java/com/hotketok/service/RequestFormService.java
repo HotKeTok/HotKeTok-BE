@@ -44,12 +44,12 @@ public class RequestFormService {
     public CreateRequestFormResponse createRequestForm(
             CreateRequestFormRequest createRequestFormRequest,
             List<MultipartFile> images,
-            long userId) {
+            Long userId) {
 
         // 사용자 서비스에서 주택주소, authorId, payerId 가져오는 서비스 로직
         // GetUserInfoResponse getUserInfoResponse = memberClient.getUserInfoByPayType(userId,createRequestFormRequest.payType());
 
-        GetUserInfoResponse getUserInfoResponse = new GetUserInfoResponse(1L, 2L, "동작 핫케톡 스테이 304호");
+        GetUserInfoResponse getUserInfoResponse = new GetUserInfoResponse(userId, 2L, "동작 핫케톡 스테이 304호");
 
         RequestForm requestForm = RequestForm.createRequestForm(
                 getUserInfoResponse.userId(),

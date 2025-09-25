@@ -9,18 +9,69 @@ spring:
       server:
         webflux:
           routes:
-            - id: requestform-service
-              uri: lb://requestform-service
-              predicates:
-                - Path=/api/requestform-service/**
-                - Method=GET,POST,PUT,DELETE
-
             - id: auth-service
               uri: lb://auth-service
               predicates:
                 - Path=/api/auth-service/**
                 - Method=GET,POST,PUT,DELETE
 
+            - id: requestform-service
+              uri: lb://requestform-service
+              predicates:
+                - Path=/api/requestform-service/**
+                - Method=GET,POST,PUT,DELETE
+              filters:
+                - JwtAuthFilter
+                - name: RoleFilter
+                  args:
+                    allowedRoles:
+                      - OWNER
+                      - TENANT
+
+            - id: example-service
+              uri: lb://requestform-service
+              predicates:
+                - Path=/api/example-service/**
+                - Method=GET,POST,PUT,DELETE
+              filters:
+                - JwtAuthFilter
+                - name: RoleFilter
+                  args:
+                    allowedRoles:
+                      - OWNER
+                      - TENANT
+
+            - id: chatting-service
+              uri: lb://chatting-service
+              predicates:
+                - Path=/api/chatting-service/**
+                - Method=GET,POST,PUT,DELETE
+              filters:
+                - JwtAuthFilter
+                - name: RoleFilter
+                  args:
+                    allowedRoles:
+                      - OWNER
+                      - TENANT
+                      - VENDOR
+
+            - id: infra-service
+              uri: lb://infra-service
+              predicates:
+                - Path=/api/infra-service/**
+                - Method=GET,POST,PUT,DELETE
+              filters:
+                - JwtAuthFilter
+                - name: RoleFilter
+                  args:
+                    allowedRoles:
+                      - OWNER
+                      - TENANT
+                      - VENDOR
+
+
+jwt:
+  secret: ThisIsHotketokSecretKeyThisIsHotketokSecretKey
 
 eureka:
   instance:
