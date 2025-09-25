@@ -13,7 +13,7 @@ spring:
 
 jwt:
   secret: ThisIsHotketokSecretKeyThisIsHotketokSecretKey
-  access-exp-ms: 3600000 # 1h
+  access-exp-ms: 43200000 # 12h
   refresh-exp-ms: 1209600000 # 14d
 
 eureka:
