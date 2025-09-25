@@ -26,23 +26,22 @@ public class ChatRoomController {
 
     // 특정 유저의 채팅방 목록 조회
     @GetMapping("/users/rooms")
-    public List<ChatRoomResponse> findChatRoomsByUserId() {
-        Long userId = 101L; // 임시 데이터
+    public List<ChatRoomResponse> findChatRoomsByUserId(@RequestHeader("userId") Long userId) {
         return chatService.findChatRoomsByUserId(userId);
     }
 
     // 채팅방 삭제
     @DeleteMapping("/rooms")
-    public ResponseEntity<Void> deleteChatRoom(@RequestParam Long roomId) {
-        Long userId = 101L; // 임시 데이터
+    public ResponseEntity<Void> deleteChatRoom(@RequestHeader("userId") Long userId,
+                                               @RequestParam Long roomId) {
         chatService.deleteChatRoom(userId, roomId);
         return ResponseEntity.noContent().build(); // 성공적으로 삭제되었으면 204 No Content
     }
 
     // 특정 채팅방의 채팅 내용 조회
     @GetMapping("/rooms/messages")
-    public List<ChatMessageResponse> findMessagesByRoomId(@RequestParam Long roomId) {
-        Long userId = 101L; // 임시 데이터
+    public List<ChatMessageResponse> findMessagesByRoomId(@RequestHeader("userId") Long userId,
+                                                          @RequestParam Long roomId) {
         return chatService.findMessagesByRoomId(userId, roomId);
     }
 }
