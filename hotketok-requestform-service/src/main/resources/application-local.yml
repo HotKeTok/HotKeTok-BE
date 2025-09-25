@@ -1,5 +1,5 @@
 server:
-  port: 8083
+  port: 8093
 
 spring:
   application:
@@ -63,5 +63,5 @@ openai:
 
 client:
   infra-service:
-    url: http://localhost:8081 # infra-service의 주소
+    url: http://localhost:8089 # infra-service의 주소
 
