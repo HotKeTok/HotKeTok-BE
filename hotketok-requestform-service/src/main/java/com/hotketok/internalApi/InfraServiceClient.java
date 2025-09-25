@@ -1,8 +1,8 @@
 package com.hotketok.internalApi;
 
-import com.hotketok.dto.internalApi.DeleteImageRequest;
-import com.hotketok.dto.internalApi.DeleteImageResponse;
-import com.hotketok.dto.internalApi.UploadImageResponse;
+import com.hotketok.dto.internalApi.DeleteFileRequest;
+import com.hotketok.dto.internalApi.DeleteFileResponse;
+import com.hotketok.dto.internalApi.UploadFileListResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -14,10 +14,10 @@ import java.util.List;
 public interface InfraServiceClient {
 
     @PostMapping(value = "/internal/infra-service/upload/imageList", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    UploadImageResponse uploadImages(
+    UploadFileListResponse uploadImages(
             @RequestPart(value = "images", required = true) List<MultipartFile> images,
             @RequestParam String folderName);
 
     @DeleteMapping(value = "/internal/infra-service/delete")
-    DeleteImageResponse deleteImage(@RequestBody DeleteImageRequest deleteImageRequest);
+    DeleteFileResponse deleteFile(@RequestBody DeleteFileRequest deleteFileRequest);
 }
