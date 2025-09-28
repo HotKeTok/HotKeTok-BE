@@ -31,7 +31,7 @@ public class HouseService {
 
         List<Long> registeredHouses = new ArrayList<>();
         for (int i = 0 ; i < request.count(); i++) {
-            House house = House.createHouse(ownerId, request.address(),request.detailAddress(),null,null,null, uploadFileResponse.fileUrl(),request.houseType());
+            House house = House.createHouse(ownerId, request.address(),request.detailAddress(),null,null,null, uploadFileResponse.fileUrl(),request.houseType(),null);
             houseRepository.save(house);
             registeredHouses.add(house.getHouseId());
         }
@@ -104,6 +104,20 @@ public class HouseService {
         house.changeTenantId(null);
         house.registerTenant(null, null);
         house.changeState(HouseState.REGISTERED);
+    }
+
+    @Transactional(readOnly = true)
+    public MyPageHouseInfoResponse getMypageHouseInfo(Long userId, String role) {
+        House house = null;
+        if (role.equals("OWNER")){
+            house = houseRepository.findByOwnerIdAndIsCurrent(userId,true)
+                    .orElseThrow(() -> new CustomException(HouseErrorCode.HOUSE_NOT_FOUND));
+        }else {
+            house = houseRepository.findByTenantIdAndIsCurrent(userId,true).orElseThrow(
+                    () -> new CustomException(HouseErrorCode.HOUSE_NOT_FOUND)
+            );
+        }
+        return new MyPageHouseInfoResponse(house.getAddress());
     }
 }
 

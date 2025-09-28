@@ -10,4 +10,6 @@ import java.util.Optional;
 public interface HouseRepository extends JpaRepository<House, Long> {
     List<House> findAllByOwnerIdAndState(Long ownerId, HouseState state);
     Optional<House> findFirstByAddressAndState(String address, HouseState state);
+    Optional<House> findByTenantIdAndIsCurrent(Long tenantId, boolean isCurrent);
+    Optional<House> findByOwnerIdAndIsCurrent(Long ownerId, boolean isCurrent);
 }
