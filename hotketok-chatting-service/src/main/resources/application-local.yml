@@ -1,5 +1,5 @@
 server:
-  port: 8086
+  port: 8096
 
 spring:
   application:
@@ -12,17 +12,16 @@ spring:
       path: /h2-console
 
   # ===== 데이터소스 =====
-#  datasource:
-#    url: jdbc:h2:tcp://localhost/~/chatting
-#    username: sa
-#    password:
-#    driver-class-name: org.h2.Driver
-
   datasource:
-    url: jdbc:h2:file:~/chatting
+    url: jdbc:h2:tcp://localhost/~/chatting
     username: sa
     password:
     driver-class-name: org.h2.Driver
+  #datasource:
+  #  url: jdbc:h2:file:~/chatting
+  #  username: sa
+  #  password:
+  #  driver-class-name: org.h2.Driver
 
   # ===== JPA =====
   jpa:

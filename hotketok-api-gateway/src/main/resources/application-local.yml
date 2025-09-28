@@ -28,19 +28,6 @@ spring:
                       - OWNER
                       - TENANT
 
-            - id: example-service
-              uri: lb://requestform-service
-              predicates:
-                - Path=/api/example-service/**
-                - Method=GET,POST,PUT,DELETE
-              filters:
-                - JwtAuthFilter
-                - name: RoleFilter
-                  args:
-                    allowedRoles:
-                      - OWNER
-                      - TENANT
-
             - id: chatting-service
               uri: lb://chatting-service
               predicates:
@@ -65,6 +52,35 @@ spring:
                 - name: RoleFilter
                   args:
                     allowedRoles:
+                      - OWNER
+                      - TENANT
+
+            - id: house-service
+              uri: lb://infra-service
+              predicates:
+                - Path=/api/house-service/**
+                - Method=GET,POST,PUT,DELETE
+              filters:
+                - JwtAuthFilter
+                - name: RoleFilter
+                  args:
+                    allowedRoles:
+                      - NONE
+                      - OWNER
+                      - TENANT
+                      - VENDOR
+
+            - id: user-service
+              uri: lb://user-service
+              predicates:
+                - Path=/api/user-service/**
+                - Method=GET,POST,PUT,DELETE
+              filters:
+                - JwtAuthFilter
+                - name: RoleFilter
+                  args:
+                    allowedRoles:
+                      - NONE
                       - OWNER
                       - TENANT
                       - VENDOR
