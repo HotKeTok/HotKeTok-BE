@@ -1,6 +1,9 @@
 package com.hotketok.service;
 
+import com.hotketok.dto.MyPageInfoResponse;
+import com.hotketok.dto.internalApi.MyPageHouseInfoResponse;
 import com.hotketok.dto.internalApi.UserProfileResponse;
+import com.hotketok.internalApi.HouseServiceClient;
 import com.hotketok.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,6 +31,7 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final HouseServiceClient houseServiceClient;
   
     @Transactional
     public void save(SignUpRequest req){
@@ -58,6 +62,15 @@ public class UserService {
     public void updateRole(Long id, Role role){
         User user = userRepository.findById(id).orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
         user.changeRole(role);
+    }
+
+    @Transactional(readOnly = true)
+    public MyPageInfoResponse GetMyPageInfo(Long userId, String role){
+        User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
+        if (role.equals("NONE")) return new MyPageInfoResponse(user.getName(),user.getPhoneNumber(),user.getLogInId(),null);
+
+        MyPageHouseInfoResponse houseInfo = houseServiceClient.getMyPageHouseInfo(userId,role);
+        return new MyPageInfoResponse(user.getName(), user.getPhoneNumber(), user.getLogInId(), houseInfo.address());
     }
 
     private UserInfo toDto(User u){
