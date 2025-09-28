@@ -22,7 +22,7 @@ public class RoleFilter extends AbstractGatewayFilterFactory<RoleFilter.Config> 
         return (exchange, chain) -> {
             String role = exchange.getRequest().getHeaders().getFirst("role");
 
-            if (role == null || role.equalsIgnoreCase("NONE")) {
+            if (role == null) {
                 exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
                 return exchange.getResponse().setComplete();
             }
