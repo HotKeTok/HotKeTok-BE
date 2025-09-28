@@ -39,8 +39,10 @@ public class House {
     @Enumerated(EnumType.STRING)
     private HouseType type; // 상태 enum (HOME, COMPANY, ETC)
 
+    private Boolean isCurrent; // 현재 집 상태
+
     @Builder(access = AccessLevel.PRIVATE)
-    private House(Long tenantId, Long ownerId, String address, String detailAddress, String floor, String number,String alias, String proveFile, HouseState state, HouseType type) {
+    private House(Long tenantId, Long ownerId, String address, String detailAddress, String floor, String number,String alias, String proveFile, HouseState state, HouseType type, Boolean isCurrent) {
         this.tenantId = tenantId;
         this.ownerId = ownerId;
         this.address = address;
@@ -51,9 +53,10 @@ public class House {
         this.state = state;
         this.type = type;
         this.proveFile = proveFile;
+        this.isCurrent = isCurrent;
     }
 
-    public static House createHouse(Long ownerId, String address, String detailAddress, String floor, String number,String alias, String proveFile,HouseType type) {
+    public static House createHouse(Long ownerId, String address, String detailAddress, String floor, String number,String alias, String proveFile,HouseType type, Boolean isCurrent) {
         return House.builder()
                 .tenantId(null)
                 .ownerId(ownerId)
@@ -65,6 +68,7 @@ public class House {
                 .state(HouseState.NONE)
                 .type(type)
                 .proveFile(proveFile)
+                .isCurrent(isCurrent)
                 .build();
     }
 
@@ -74,6 +78,10 @@ public class House {
 
     public void changeTenantId(Long tenantId) {
         this.tenantId = tenantId;
+    }
+
+    public void changeCurrentHouse(Boolean isCurrent) {
+        this.isCurrent = isCurrent;
     }
 
     public void registerTenant(String floor, String number) {
