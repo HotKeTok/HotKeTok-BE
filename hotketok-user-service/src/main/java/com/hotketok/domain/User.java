@@ -60,4 +60,12 @@ public class User extends BaseTimeEntity {
     public void changeRole(Role role) {
         this.role = role;
     }
+
+    public void changeProfileImage(String profileImage) {
+        this.profileImage = profileImage;
+    }
+
+    public void changeName(String name) {
+        this.name = name;
+    }
 }

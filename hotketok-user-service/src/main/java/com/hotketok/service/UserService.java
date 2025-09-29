@@ -1,18 +1,17 @@
 package com.hotketok.service;
 
-import com.hotketok.dto.MyPageInfoResponse;
+import com.hotketok.dto.*;
 import com.hotketok.dto.internalApi.MyPageHouseInfoResponse;
+import com.hotketok.dto.internalApi.UploadFileResponse;
 import com.hotketok.dto.internalApi.UserProfileResponse;
 import com.hotketok.internalApi.HouseServiceClient;
+import com.hotketok.internalApi.InfraServiceClient;
 import com.hotketok.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.hotketok.domain.User;
 import com.hotketok.domain.enums.Role;
-import com.hotketok.dto.SignUpRequest;
-import com.hotketok.dto.TenantInfoResponse;
-import com.hotketok.dto.UserInfo;
 import com.hotketok.exception.UserErrorCode;
 import com.hotketok.hotketokcommonservice.error.exception.CustomException;
 import com.hotketok.repository.UserRepository;
@@ -20,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -32,6 +32,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final HouseServiceClient houseServiceClient;
+    private final InfraServiceClient infraServiceClient;
   
     @Transactional
     public void save(SignUpRequest req){
@@ -71,6 +72,14 @@ public class UserService {
 
         MyPageHouseInfoResponse houseInfo = houseServiceClient.getMyPageHouseInfo(userId,role);
         return new MyPageInfoResponse(user.getName(), user.getPhoneNumber(), user.getLogInId(), houseInfo.address());
+    }
+
+    @Transactional
+    public void UpdateMyPageInfo(Long userId, MultipartFile image, UpdateMyPageInfoRequest updateMyPageInfoRequest){
+        User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
+        UploadFileResponse uploadFileResponse = infraServiceClient.uploadFile(image, "user-profile/");
+        user.changeProfileImage(uploadFileResponse.fileUrl());
+        user.changeName(updateMyPageInfoRequest.name());
     }
 
     private UserInfo toDto(User u){
