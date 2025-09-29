@@ -5,7 +5,9 @@ import com.hotketok.exception.AuthErrorCode;
 import com.hotketok.hotketokcommonservice.error.exception.CustomException;
 import com.hotketok.internalApi.UserServiceClient;
 import com.hotketok.repository.PhoneAuthRepository;
+import com.hotketok.repository.RefreshTokenRepository;
 import com.hotketok.util.JwtUtil;
+import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -20,6 +22,7 @@ public class AuthService {
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
     private final PhoneAuthRepository phoneAuthRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     public SignUpResponse signup(SignUpRequest req){
         System.out.println("[AuthService] signup: " + req.logInId());
@@ -48,9 +51,32 @@ public class AuthService {
     public JwtToken login(LoginRequest req){
         log.info("[AuthService] login: " + req.logInId());
         UserInfo user = userServiceClient.findByLogInId(req.logInId());
-        if(user==null) throw new CustomException(AuthErrorCode.USER_NOT_FOUNT);
+
+        if(user==null) throw new CustomException(AuthErrorCode.USER_NOT_FOUND);
+
         if(!passwordEncoder.matches(req.password(), user.password()))
             throw new CustomException(AuthErrorCode.BAD_REQUEST_PASSWORD);
-        return jwtUtil.issue(user.id(), user.role());
+
+        JwtToken jwtToken = jwtUtil.issue(user.id(), user.role());
+        refreshTokenRepository.save(user.id(), jwtToken.refreshToken(), jwtUtil.getRefreshExpMs());
+        return jwtToken;
+    }
+
+    public JwtToken refresh(String refreshToken) {
+        Claims claims = jwtUtil.parse(refreshToken);
+        if (!"refresh".equals(claims.getSubject())) {
+            throw new CustomException(AuthErrorCode.INVALID_REFRESH_TOKEN);
+        }
+        Long userId = claims.get("userId", Long.class);
+
+        UserInfo user = userServiceClient.findById(userId);
+        if (user == null) {
+            throw new CustomException(AuthErrorCode.USER_NOT_FOUND);
+        }
+
+        JwtToken jwtToken = jwtUtil.issue(userId, user.role());
+        refreshTokenRepository.save(user.id(), jwtToken.refreshToken(), jwtUtil.getRefreshExpMs());
+
+        return jwtToken;
     }
 }

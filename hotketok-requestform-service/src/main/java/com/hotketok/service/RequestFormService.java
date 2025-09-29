@@ -2,6 +2,7 @@ package com.hotketok.service;
 
 import com.hotketok.constant.GPTPrompt;
 import com.hotketok.dto.CreateRequestFormResponse;
+import com.hotketok.dto.internalApi.UploadFileListResponse;
 import com.hotketok.parser.OpenAIResponseParser;
 import com.hotketok.domain.RequestForm;
 import com.hotketok.domain.RequestFormImage;
@@ -9,7 +10,6 @@ import com.hotketok.domain.enums.Status;
 import com.hotketok.dto.ChatGPTResponse;
 import com.hotketok.dto.CreateRequestFormRequest;
 import com.hotketok.dto.GetUserInfoResponse;
-import com.hotketok.dto.internalApi.UploadImageResponse;
 import com.hotketok.internalApi.InfraServiceClient;
 import com.hotketok.internalApi.OpenAiClient;
 import com.hotketok.repository.RequestFormImageRepository;
@@ -44,12 +44,12 @@ public class RequestFormService {
     public CreateRequestFormResponse createRequestForm(
             CreateRequestFormRequest createRequestFormRequest,
             List<MultipartFile> images,
-            long userId) {
+            Long userId) {
 
         // 사용자 서비스에서 주택주소, authorId, payerId 가져오는 서비스 로직
         // GetUserInfoResponse getUserInfoResponse = memberClient.getUserInfoByPayType(userId,createRequestFormRequest.payType());
 
-        GetUserInfoResponse getUserInfoResponse = new GetUserInfoResponse(1L, 2L, "동작 핫케톡 스테이 304호");
+        GetUserInfoResponse getUserInfoResponse = new GetUserInfoResponse(userId, 2L, "동작 핫케톡 스테이 304호");
 
         RequestForm requestForm = RequestForm.createRequestForm(
                 getUserInfoResponse.userId(),
@@ -66,9 +66,9 @@ public class RequestFormService {
         // List<String> imageUrls = new ArrayList<>(); saga 패턴으로 인해 추후 이미지 전체 삭제 API 개발 시 추가
 
         try {
-            UploadImageResponse uploadImageResponse = infraServiceClient.uploadImages(images, "requestform-image/");
+            UploadFileListResponse uploadFileListResponse = infraServiceClient.uploadImages(images, "requestform-image/");
 
-            List<RequestFormImage> imageList = uploadImageResponse.imageList().stream().map(image ->
+            List<RequestFormImage> imageList = uploadFileListResponse.fileList().stream().map(image ->
                     RequestFormImage.createRequestFormImage(requestForm, image)
             ).collect(Collectors.toList());
 
@@ -89,9 +89,9 @@ public class RequestFormService {
     }
 
     public ChatGPTResponse helpDescriptionByGPT(List<MultipartFile> images) throws Exception {
-        UploadImageResponse uploadImageResponse = infraServiceClient.uploadImages(images, "requestform-ai/");
+        UploadFileListResponse uploadFileListResponse = infraServiceClient.uploadImages(images, "requestform-ai/");
 
-        List<String> imageList = uploadImageResponse.imageList();
+        List<String> imageList = uploadFileListResponse.fileList();
         String prompt = GPTPrompt.CONTENT;
 
 

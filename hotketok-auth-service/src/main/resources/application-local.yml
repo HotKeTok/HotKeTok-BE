@@ -1,5 +1,5 @@
 server:
-  port: 8085
+  port: 8087
 
 spring:
   application:
@@ -13,7 +13,7 @@ spring:
 
 jwt:
   secret: ThisIsHotketokSecretKeyThisIsHotketokSecretKey
-  access-exp-ms: 3600 # 1h
+  access-exp-ms: 43200000 # 12h
   refresh-exp-ms: 1209600000 # 14d
 
 eureka:
@@ -39,4 +39,4 @@ coolsms:
 
 client:
   user-service:
-    url: http://localhost:8084 # infra-service의 주소
+    url: http://localhost:8088 # infra-service의 주소

@@ -11,4 +11,5 @@ include(
         "hotketok-user-service",
         "hotketok-auth-service",
         "hotketok-post-service",
+        "hotketok-house-service"
 )
