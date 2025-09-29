@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 @Entity
@@ -38,21 +39,21 @@ public class Post  extends BaseTimeEntity {
     private String silentTime;
 
     // 태그 다중 선택 가능
-    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinTable(
-            name = "post_to_tag", // 생성될 중간 테이블의 이름
-            joinColumns = @JoinColumn(name = "post_id"), // 중간 테이블 설정
-            inverseJoinColumns = @JoinColumn(name = "posttag_id")
-    )
-    private Set<PostTag> tags = new HashSet<>();
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<PostToTag> postToTags = new HashSet<>();
 
     @Builder
-    private Post(Long receiverId, Long senderId, String content, Boolean isAnonymous, String silentTime, Set<PostTag> tags) {
+    private Post(Long receiverId, Long senderId, String content, Boolean isAnonymous, String silentTime) {
         this.receiverId = receiverId;
         this.senderId = senderId;
         this.content = content;
         this.isAnonymous = isAnonymous;
         this.silentTime = silentTime;
-        this.tags = tags;
+    }
+
+    // 연관관계 편의 메서드
+    public void addTag(Optional<PostTag> tag) {
+        PostToTag postToTag = PostToTag.createPostToTag(this, tag):
+        this.postToTags.add(postToTag);
     }
 }

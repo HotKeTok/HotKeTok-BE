@@ -18,18 +18,20 @@ public record PostDetailResponse(
 ) {
     public static PostDetailResponse of(Post post) {
         List<String> tagNames;
-        if (post.getTags() != null && !post.getTags().isEmpty()) {
-            tagNames = post.getTags().stream()
-                    .map(PostTag::getContent)
+
+        if (post.getPostToTags() != null && !post.getPostToTags().isEmpty()) {
+            // PostToTag 객체 스트리밍해서 PostTag 얻고 최종 이름 가져옴
+            tagNames = post.getPostToTags().stream()
+                    .map(postToTag -> postToTag.getTag().getContent())
                     .collect(Collectors.toList());
         } else {
-            // 태그가 없는 경우 빈 리스트를 반환
             tagNames = Collections.emptyList();
         }
+
         return new PostDetailResponse(
                 post.getSenderId(),
                 post.getCreatedAt(),
-                tagNames, // 수정된 태그 목록 사용
+                tagNames,
                 post.getContent()
         );
     }

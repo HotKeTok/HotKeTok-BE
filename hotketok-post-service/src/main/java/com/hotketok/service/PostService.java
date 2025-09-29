@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -59,23 +60,27 @@ public class PostService {
     // 쪽지 쓰기
     @Transactional
     public void sendPost(Long senderId, SendPostRequest request) {
-        Set<PostTag> foundTags = Collections.emptySet();
-        List<String> tagNames = request.tags();
-
-        if (tagNames != null && !tagNames.isEmpty()) {
-            foundTags = postTagRepository.findByContentIn(tagNames);
-        }
-
+        // 1. Post 엔티티 먼저 생성 (태그 연결 없이)
         Post post = Post.builder()
                 .senderId(senderId)
                 .receiverId(request.receiverId())
                 .content(request.detailContent())
                 .isAnonymous(request.isAnonymous())
-                .silentTime(request.silentTime())
-                .tags(foundTags) // 태그 연결
+                .isAnonymous(Boolean.valueOf(request.silentTime()))
                 .build();
 
+        List<String> tagNames = request.tags();
+
+        // 2. 태그 존재하면 각 태그 처리
+        if (tagNames != null && !tagNames.isEmpty()) {
+            for (String tagName : tagNames) {
+                Optional<PostTag> tag = postTagRepository.findByContent(tagName);
+                // 3. Post와 연관관계 사용해 중간 테이블로 연결
+                post.addTag(tag);
+            }
+        }
+
+        // 4. Post 저장 -> PostToTag도 같이 저장됨
         postRepository.save(post);
-        // Post에 Tag를 저장하면, Tag 테이블에서 찾아 중간 테이블에 조립하는 방식
     }
 }
