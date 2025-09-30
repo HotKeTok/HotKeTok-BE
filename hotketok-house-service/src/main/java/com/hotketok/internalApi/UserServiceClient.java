@@ -11,10 +11,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 @FeignClient(name = "user-service", url = "${client.user-service.url}")
 public interface UserServiceClient {
 
-    @PostMapping("/internal/users/change-role/{userId}")
+    @PostMapping("/internal/user-service/change-role/{userId}")
     void updateRole(@PathVariable("userId") Long userId, @RequestParam("role") Role role);
 
-    @GetMapping("/internal/users/get-tenantInfo/{userId}")
+    @GetMapping("/internal/user-service/get-tenantInfo/{userId}")
     TenantInfoResponse getTenantInfo(@PathVariable("userId") Long userId);
 }
 

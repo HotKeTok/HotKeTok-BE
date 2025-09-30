@@ -12,6 +12,8 @@ public enum UserErrorCode implements ErrorCode {
 
     USER_REGISTERED(HttpStatus.CONFLICT, "이미 존재하는 사용자입니다"),
     USER_ALREADY_DELETED(HttpStatus.BAD_REQUEST, "이미 삭제된 사용자입니다."),
+
+    CANT_CHANGE_CURRENT_ADDRESS(HttpStatus.FORBIDDEN,"현재 주소를 변경할 수 없습니다.")
     ;
 
     private final HttpStatus httpStatus;

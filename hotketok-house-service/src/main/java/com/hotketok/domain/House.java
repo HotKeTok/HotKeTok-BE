@@ -43,7 +43,7 @@ public class House {
     private HouseType type; // 상태 enum (HOME, COMPANY, ETC)
 
     @Builder(access = AccessLevel.PRIVATE)
-    private House(Long tenantId, Long ownerId, String address, String detailAddress, String floor, String number,String alias, String houseTag, String proveFile, HouseState state, HouseType type) {
+    private House(Long tenantId, Long ownerId, String address, String detailAddress, String floor, String number,String alias, String proveFile, HouseState state, HouseType type, Boolean isCurrent) {
         this.tenantId = tenantId;
         this.ownerId = ownerId;
         this.address = address;
@@ -60,17 +60,17 @@ public class House {
     @JoinColumn(name = "house_id")
     private Set<HouseTag> houseTags = new HashSet<>();
 
-    public static House createHouse(Long ownerId, String address, String detailAddress, String floor, String number,String alias, String proveFile,HouseType type) {
+    public static House createHouse(Long ownerId, String address, String detailAddress, String proveFile) {
         return House.builder()
                 .tenantId(null)
                 .ownerId(ownerId)
                 .address(address)
                 .detailAddress(detailAddress)
-                .floor(floor)
-                .number(number)
-                .alias(alias)
+                .floor(null)
+                .number(null)
+                .alias(null)
                 .state(HouseState.NONE)
-                .type(type)
+                .type(HouseType.NONE)
                 .proveFile(proveFile)
                 .build();
     }
@@ -84,8 +84,10 @@ public class House {
         this.tenantId = tenantId;
     }
 
-    public void registerTenant(String floor, String number) {
+    public void registerTenant(String floor, String number, String alias, HouseType type) {
         this.floor = floor;
         this.number = number;
+        this.alias = alias;
+        this.type = type;
     }
 }
