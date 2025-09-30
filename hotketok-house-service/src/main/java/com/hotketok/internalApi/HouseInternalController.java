@@ -28,21 +28,18 @@ public class HouseInternalController {
     private final HouseService houseService;
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<HouseInfoResponse> getHouseInfoByUserId(@PathVariable("userId") Long userId) {
-        HouseInfoResponse response = houseService.findHouseInfoByUserId(userId);
-        return ResponseEntity.ok(response);
+    public HouseInfoResponse getHouseInfoByUserId(@PathVariable("userId") Long userId) {
+        return houseService.findHouseInfoByUserId(userId);
     }
 
     @GetMapping("/user/{userId}/id")
-    public ResponseEntity<HouseIdResponse> getHouseIdByUserId(@PathVariable("userId") Long userId) {
-        HouseIdResponse response = houseService.findHouseIdByUserId(userId);
-        return ResponseEntity.ok(response);
+    public HouseIdResponse getHouseIdByUserId(@PathVariable("userId") Long userId) {
+        return houseService.findHouseIdByUserId(userId);
     }
 
     @GetMapping("/{houseId}/residents")
-    public ResponseEntity<List<HouseInfoResponse>> getResidentsByHouseId(@PathVariable("houseId") Long houseId) {
-        List<HouseInfoResponse> response = houseService.findResidentsByHouseId(houseId);
-        return ResponseEntity.ok(response);
+    public List<HouseInfoResponse> getResidentsByHouseId(@PathVariable("houseId") Long houseId) {
+        return houseService.findResidentsByHouseId(houseId);
     }
 
     @GetMapping("/find-house-by-address")
