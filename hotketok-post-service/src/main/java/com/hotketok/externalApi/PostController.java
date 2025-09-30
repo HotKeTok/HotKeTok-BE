@@ -1,5 +1,6 @@
 package com.hotketok.externalApi;
 
+import com.hotketok.dto.internalApi.AllHouseTagsResponse;
 import com.hotketok.dto.internalApi.PostDetailResponse;
 import com.hotketok.dto.internalApi.PostResponse;
 import com.hotketok.dto.internalApi.SendPostRequest;
@@ -44,5 +45,12 @@ public class PostController {
         Long userId = 101L;
         postService.sendPost(userId, request);
         return ResponseEntity.accepted().build();
+    }
+
+    // 이웃 목록 조회
+    @GetMapping("/tenant-list")
+    public AllHouseTagsResponse getAllHouseTags() {
+        Long userId = 101L; // 임시 데이터
+        return postService.getAllHouseTags(userId);
     }
 }

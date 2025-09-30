@@ -1,6 +1,7 @@
 package com.hotketok.service;
 
 import com.hotketok.domain.House;
+import com.hotketok.domain.HouseTag;
 import com.hotketok.domain.enums.HouseState;
 import com.hotketok.dto.*;
 import com.hotketok.dto.internalApi.HouseInfoResponse;
@@ -17,8 +18,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -113,8 +116,40 @@ public class HouseService {
         Optional<House> houseOptional = houseRepository.findByTenantIdOrOwnerId(userId, userId);
 
         return houseOptional
-                .map(house -> new HouseInfoResponse(house.getFloor(), house.getNumber()))
-                .orElse(new HouseInfoResponse(null, null));
+                .map(house -> {
+                    List<String> tagContents = house.getHouseTags().stream()
+                            .map(HouseTag::getContent)
+                            .collect(Collectors.toList());
+
+                    return new HouseInfoResponse(
+                            userId,
+                            house.getFloor(),
+                            house.getNumber(),
+                            tagContents
+                    );
+                })
+                .orElse(new HouseInfoResponse(userId, null, null, Collections.emptyList()));
+    }
+
+    // 내부 통신 API (userId로 같은 주택에 사는 입주민 정보를 가져오기 위함)
+    public List<HouseInfoResponse> findResidentsByHouseId(Long houseId) {
+        return houseRepository.findById(houseId).map(baseHouse -> {
+            String address = baseHouse.getAddress();
+            String detailAddress = baseHouse.getDetailAddress();
+
+            List<House> residents = houseRepository.findAllByAddressAndDetailAddress(address, detailAddress);
+
+            return residents.stream()
+                    .map(resident -> new HouseInfoResponse(
+                            resident.getTenantId() != null ? resident.getTenantId() : resident.getOwnerId(),
+                            resident.getFloor(),
+                            resident.getNumber(),
+                            resident.getHouseTags().stream()
+                                    .map(HouseTag::getContent)
+                                    .collect(Collectors.toList())
+                    ))
+                    .collect(Collectors.toList());
+        }).orElse(Collections.emptyList());
     }
 }
 
