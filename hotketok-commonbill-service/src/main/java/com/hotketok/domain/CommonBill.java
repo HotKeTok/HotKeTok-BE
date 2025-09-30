@@ -3,9 +3,7 @@ package com.hotketok.domain;
 import com.hotketok.domain.enums.BillType;
 import com.hotketok.hotketokjpaservice.entity.BaseTimeEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +18,7 @@ public class CommonBill extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long ownerId;
+    private String address;
 
     private int year;
 
@@ -45,6 +43,27 @@ public class CommonBill extends BaseTimeEntity {
                 .mapToLong(CommonBillDetail::getAmount).sum();
 
         balance = totalIncome - totalExpense;
+    }
+
+    @Builder(access = AccessLevel.PRIVATE)
+    private CommonBill(String address, int year, int month, Long totalIncome, Long totalExpense, Long balance) {
+        this.address = address;
+        this.year = year;
+        this.month = month;
+        this.totalIncome = totalIncome;
+        this.totalExpense = totalExpense;
+        this.balance = balance;
+    }
+
+    public static CommonBill createCommonBill(String address, int year, int month) {
+        return CommonBill.builder()
+                .address(address)
+                .year(year)
+                .month(month)
+                .totalIncome(0L)
+                .totalExpense(0L)
+                .balance(0L)
+                .build();
     }
 }
 
