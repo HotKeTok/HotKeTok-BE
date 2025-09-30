@@ -4,6 +4,7 @@ import com.hotketok.domain.House;
 import com.hotketok.domain.HouseTag;
 import com.hotketok.domain.enums.HouseState;
 import com.hotketok.dto.*;
+import com.hotketok.dto.internalApi.HouseIdResponse;
 import com.hotketok.dto.internalApi.HouseInfoResponse;
 import com.hotketok.dto.internalApi.Role;
 import com.hotketok.dto.internalApi.UploadFileResponse;
@@ -129,6 +130,13 @@ public class HouseService {
                     );
                 })
                 .orElse(new HouseInfoResponse(userId, null, null, Collections.emptyList()));
+    }
+
+    // 내부 통신 API (userId로 유저의 houseId 가져오기 위함)
+    public HouseIdResponse findHouseIdByUserId(Long userId) {
+        return houseRepository.findByTenantIdOrOwnerId(userId, userId)
+                .map(house -> new HouseIdResponse(house.getHouseId()))
+                .orElse(new HouseIdResponse(null));
     }
 
     // 내부 통신 API (userId로 같은 주택에 사는 입주민 정보를 가져오기 위함)

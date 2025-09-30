@@ -96,30 +96,30 @@ public class PostService {
     public AllHouseTagsResponse getAllHouseTags(Long userId) {
         HouseIdResponse houseIdResponse = userServiceClient.getHouseIdByUserId(userId);
         if (houseIdResponse == null || houseIdResponse.houseId() == null) {
-            return new AllHouseTagsResponse(Collections.emptyList()); // 집 정보가 없으면 빈 목록 반환
+            return new AllHouseTagsResponse(Collections.emptyList());
         }
         Long houseId = houseIdResponse.houseId();
 
         List<HouseInfoResponse> residents = userServiceClient.getResidentsByHouseId(houseId);
 
-        // 이웃 목록과 태그 연결
-        Map<String, Map<String, String>> floorData = new LinkedHashMap<>();
+        Map<String, Map<String, String>> tagsByFloor = new LinkedHashMap<>();
         for (HouseInfoResponse resident : residents) {
             String floor = resident.floor();
             String number = resident.number();
 
-            // 태그 리스트를 문자열로 합침
+            // 태그 리스트 연결
             String tagsAsString = null;
             if (resident.houseTags() != null && !resident.houseTags().isEmpty()) {
                 tagsAsString = String.join(", ", resident.houseTags());
             }
 
-            floorData.computeIfAbsent(floor, k -> new LinkedHashMap<>()).put(number, tagsAsString);
+            // 층을 키로 하는 맵이 없으면 새로 만들고 쌍을 추가
+            tagsByFloor.computeIfAbsent(floor, k -> new LinkedHashMap<>()).put(number, tagsAsString);
         }
 
-        List<FloorResponse> floorResponses = floorData.entrySet().stream()
+        List<FloorResponse> floorResponses = tagsByFloor.entrySet().stream()
                 .map(entry -> new FloorResponse(entry.getKey(), entry.getValue()))
-                .toList();
+                .collect(Collectors.toList());
 
         return new AllHouseTagsResponse(floorResponses);
     }

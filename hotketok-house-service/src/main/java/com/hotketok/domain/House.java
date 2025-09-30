@@ -34,8 +34,6 @@ public class House {
 
     private String alias; // 별칭
 
-    private String houseTag;
-
     private String proveFile; // 등기부등본 같은 증명자료
 
     @Enumerated(EnumType.STRING)

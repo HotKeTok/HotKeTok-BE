@@ -50,7 +50,7 @@ public class PostController {
     // 이웃 목록 조회
     @GetMapping("/tenant-list")
     public AllHouseTagsResponse getAllHouseTags() {
-        Long userId = 101L; // 임시 데이터
+        Long userId = 102L; // 임시 데이터
         return postService.getAllHouseTags(userId);
     }
 }
