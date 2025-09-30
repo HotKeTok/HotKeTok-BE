@@ -1,6 +1,6 @@
 package com.hotketok.internalApi;
 
-import com.hotketok.dto.MyPageHouseInfoResponse;
+import com.hotketok.dto.internalApi.GetHouseInfoByAddressResponse;
 import com.hotketok.service.HouseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,9 +14,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class HouseInternalController {
     private final HouseService houseService;
 
-    @GetMapping("/mypage/house")
-    public MyPageHouseInfoResponse getMyPageHouseInfo(@RequestParam("userId") Long userId, // 예시: Request 객체에 userId가 있다면
-                                                      @RequestParam("role") String role) {
-        return houseService.getMypageHouseInfo(userId,role);
+    @GetMapping("/find-house-by-address")
+    public GetHouseInfoByAddressResponse getHouseInfoByAddress(@RequestParam("userId") Long userId,
+                                                               @RequestParam("role") String role, @RequestParam("address") String address) {
+        return houseService.getHouseInfoByAddress(userId,role,address);
     }
 }
