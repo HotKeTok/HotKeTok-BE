@@ -108,4 +108,10 @@ public class UserService {
                 .map(UserProfileResponse::from)
                 .collect(Collectors.toList());
     }
+
+    public String getCurrentAddressByUserId(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
+        return user.getCurrentAddress();
+    }
 }

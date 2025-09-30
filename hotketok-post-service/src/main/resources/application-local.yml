@@ -1,18 +1,9 @@
 server:
-  port: 8088
+  port: 8097
 
 spring:
   application:
-    name: user-service
-  cloud:
-    kubernetes:
-      config:
-        enabled: false
-
-  servlet:
-    multipart:
-      max-file-size: 50MB    # 파일 하나의 최대 크기
-      max-request-size: 200MB # 전체 요청의 최대 크기
+    name: post-service
 
   # ===== H2 콘솔 =====
   h2:
@@ -21,16 +12,18 @@ spring:
       path: /h2-console
 
   # ===== 데이터소스 =====
-  datasource:
-#    url: jdbc:h2:tcp://localhost/~/user
+#  datasource:
+#    url: jdbc:h2:tcp://localhost/~/chatting
 #    username: sa
 #    password:
 #    driver-class-name: org.h2.Driver
-    url: jdbc:h2:file:~/user
+
+  datasource:
+    url: jdbc:h2:file:~/post
     username: sa
     password:
     driver-class-name: org.h2.Driver
-#
+
   # ===== JPA =====
   jpa:
     hibernate:
@@ -42,7 +35,7 @@ spring:
 
 eureka:
   instance:
-    hostname: user-service
+    hostname: chatting-service
     preferIpAddress: true
   client:
     registry-fetch-interval-seconds: 3
@@ -54,9 +47,10 @@ eureka:
 logging:
   level:
     org.hibernate.SQL: debug
+    com.hotketok: info
 
 client:
   house-service:
-    url: http://localhost:8090 # house-service의 주소
-  infra-service:
-    url: http://localhost:8089 # infra-service의 주소
+    url: http://localhost:8090
+  user-service:
+    url: http://localhost:8088
