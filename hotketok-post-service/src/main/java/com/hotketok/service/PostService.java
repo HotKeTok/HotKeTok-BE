@@ -5,6 +5,8 @@ import com.hotketok.domain.Post;
 import com.hotketok.domain.PostTag;
 import com.hotketok.domain.PostToTag;
 import com.hotketok.dto.internalApi.*;
+import com.hotketok.exception.PostErrorCode;
+import com.hotketok.hotketokcommonservice.error.exception.CustomException;
 import com.hotketok.internalApi.HouseServiceClient;
 import com.hotketok.internalApi.UserServiceClient;
 import com.hotketok.repository.PostRepository;
@@ -74,11 +76,11 @@ public class PostService {
     @Transactional
     public PostDetailResponse getPostDetail(Long postId, Long userId) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("해당하는 쪽지가 존재하지 않습니다. ID: " + postId));
+                .orElseThrow(() -> new CustomException(PostErrorCode.POST_NOT_FOUND));
 
         // 유저의 쪽지인지 확인
         if (!post.getSenderId().equals(userId) && !post.getReceiverId().equals(userId)) {
-            throw new IllegalArgumentException("해당 쪽지를 조회할 권한이 없습니다.");
+            throw new CustomException(PostErrorCode.POST_ACCESS_DENIED);
         }
 
         // HouseServiceClient로 집정보 받아옴
