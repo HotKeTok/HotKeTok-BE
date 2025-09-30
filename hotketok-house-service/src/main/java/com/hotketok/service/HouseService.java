@@ -65,7 +65,7 @@ public class HouseService {
         }
 
         house.changeTenantId(tenantId);
-        house.registerTenant(registerTenantRequest.floor(), registerTenantRequest.number());
+        house.registerTenant(registerTenantRequest.floor(), registerTenantRequest.number(), registerTenantRequest.alias(), registerTenantRequest.houseType());
         house.changeState(HouseState.TENANT_REQUEST);
         return new RegisterTenantResponse(tenantId, house.getHouseId());
     }
@@ -103,7 +103,7 @@ public class HouseService {
             throw new CustomException(HouseErrorCode.HOUSE_NOT_EQUAL_OWNER);
         }
         house.changeTenantId(null);
-        house.registerTenant(null, null);
+        house.registerTenant(null, null,null,null);
         house.changeState(HouseState.REGISTERED);
     }
 
