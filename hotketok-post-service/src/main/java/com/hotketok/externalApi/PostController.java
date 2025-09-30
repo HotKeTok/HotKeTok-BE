@@ -1,9 +1,6 @@
 package com.hotketok.externalApi;
 
-import com.hotketok.dto.internalApi.AllHouseTagsResponse;
-import com.hotketok.dto.internalApi.PostDetailResponse;
-import com.hotketok.dto.internalApi.PostResponse;
-import com.hotketok.dto.internalApi.SendPostRequest;
+import com.hotketok.dto.internalApi.*;
 import com.hotketok.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -49,8 +46,9 @@ public class PostController {
 
     // 이웃 목록 조회
     @GetMapping("/tenant-list")
-    public AllHouseTagsResponse getAllHouseTags() {
+    public ResponseEntity<List<FloorResponse>> getAllHouseTags() {
         Long userId = 102L; // 임시 데이터
-        return postService.getAllHouseTags(userId);
+        List<FloorResponse> response = postService.getAllHouseTags(userId);
+        return ResponseEntity.ok(response);
     }
 }

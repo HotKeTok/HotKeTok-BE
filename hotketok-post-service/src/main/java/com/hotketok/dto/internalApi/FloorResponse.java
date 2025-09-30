@@ -4,6 +4,6 @@ import java.util.Map;
 
 public record FloorResponse(
         String floor,
-        Map<String, String> units
+        Map<String, String> number
 ) {
 }

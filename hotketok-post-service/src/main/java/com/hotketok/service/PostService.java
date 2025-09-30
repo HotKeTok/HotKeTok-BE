@@ -95,29 +95,25 @@ public class PostService {
     }
 
     // 이웃 목록 조회
-    public AllHouseTagsResponse getAllHouseTags(Long userId) {
+    public List<FloorResponse> getAllHouseTags(Long userId) {
         HouseIdResponse houseIdResponse = houseServiceClient.getHouseIdByUserId(userId);
         if (houseIdResponse == null || houseIdResponse.houseId() == null) {
-            return new AllHouseTagsResponse(Collections.emptyList());
+            return Collections.emptyList();
         }
         Long houseId = houseIdResponse.houseId();
-        System.out.println("houseId = " + houseId);
 
         List<HouseInfoResponse> residents = houseServiceClient.getResidentsByHouseId(houseId);
-        System.out.println("residents = " + residents);
 
         Map<String, Map<String, String>> tagsByFloor = new LinkedHashMap<>();
         for (HouseInfoResponse resident : residents) {
             String floor = resident.floor();
             String number = resident.number();
 
-            // 태그 리스트 연결
             String tagsAsString = null;
             if (resident.houseTags() != null && !resident.houseTags().isEmpty()) {
                 tagsAsString = String.join(", ", resident.houseTags());
             }
 
-            // 층을 키로 하는 맵이 없으면 새로 만들고 쌍을 추가
             tagsByFloor.computeIfAbsent(floor, k -> new LinkedHashMap<>()).put(number, tagsAsString);
         }
 
@@ -125,6 +121,6 @@ public class PostService {
                 .map(entry -> new FloorResponse(entry.getKey(), entry.getValue()))
                 .collect(Collectors.toList());
 
-        return new AllHouseTagsResponse(floorResponses);
+        return floorResponses;
     }
 }
