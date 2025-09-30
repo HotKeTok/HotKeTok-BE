@@ -13,7 +13,7 @@ public interface HouseRepository extends JpaRepository<House, Long> {
 
     Optional<House> findByTenantIdOrOwnerId(Long tenantId, Long ownerId);
 
-    // HouseId로 모든 입주민 찾음
+  
     List<House> findAllByHouseId(Long houseId);
 
     // 같은 건물 주민을 모두 찾음
@@ -21,5 +21,4 @@ public interface HouseRepository extends JpaRepository<House, Long> {
 
     Optional<House> findFirstByAddressAndTenantId(String address, Long tenantId);
     Optional<House> findFirstByAddressAndOwnerId(String address, Long ownerId);
-
 }
