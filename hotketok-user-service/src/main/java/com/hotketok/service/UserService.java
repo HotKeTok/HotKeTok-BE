@@ -87,9 +87,7 @@ public class UserService {
     public MyPageInfoResponse GetMyPageInfo(Long userId, String role){
         User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
         if (role.equals("NONE")) return new MyPageInfoResponse(user.getName(),user.getPhoneNumber(),user.getLogInId(),null);
-
-        MyPageHouseInfoResponse houseInfo = houseServiceClient.getMyPageHouseInfo(userId,role);
-        return new MyPageInfoResponse(user.getName(), user.getPhoneNumber(), user.getLogInId(), houseInfo.address());
+        return new MyPageInfoResponse(user.getName(), user.getPhoneNumber(), user.getLogInId(), user.getCurrentAddress());
     }
 
     @Transactional

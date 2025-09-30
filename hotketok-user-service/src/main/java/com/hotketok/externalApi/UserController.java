@@ -18,7 +18,7 @@ public class UserController {
 
     private final UserService userService;
 
-    @GetMapping("/mypage")
+    @GetMapping("/mypage/info")
     public MyPageInfoResponse getMyPageProfile(@RequestHeader("userId") Long userId, @RequestHeader("role") String role) {
         return userService.GetMyPageInfo(userId, role);
     }
