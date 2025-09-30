@@ -56,7 +56,7 @@ spring:
                       - TENANT
 
             - id: house-service
-              uri: lb://infra-service
+              uri: lb://house-service
               predicates:
                 - Path=/api/house-service/**
                 - Method=GET,POST,PUT,DELETE

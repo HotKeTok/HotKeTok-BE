@@ -6,6 +6,7 @@ import com.hotketok.domain.enums.HouseState;
 import com.hotketok.dto.*;
 import com.hotketok.dto.internalApi.HouseIdResponse;
 import com.hotketok.dto.internalApi.HouseInfoResponse;
+import com.hotketok.dto.internalApi.GetHouseInfoByAddressResponse;
 import com.hotketok.dto.internalApi.Role;
 import com.hotketok.dto.internalApi.UploadFileResponse;
 import com.hotketok.exception.HouseErrorCode;
@@ -39,7 +40,7 @@ public class HouseService {
 
         List<Long> registeredHouses = new ArrayList<>();
         for (int i = 0 ; i < request.count(); i++) {
-            House house = House.createHouse(ownerId, request.address(),request.detailAddress(),null,null,null, uploadFileResponse.fileUrl(),request.houseType());
+            House house = House.createHouse(ownerId, request.address(),request.detailAddress(), uploadFileResponse.fileUrl());
             houseRepository.save(house);
             registeredHouses.add(house.getHouseId());
         }
@@ -72,7 +73,7 @@ public class HouseService {
         }
 
         house.changeTenantId(tenantId);
-        house.registerTenant(registerTenantRequest.floor(), registerTenantRequest.number());
+        house.registerTenant(registerTenantRequest.floor(), registerTenantRequest.number(), registerTenantRequest.alias(), registerTenantRequest.houseType());
         house.changeState(HouseState.TENANT_REQUEST);
         return new RegisterTenantResponse(tenantId, house.getHouseId());
     }
@@ -110,7 +111,7 @@ public class HouseService {
             throw new CustomException(HouseErrorCode.HOUSE_NOT_EQUAL_OWNER);
         }
         house.changeTenantId(null);
-        house.registerTenant(null, null);
+        house.registerTenant(null, null,null,null);
         house.changeState(HouseState.REGISTERED);
     }
 
@@ -168,6 +169,16 @@ public class HouseService {
             log.warn("houseId에 해당하는 기준 집을 찾지 못했습니다: houseId={}", houseId);
             return Collections.emptyList(); // 기준 집이 없으면 빈 리스트를 반환
         });
+
+    @Transactional(readOnly = true)
+    public GetHouseInfoByAddressResponse getHouseInfoByAddress(Long userId, String role, String address) {
+        House house = null;
+        if (role.equals("OWNER")){
+            house = houseRepository.findFirstByAddressAndOwnerId(address, userId).orElseThrow(() -> new CustomException(HouseErrorCode.HOUSE_NOT_FOUND));
+        }else if(role.equals("TENANT")){
+            house = houseRepository.findFirstByAddressAndTenantId(address, userId).orElseThrow(() -> new CustomException(HouseErrorCode.HOUSE_NOT_FOUND));
+        }
+        return new GetHouseInfoByAddressResponse(address,house.getNumber(),house.getState().toString());
     }
 }
 

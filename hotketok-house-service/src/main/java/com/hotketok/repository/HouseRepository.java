@@ -10,11 +10,13 @@ import java.util.Optional;
 public interface HouseRepository extends JpaRepository<House, Long> {
     List<House> findAllByOwnerIdAndState(Long ownerId, HouseState state);
     Optional<House> findFirstByAddressAndState(String address, HouseState state);
-    Optional<House> findByTenantIdOrOwnerId(Long tenantId, Long ownerId);
 
-    // HouseId로 모든 입주민 찾음
+    Optional<House> findByTenantIdOrOwnerId(Long tenantId, Long ownerId);
+  
     List<House> findAllByHouseId(Long houseId);
 
     // 같은 건물 주민을 모두 찾음
     List<House> findAllByAddressAndDetailAddress(String address, String detailAddress);
+    Optional<House> findFirstByAddressAndTenantId(String address, Long tenantId);
+    Optional<House> findFirstByAddressAndOwnerId(String address, Long ownerId);
 }
