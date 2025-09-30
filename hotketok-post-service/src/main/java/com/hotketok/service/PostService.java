@@ -1,10 +1,12 @@
 package com.hotketok.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hotketok.domain.Post;
 import com.hotketok.domain.PostTag;
 import com.hotketok.domain.PostToTag;
 import com.hotketok.dto.internalApi.*;
 import com.hotketok.internalApi.HouseServiceClient;
+import com.hotketok.internalApi.UserServiceClient;
 import com.hotketok.repository.PostRepository;
 import com.hotketok.repository.PostTagRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +25,9 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final PostTagRepository postTagRepository;
+    private final UserServiceClient userServiceClient;
     private final HouseServiceClient houseServiceClient;
+    private final ObjectMapper objectMapper;
 
     // 받은 쪽지 목록 조회
     public List<PostResponse> getReceiveList(Long userId) {
@@ -96,13 +100,10 @@ public class PostService {
 
     // 이웃 목록 조회
     public List<FloorResponse> getAllHouseTags(Long userId) {
-        HouseIdResponse houseIdResponse = houseServiceClient.getHouseIdByUserId(userId);
-        if (houseIdResponse == null || houseIdResponse.houseId() == null) {
-            return Collections.emptyList();
-        }
-        Long houseId = houseIdResponse.houseId();
+        CurrentAddressResponse currentAddressResponse = userServiceClient.getCurrentAddress(userId);
+        String currentAddress = currentAddressResponse.currentAddress();
 
-        List<HouseInfoResponse> residents = houseServiceClient.getResidentsByHouseId(houseId);
+        List<HouseInfoResponse> residents = houseServiceClient.getResidentsByAddress(currentAddress);
 
         Map<String, Map<String, String>> tagsByFloor = new LinkedHashMap<>();
         for (HouseInfoResponse resident : residents) {
@@ -117,10 +118,8 @@ public class PostService {
             tagsByFloor.computeIfAbsent(floor, k -> new LinkedHashMap<>()).put(number, tagsAsString);
         }
 
-        List<FloorResponse> floorResponses = tagsByFloor.entrySet().stream()
+        return tagsByFloor.entrySet().stream()
                 .map(entry -> new FloorResponse(entry.getKey(), entry.getValue()))
                 .collect(Collectors.toList());
-
-        return floorResponses;
     }
 }

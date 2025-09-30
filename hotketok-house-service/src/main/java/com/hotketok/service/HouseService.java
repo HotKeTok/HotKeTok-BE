@@ -4,9 +4,8 @@ import com.hotketok.domain.House;
 import com.hotketok.domain.HouseTag;
 import com.hotketok.domain.enums.HouseState;
 import com.hotketok.dto.*;
-import com.hotketok.dto.internalApi.HouseIdResponse;
-import com.hotketok.dto.internalApi.HouseInfoResponse;
 import com.hotketok.dto.internalApi.GetHouseInfoByAddressResponse;
+import com.hotketok.dto.internalApi.HouseInfoResponse;
 import com.hotketok.dto.internalApi.Role;
 import com.hotketok.dto.internalApi.UploadFileResponse;
 import com.hotketok.exception.HouseErrorCode;
@@ -20,10 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -129,46 +125,20 @@ public class HouseService {
                 .orElseThrow(() -> new IllegalArgumentException("해당 유저의 집 정보를 찾을 수 없습니다. userId=" + userId));
     }
 
-    // 내부 통신 API (userId로 유저의 houseId 가져오기 위함)
-    public HouseIdResponse findHouseIdByUserId(Long userId) {
-        return houseRepository.findByTenantIdOrOwnerId(userId, userId)
-                .map(house -> {
-                    log.info(">>>> [HouseService] 조회된 houseId: {}", house.getHouseId());
-                    return new HouseIdResponse(house.getHouseId());
-                })
-                .orElseGet(() -> {
-                    log.warn(">>>> [HouseService] userId에 해당하는 집을 찾지 못했습니다: userId={}", userId);
-                    return new HouseIdResponse(null);
-                });
-    }
+    // 이웃 목록 조회 내부 API
+    public List<HouseInfoResponse> findResidentsByAddress(String address) {
+        List<House> residents = houseRepository.findAllByAddressAndState(address, HouseState.MATCHED);
 
-    // 내부 통신 API (userId로 같은 주택에 사는 입주민 정보를 가져오기 위함)
-    public List<HouseInfoResponse> findResidentsByHouseId(Long houseId) {
-        return houseRepository.findById(houseId).map(baseHouse -> {
-            String address = baseHouse.getAddress();
-            String detailAddress = baseHouse.getDetailAddress();
-
-            List<House> residents = houseRepository.findAllByAddressAndDetailAddress(address, detailAddress);
-
-            List<HouseInfoResponse> responseList = residents.stream()
-                    .map(resident -> new HouseInfoResponse(
-                            resident.getTenantId() != null ? resident.getTenantId() : resident.getOwnerId(),
-                            resident.getFloor(),
-                            resident.getNumber(),
-                            // 태그 다중 반환
-                            resident.getHouseTags().stream()
-                                    .map(HouseTag::getContent)
-                                    .collect(Collectors.toList())
-                    ))
-                    .collect(Collectors.toList());
-
-            log.info("최종 반환될 주민 정보 DTO 목록: {}", responseList);
-            return responseList;
-
-        }).orElseGet(() -> {
-            log.warn("houseId에 해당하는 기준 집을 찾지 못했습니다: houseId={}", houseId);
-            return Collections.emptyList(); // 기준 집이 없으면 빈 리스트를 반환
-        });
+        return residents.stream()
+                .map(resident -> new HouseInfoResponse(
+                        resident.getTenantId() != null ? resident.getTenantId() : resident.getOwnerId(),
+                        resident.getFloor(),
+                        resident.getNumber(),
+                        resident.getHouseTags().stream()
+                                .map(HouseTag::getContent)
+                                .collect(Collectors.toList())
+                ))
+                .toList();
     }
 
     @Transactional(readOnly = true)

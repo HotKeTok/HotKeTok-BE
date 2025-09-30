@@ -1,10 +1,10 @@
 package com.hotketok.internalApi;
 
-import com.hotketok.dto.internalApi.HouseIdResponse;
 import com.hotketok.dto.internalApi.HouseInfoResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -14,10 +14,7 @@ public interface HouseServiceClient {
     @GetMapping("/internal/house-service/user/{userId}")
     HouseInfoResponse getHouseInfoByUserId(@PathVariable("userId") Long userId);
 
-    @GetMapping("/internal/house-service/user/{userId}/id")
-    HouseIdResponse getHouseIdByUserId(@PathVariable("userId") Long userId);
-
-    @GetMapping("/internal/house-service/{houseId}/residents")
-    List<HouseInfoResponse> getResidentsByHouseId(@PathVariable("houseId") Long houseId);
+    @GetMapping("/internal/house-service/residents")
+    List<HouseInfoResponse> getResidentsByAddress(@RequestParam String address);
 }
 

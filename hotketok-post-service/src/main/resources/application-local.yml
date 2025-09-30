@@ -52,3 +52,5 @@ logging:
 client:
   house-service:
     url: http://localhost:8090
+  user-service:
+    url: http://localhost:8088

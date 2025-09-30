@@ -17,7 +17,8 @@ public class PostController {
 
     // 받은 쪽지 목록 조회
     @GetMapping("/receive-list")
-    public List<PostResponse> getReceiveList(@RequestHeader("userId") Long userId) {
+    public List<PostResponse> getReceiveList() {
+        Long userId = 101L;
         return postService.getReceiveList(userId);
     }
 
@@ -35,15 +36,14 @@ public class PostController {
 
     // 쪽지 쓰기
     @PostMapping("/write")
-    public ResponseEntity<Void> sendPost(@RequestHeader("userId") Long userId, @RequestBody SendPostRequest request) {
+    public void sendPost(@RequestHeader("userId") Long userId, @RequestBody SendPostRequest request) {
         postService.sendPost(userId, request);
-        return ResponseEntity.accepted().build();
     }
 
     // 이웃 목록 조회
     @GetMapping("/tenant-list")
-    public ResponseEntity<List<FloorResponse>> getAllHouseTags(@RequestHeader("userId") Long userId) {
-        List<FloorResponse> response = postService.getAllHouseTags(userId);
-        return ResponseEntity.ok(response);
+    public List<FloorResponse> getAllHouseTags() {
+        Long userId = 101L;
+        return postService.getAllHouseTags(userId);
     }
 }

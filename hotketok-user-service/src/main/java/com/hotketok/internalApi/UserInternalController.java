@@ -1,6 +1,7 @@
 package com.hotketok.internalApi;
 
 // 채팅 서비스에서 호출하는 컨트롤러
+import com.hotketok.dto.internalApi.CurrentAddressResponse;
 import com.hotketok.dto.internalApi.UserProfileResponse;
 import com.hotketok.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -42,5 +43,11 @@ public class UserInternalController {
 
     @GetMapping("/get-tenantInfo/{userId}")
     public TenantInfoResponse getTenantInfo(@PathVariable("userId") Long userId){ return userService.getTenantInfo(userId);}
+
+    @GetMapping("/{userId}/current-address")
+    public CurrentAddressResponse getCurrentAddress(@PathVariable Long userId) {
+        String address = userService.getCurrentAddressByUserId(userId);
+        return new CurrentAddressResponse(address);
+    }
 }
 
