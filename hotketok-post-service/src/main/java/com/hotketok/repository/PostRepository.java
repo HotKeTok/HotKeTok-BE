@@ -7,4 +7,5 @@ import java.util.List;
 public interface PostRepository extends JpaRepository<Post, Long> {
     List<Post> findByReceiverId(Long recipientId);
     List<Post> findBySenderId(Long senderId);
+    List<Post> findAllBySenderIdIn(List<Long> senderIds);
 }

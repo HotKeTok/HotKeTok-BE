@@ -11,10 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -93,5 +90,49 @@ public class PostService {
 
         // 4. Post 저장 -> PostToTag도 같이 저장됨
         postRepository.save(post);
+    }
+
+    // 이웃 목록 조회
+    public AllHouseTagsResponse getAllHouseTags(Long userId) {
+        // 유저의 집 정보 가져옴
+        HouseIdResponse houseIdResponse = userServiceClient.getHouseIdByUserId(userId);
+        if (houseIdResponse == null || houseIdResponse.houseId() == null) {
+            return new AllHouseTagsResponse(Collections.emptyList()); // 집 정보가 없으면 빈 목록 반환
+        }
+        Long houseId = houseIdResponse.houseId();
+
+        List<HouseInfoResponse> residents = userServiceClient.getResidentsByHouseId(houseId);
+        List<Long> userIds = residents.stream().map(HouseInfoResponse::userId).toList();
+
+        // 3. 주민들의 ID를 사용하여 관련된 모든 쪽지를 한 번에 조회합니다.
+        List<Post> posts = postRepository.findAllBySenderIdIn(userIds);
+
+        // 4. 각 사용자(senderId)별로 가장 대표적인 태그 하나를 매핑합니다.
+        Map<Long, String> userTagMap = posts.stream()
+                .collect(Collectors.toMap(
+                        Post::getSenderId,
+                        post -> post.getPostToTags().stream()
+                                .findFirst()
+                                .map(postToTag -> postToTag.getTag().getContent())
+                                .orElse(null),
+                        (existing, replacement) -> existing
+                ));
+
+        // 5. 주민 정보를 층별 -> 호수별로 그룹화하고, 매핑된 태그를 할당합니다.
+        Map<String, Map<String, String>> floorData = new LinkedHashMap<>();
+        for (HouseInfoResponse resident : residents) {
+            String floor = resident.floor();
+            String number = resident.number();
+            String tag = userTagMap.get(resident.userId());
+
+            floorData.computeIfAbsent(floor, k -> new LinkedHashMap<>()).put(number, tag);
+        }
+
+        // 6. 최종 응답 DTO 형식으로 변환합니다.
+        List<FloorResponse> floorResponses = floorData.entrySet().stream()
+                .map(entry -> new FloorResponse(entry.getKey(), entry.getValue()))
+                .toList();
+
+        return new AllHouseTagsResponse(floorResponses);
     }
 }
