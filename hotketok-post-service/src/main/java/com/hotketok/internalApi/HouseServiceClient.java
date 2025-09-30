@@ -11,13 +11,13 @@ import java.util.List;
 @FeignClient(name = "house-service", url = "${client.house-service.url}")
 public interface HouseServiceClient {
 
-    @GetMapping("/internal/houses/user/{userId}")
+    @GetMapping("/internal/house-service/user/{userId}")
     HouseInfoResponse getHouseInfoByUserId(@PathVariable("userId") Long userId);
 
-    @GetMapping("/internal/houses/user/{userId}/id")
+    @GetMapping("/internal/house-service/user/{userId}/id")
     HouseIdResponse getHouseIdByUserId(@PathVariable("userId") Long userId);
 
-    @GetMapping("/internal/houses/{houseId}/residents")
+    @GetMapping("/internal/house-service/{houseId}/residents")
     List<HouseInfoResponse> getResidentsByHouseId(@PathVariable("houseId") Long houseId);
 }
 
