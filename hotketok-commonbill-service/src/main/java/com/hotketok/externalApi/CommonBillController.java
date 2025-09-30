@@ -21,5 +21,13 @@ public class CommonBillController {
         commonBillService.addCommonBillDetail(ownerId,request);
         return ResponseEntity.ok().build();
     }
+
+    // 입주민/집주인 - 내역 조회
+    @GetMapping("/view")
+    public GetCommonBillResponse view(@RequestHeader Long ownerId,
+                                      @RequestParam int year,
+                                      @RequestParam int month) {
+        return commonBillService.getCommonBills(ownerId, year, month);
+    }
 }
 
