@@ -17,8 +17,7 @@ public class PostController {
 
     // 받은 쪽지 목록 조회
     @GetMapping("/receive-list")
-    public List<PostResponse> getReceiveList() {
-        Long userId = 101L;
+    public List<PostResponse> getReceiveList(@RequestHeader("userId") Long userId) {
         return postService.getReceiveList(userId);
     }
 

@@ -27,17 +27,24 @@ public class PostService {
     private final PostTagRepository postTagRepository;
     private final UserServiceClient userServiceClient;
     private final HouseServiceClient houseServiceClient;
-    private final ObjectMapper objectMapper;
 
     // 받은 쪽지 목록 조회
     public List<PostResponse> getReceiveList(Long userId) {
         List<Post> posts = postRepository.findByReceiverId(userId);
 
+        CurrentAddressResponse currentAddressResponse = userServiceClient.getCurrentAddress(userId);
+        String currentAddress = currentAddressResponse.currentAddress();
+
         return posts.stream()
                 .map(post -> {
-                    // 쪽지를 보낸 사람의 집 정보를 UserService에 요청
-                    HouseInfoResponse houseInfo = houseServiceClient.getHouseInfoByUserId(post.getSenderId());
-                    return PostResponse.of(post, houseInfo);
+                    List<HouseInfoResponse> matchedHouses = houseServiceClient.getMatchedHousesByTenantAndAddress(post.getSenderId(), currentAddress);
+
+                    HouseInfoResponse matchedHouse = matchedHouses.stream()
+                            .filter(house -> house.userId().equals(post.getSenderId()))
+                            .findFirst()
+                            .orElse(null);
+
+                    return PostResponse.of(post, matchedHouse);
                 })
                 .collect(Collectors.toList());
     }
@@ -46,14 +53,24 @@ public class PostService {
     public List<PostResponse> getSendList(Long userId) {
         List<Post> posts = postRepository.findBySenderId(userId);
 
-        HouseInfoResponse houseInfo = houseServiceClient.getHouseInfoByUserId(userId);
+        CurrentAddressResponse currentAddressResponse = userServiceClient.getCurrentAddress(userId);
+        String currentAddress = currentAddressResponse.currentAddress();
 
         return posts.stream()
-                .map(post -> PostResponse.of(post, houseInfo))
+                .map(post -> {
+                    List<HouseInfoResponse> matchedHouses = houseServiceClient.getMatchedHousesByTenantAndAddress(post.getReceiverId(), currentAddress);
+
+                    HouseInfoResponse matchedHouse = matchedHouses.stream()
+                            .filter(house -> house.userId().equals(post.getReceiverId()))
+                            .findFirst()
+                            .orElse(null);
+
+                    return PostResponse.of(post, matchedHouse);
+                })
                 .collect(Collectors.toList());
     }
 
-    // 쪽지 내용 상세 조회
+    // 쪽지 상세 조회
     @Transactional
     public PostDetailResponse getPostDetail(Long postId, Long userId) {
         Post post = postRepository.findById(postId)

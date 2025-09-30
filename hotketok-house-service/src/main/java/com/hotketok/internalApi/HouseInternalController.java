@@ -16,14 +16,20 @@ public class HouseInternalController {
 
     private final HouseService houseService;
 
-    @GetMapping("/user/{userId}")
-    public HouseInfoResponse getHouseInfoByUserId(@PathVariable("userId") Long userId) {
-        return houseService.findHouseInfoByUserId(userId);
+    @GetMapping("/houses")
+    public List<HouseInfoResponse> getMatchedHousesByTenantAndAddress(
+            @RequestParam Long tenantId,
+            @RequestParam String address) {
+        return houseService.getMatchedHousesByTenantAndAddress(tenantId, address);
     }
-
     @GetMapping("/residents")
     public List<HouseInfoResponse> getResidentsByUserId(@RequestParam String address) {
         return houseService.findResidentsByAddress(address);
+    }
+
+    @GetMapping("/user/{userId}")
+    public HouseInfoResponse getHouseInfoByUserId(@PathVariable("userId") Long userId) {
+        return houseService.findHouseInfoByUserId(userId);
     }
 
     @GetMapping("/find-house-by-address")

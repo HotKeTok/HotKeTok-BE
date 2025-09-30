@@ -16,5 +16,11 @@ public interface HouseServiceClient {
 
     @GetMapping("/internal/house-service/residents")
     List<HouseInfoResponse> getResidentsByAddress(@RequestParam String address);
+
+    @GetMapping("/internal/house-service/houses")
+    List<HouseInfoResponse> getMatchedHousesByTenantAndAddress(
+            @RequestParam("tenantId") Long tenantId,
+            @RequestParam("address") String address
+    );
 }
 

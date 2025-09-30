@@ -111,18 +111,37 @@ public class HouseService {
         house.changeState(HouseState.REGISTERED);
     }
 
-    // 내부 통신 API (쪽지에서 집 정보를 가져오기 위함)
     public HouseInfoResponse findHouseInfoByUserId(Long userId) {
-        return houseRepository.findByTenantIdOrOwnerId(userId, userId)
+        return houseRepository.findByTenantId(userId)
+                .map(house -> {
+                    List<String> tagContents = house.getHouseTags().stream()
+                            .map(HouseTag::getContent)
+                            .collect(Collectors.toList());
+
+                    return new HouseInfoResponse(
+                            userId,
+                            house.getFloor(),
+                            house.getNumber(),
+                            tagContents
+                    );
+                })
+                .orElseThrow(() -> new CustomException(HouseErrorCode.HOUSE_NOT_FOUND));
+    }
+
+    // 내부 통신 API (쪽지에서 집 정보를 가져오기 위함)
+    public List<HouseInfoResponse> getMatchedHousesByTenantAndAddress(Long tenantId, String address) {
+        List<House> matchedHouses = houseRepository.findAllByAddressAndStateAndTenantId(address, HouseState.MATCHED, tenantId);
+
+        return matchedHouses.stream()
                 .map(house -> new HouseInfoResponse(
-                        userId,
+                        tenantId,
                         house.getFloor(),
                         house.getNumber(),
                         house.getHouseTags().stream()
-                                .map(HouseTag::getContent)
+                                .map(tag -> tag.getContent())
                                 .collect(Collectors.toList())
                 ))
-                .orElseThrow(() -> new IllegalArgumentException("해당 유저의 집 정보를 찾을 수 없습니다. userId=" + userId));
+                .collect(Collectors.toList());
     }
 
     // 이웃 목록 조회 내부 API
