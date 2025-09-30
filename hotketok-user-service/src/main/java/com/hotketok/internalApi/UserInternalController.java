@@ -17,7 +17,7 @@ import com.hotketok.dto.UserInfo;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/internal/users")
+@RequestMapping("/internal/user-service")
 @RequiredArgsConstructor
 public class UserInternalController {
 

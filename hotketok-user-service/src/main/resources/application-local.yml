@@ -9,6 +9,11 @@ spring:
       config:
         enabled: false
 
+  servlet:
+    multipart:
+      max-file-size: 50MB    # 파일 하나의 최대 크기
+      max-request-size: 200MB # 전체 요청의 최대 크기
+
   # ===== H2 콘솔 =====
   h2:
     console:
@@ -49,3 +54,9 @@ eureka:
 logging:
   level:
     org.hibernate.SQL: debug
+
+client:
+  house-service:
+    url: http://localhost:8090 # house-service의 주소
+  infra-service:
+    url: http://localhost:8089 # infra-service의 주소

@@ -1,6 +1,5 @@
 package com.hotketok.externalApi;
 
-import com.hotketok.domain.House;
 import com.hotketok.dto.*;
 import com.hotketok.service.HouseService;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/houses-service")
+@RequestMapping("/api/house-service")
 @RequiredArgsConstructor
 public class HouseController {
     private final HouseService houseService;

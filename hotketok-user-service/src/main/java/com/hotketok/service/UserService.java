@@ -1,22 +1,22 @@
 package com.hotketok.service;
 
+import com.hotketok.dto.*;
+import com.hotketok.dto.internalApi.GetHouseInfoByAddressResponse;
+import com.hotketok.dto.internalApi.MyPageHouseInfoResponse;
+import com.hotketok.dto.internalApi.UploadFileResponse;
 import com.hotketok.dto.internalApi.UserProfileResponse;
+import com.hotketok.internalApi.HouseServiceClient;
+import com.hotketok.internalApi.InfraServiceClient;
 import com.hotketok.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.hotketok.domain.User;
 import com.hotketok.domain.enums.Role;
-import com.hotketok.dto.SignUpRequest;
-import com.hotketok.dto.TenantInfoResponse;
-import com.hotketok.dto.UserInfo;
 import com.hotketok.exception.UserErrorCode;
 import com.hotketok.hotketokcommonservice.error.exception.CustomException;
-import com.hotketok.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,6 +28,8 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final HouseServiceClient houseServiceClient;
+    private final InfraServiceClient infraServiceClient;
   
     @Transactional
     public void save(SignUpRequest req){
@@ -58,6 +60,42 @@ public class UserService {
     public void updateRole(Long id, Role role){
         User user = userRepository.findById(id).orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
         user.changeRole(role);
+    }
+
+    @Transactional
+    public void updateCurrentAddress(Long id, String updateAddress){
+        User user = userRepository.findById(id).orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
+        GetHouseInfoByAddressResponse response;
+        if (user.getRole().equals(Role.OWNER)){
+            response = houseServiceClient.getHouseInfoByAddress(id, user.getRole().name(), updateAddress);
+            if (response.houseState().equals("NONE")){
+                throw new CustomException(UserErrorCode.CANT_CHANGE_CURRENT_ADDRESS);
+            }
+        } else if(user.getRole().equals(Role.TENANT)){
+            response = houseServiceClient.getHouseInfoByAddress(id,user.getRole().name(),updateAddress);
+            if (response.houseState().equals("TENANT_REQUEST")){
+                throw new CustomException(UserErrorCode.CANT_CHANGE_CURRENT_ADDRESS);
+            }
+        } else if(user.getRole().equals(Role.NONE)){
+            throw new CustomException(UserErrorCode.CANT_CHANGE_CURRENT_ADDRESS);
+        }
+
+        user.changeCurrentAddress(updateAddress);
+    }
+
+    @Transactional(readOnly = true)
+    public MyPageInfoResponse GetMyPageInfo(Long userId, String role){
+        User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
+        if (role.equals("NONE")) return new MyPageInfoResponse(user.getName(),user.getPhoneNumber(),user.getLogInId(),null);
+        return new MyPageInfoResponse(user.getName(), user.getPhoneNumber(), user.getLogInId(), user.getCurrentAddress());
+    }
+
+    @Transactional
+    public void UpdateMyPageInfo(Long userId, MultipartFile image, UpdateMyPageInfoRequest updateMyPageInfoRequest){
+        User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
+        UploadFileResponse uploadFileResponse = infraServiceClient.uploadFile(image, "user-profile/");
+        user.changeProfileImage(uploadFileResponse.fileUrl());
+        user.changeName(updateMyPageInfoRequest.name());
     }
 
     private UserInfo toDto(User u){
