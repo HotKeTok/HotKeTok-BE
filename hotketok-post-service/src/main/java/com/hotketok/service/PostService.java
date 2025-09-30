@@ -8,6 +8,7 @@ import com.hotketok.internalApi.HouseServiceClient;
 import com.hotketok.repository.PostRepository;
 import com.hotketok.repository.PostTagRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,13 +16,14 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class PostService {
 
     private final PostRepository postRepository;
     private final PostTagRepository postTagRepository;
-    private final HouseServiceClient userServiceClient;
+    private final HouseServiceClient houseServiceClient;
 
     // 받은 쪽지 목록 조회
     public List<PostResponse> getReceiveList(Long userId) {
@@ -30,7 +32,7 @@ public class PostService {
         return posts.stream()
                 .map(post -> {
                     // 쪽지를 보낸 사람의 집 정보를 UserService에 요청
-                    HouseInfoResponse houseInfo = userServiceClient.getHouseInfoByUserId(post.getSenderId());
+                    HouseInfoResponse houseInfo = houseServiceClient.getHouseInfoByUserId(post.getSenderId());
                     return PostResponse.of(post, houseInfo);
                 })
                 .collect(Collectors.toList());
@@ -40,7 +42,7 @@ public class PostService {
     public List<PostResponse> getSendList(Long userId) {
         List<Post> posts = postRepository.findBySenderId(userId);
 
-        HouseInfoResponse houseInfo = userServiceClient.getHouseInfoByUserId(userId);
+        HouseInfoResponse houseInfo = houseServiceClient.getHouseInfoByUserId(userId);
 
         return posts.stream()
                 .map(post -> PostResponse.of(post, houseInfo))
@@ -59,7 +61,7 @@ public class PostService {
         }
 
         // HouseServiceClient로 집정보 받아옴
-        HouseInfoResponse houseInfo = userServiceClient.getHouseInfoByUserId(post.getSenderId());
+        HouseInfoResponse houseInfo = houseServiceClient.getHouseInfoByUserId(post.getSenderId());
 
         return PostDetailResponse.of(post, houseInfo);
     }
@@ -94,13 +96,15 @@ public class PostService {
 
     // 이웃 목록 조회
     public AllHouseTagsResponse getAllHouseTags(Long userId) {
-        HouseIdResponse houseIdResponse = userServiceClient.getHouseIdByUserId(userId);
+        HouseIdResponse houseIdResponse = houseServiceClient.getHouseIdByUserId(userId);
         if (houseIdResponse == null || houseIdResponse.houseId() == null) {
             return new AllHouseTagsResponse(Collections.emptyList());
         }
         Long houseId = houseIdResponse.houseId();
+        System.out.println("houseId = " + houseId);
 
-        List<HouseInfoResponse> residents = userServiceClient.getResidentsByHouseId(houseId);
+        List<HouseInfoResponse> residents = houseServiceClient.getResidentsByHouseId(houseId);
+        System.out.println("residents = " + residents);
 
         Map<String, Map<String, String>> tagsByFloor = new LinkedHashMap<>();
         for (HouseInfoResponse resident : residents) {

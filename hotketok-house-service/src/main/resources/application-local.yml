@@ -51,6 +51,7 @@ eureka:
 logging:
   level:
     org.hibernate.SQL: debug
+    com.hotketok: info
 
 client:
   user-service:

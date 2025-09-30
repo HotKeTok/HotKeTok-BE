@@ -1,5 +1,6 @@
 package com.hotketok.internalApi;
 
+import com.hotketok.dto.internalApi.HouseIdResponse;
 import com.hotketok.dto.internalApi.HouseInfoResponse;
 import com.hotketok.service.HouseService;
 import lombok.RequiredArgsConstructor;
@@ -18,9 +19,15 @@ public class HouseInternalController {
 
     private final HouseService houseService;
 
-    @GetMapping("/user/{userId}/id")
+    @GetMapping("/user/{userId}")
     public ResponseEntity<HouseInfoResponse> getHouseInfoByUserId(@PathVariable("userId") Long userId) {
         HouseInfoResponse response = houseService.findHouseInfoByUserId(userId);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/user/{userId}/id")
+    public ResponseEntity<HouseIdResponse> getHouseIdByUserId(@PathVariable("userId") Long userId) {
+        HouseIdResponse response = houseService.findHouseIdByUserId(userId);
         return ResponseEntity.ok(response);
     }
 

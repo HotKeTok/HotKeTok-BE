@@ -15,9 +15,6 @@ public interface HouseRepository extends JpaRepository<House, Long> {
     // HouseId로 모든 입주민 찾음
     List<House> findAllByHouseId(Long houseId);
 
-    // UserId로 HouseId 찾음
-    Optional<House> findFirstByTenantIdOrOwnerId(Long tenantId, Long ownerId);
-
     // 같은 건물 주민을 모두 찾음
     List<House> findAllByAddressAndDetailAddress(String address, String detailAddress);
 }
