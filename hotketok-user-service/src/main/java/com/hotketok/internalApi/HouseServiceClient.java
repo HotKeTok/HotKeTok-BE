@@ -16,6 +16,6 @@ public interface HouseServiceClient {
                                                         @RequestParam("role") String role,
                                                         @RequestParam("address") String address);
 
-    @GetMapping("/internal/house/residents")
+    @GetMapping("/internal/house-service/residents")
     List<HouseInfoResponse> getResidentsByAddress(@RequestParam String address);
 }
