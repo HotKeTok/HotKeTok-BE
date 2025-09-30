@@ -52,8 +52,8 @@ public class Post  extends BaseTimeEntity {
     }
 
     // 연관관계 편의 메서드
-    public void addTag(Optional<PostTag> tag) {
-        PostToTag postToTag = PostToTag.createPostToTag(this, tag):
+    public void addTag(PostTag tag) {
+        PostToTag postToTag = PostToTag.createPostToTag(this, tag);
         this.postToTags.add(postToTag);
     }
 }

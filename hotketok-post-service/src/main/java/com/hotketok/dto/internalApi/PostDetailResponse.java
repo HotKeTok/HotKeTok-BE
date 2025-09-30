@@ -1,7 +1,6 @@
 package com.hotketok.dto.internalApi;
 
 import com.hotketok.domain.Post;
-import com.hotketok.domain.PostTag;
 //import com.hotketok.dto.internalApi.UserProfileResponse;
 
 import java.time.LocalDateTime;
@@ -11,12 +10,12 @@ import java.util.stream.Collectors;
 
 public record PostDetailResponse(
         Long senderId,
-        //String senderNumber,
+        String senderNumber,
         LocalDateTime createdAt,
         List<String> tags,
         String content
 ) {
-    public static PostDetailResponse of(Post post) {
+    public static PostDetailResponse of(Post post, HouseInfoResponse houseInfo) {
         List<String> tagNames;
 
         if (post.getPostToTags() != null && !post.getPostToTags().isEmpty()) {
@@ -28,8 +27,16 @@ public record PostDetailResponse(
             tagNames = Collections.emptyList();
         }
 
+        // 층 호수 연결
+        String senderNumber = null;
+        if (houseInfo != null && houseInfo.floor() != null && houseInfo.number() != null) {
+//            senderNumber = houseInfo.floor() + " " + houseInfo.number();
+            senderNumber = houseInfo.number();
+        }
+
         return new PostDetailResponse(
                 post.getSenderId(),
+                senderNumber,
                 post.getCreatedAt(),
                 tagNames,
                 post.getContent()

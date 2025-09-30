@@ -3,6 +3,7 @@ package com.hotketok.service;
 import com.hotketok.domain.House;
 import com.hotketok.domain.enums.HouseState;
 import com.hotketok.dto.*;
+import com.hotketok.dto.internalApi.HouseInfoResponse;
 import com.hotketok.dto.internalApi.Role;
 import com.hotketok.dto.internalApi.UploadFileResponse;
 import com.hotketok.exception.HouseErrorCode;
@@ -17,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -104,6 +106,15 @@ public class HouseService {
         house.changeTenantId(null);
         house.registerTenant(null, null);
         house.changeState(HouseState.REGISTERED);
+    }
+
+    // 내부 통신 API (쪽지에서 집 정보를 가져오기 위함)
+    public HouseInfoResponse findHouseInfoByUserId(Long userId) {
+        Optional<House> houseOptional = houseRepository.findByTenantIdOrOwnerId(userId, userId);
+
+        return houseOptional
+                .map(house -> new HouseInfoResponse(house.getFloor(), house.getNumber()))
+                .orElse(new HouseInfoResponse(null, null));
     }
 }
 

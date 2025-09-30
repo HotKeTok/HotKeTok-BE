@@ -2,9 +2,9 @@ package com.hotketok.service;
 
 import com.hotketok.domain.Post;
 import com.hotketok.domain.PostTag;
-import com.hotketok.dto.internalApi.PostDetailResponse;
-import com.hotketok.dto.internalApi.PostResponse;
-import com.hotketok.dto.internalApi.SendPostRequest;
+import com.hotketok.domain.PostToTag;
+import com.hotketok.dto.internalApi.*;
+import com.hotketok.internalApi.HouseServiceClient;
 import com.hotketok.repository.PostRepository;
 import com.hotketok.repository.PostTagRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,13 +24,18 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final PostTagRepository postTagRepository;
+    private final HouseServiceClient userServiceClient;
 
     // 받은 쪽지 목록 조회
     public List<PostResponse> getReceiveList(Long userId) {
         List<Post> posts = postRepository.findByReceiverId(userId);
 
         return posts.stream()
-                .map(PostResponse::new) // 생성자 참조 사용해 간결하게 변환
+                .map(post -> {
+                    // 쪽지를 보낸 사람의 집 정보를 UserService에 요청
+                    HouseInfoResponse houseInfo = userServiceClient.getHouseInfoByUserId(post.getSenderId());
+                    return PostResponse.of(post, houseInfo);
+                })
                 .collect(Collectors.toList());
     }
 
@@ -38,8 +43,10 @@ public class PostService {
     public List<PostResponse> getSendList(Long userId) {
         List<Post> posts = postRepository.findBySenderId(userId);
 
+        HouseInfoResponse houseInfo = userServiceClient.getHouseInfoByUserId(userId);
+
         return posts.stream()
-                .map(PostResponse::new)
+                .map(post -> PostResponse.of(post, houseInfo))
                 .collect(Collectors.toList());
     }
 
@@ -54,7 +61,10 @@ public class PostService {
             throw new IllegalArgumentException("해당 쪽지를 조회할 권한이 없습니다.");
         }
 
-        return PostDetailResponse.of(post);
+        // HouseServiceClient로 집정보 받아옴
+        HouseInfoResponse houseInfo = userServiceClient.getHouseInfoByUserId(post.getSenderId());
+
+        return PostDetailResponse.of(post, houseInfo);
     }
 
     // 쪽지 쓰기
@@ -66,7 +76,7 @@ public class PostService {
                 .receiverId(request.receiverId())
                 .content(request.detailContent())
                 .isAnonymous(request.isAnonymous())
-                .isAnonymous(Boolean.valueOf(request.silentTime()))
+                .silentTime(request.silentTime())
                 .build();
 
         List<String> tagNames = request.tags();
@@ -74,8 +84,9 @@ public class PostService {
         // 2. 태그 존재하면 각 태그 처리
         if (tagNames != null && !tagNames.isEmpty()) {
             for (String tagName : tagNames) {
-                Optional<PostTag> tag = postTagRepository.findByContent(tagName);
-                // 3. Post와 연관관계 사용해 중간 테이블로 연결
+                PostTag tag = postTagRepository.findByContent(tagName)
+                        .orElseGet(() -> postTagRepository.save(PostTag.createPostTag(tagName)));
+
                 post.addTag(tag);
             }
         }
