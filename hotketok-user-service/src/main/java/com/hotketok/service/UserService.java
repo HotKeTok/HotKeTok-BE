@@ -1,6 +1,7 @@
 package com.hotketok.service;
 
 import com.hotketok.dto.*;
+import com.hotketok.dto.internalApi.GetHouseInfoByAddressResponse;
 import com.hotketok.dto.internalApi.MyPageHouseInfoResponse;
 import com.hotketok.dto.internalApi.UploadFileResponse;
 import com.hotketok.dto.internalApi.UserProfileResponse;
@@ -14,11 +15,7 @@ import com.hotketok.domain.User;
 import com.hotketok.domain.enums.Role;
 import com.hotketok.exception.UserErrorCode;
 import com.hotketok.hotketokcommonservice.error.exception.CustomException;
-import com.hotketok.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -63,6 +60,27 @@ public class UserService {
     public void updateRole(Long id, Role role){
         User user = userRepository.findById(id).orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
         user.changeRole(role);
+    }
+
+    @Transactional
+    public void updateCurrentAddress(Long id, String updateAddress){
+        User user = userRepository.findById(id).orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
+        GetHouseInfoByAddressResponse response;
+        if (user.getRole().equals(Role.OWNER)){
+            response = houseServiceClient.getHouseInfoByAddress(id, user.getRole().name(), updateAddress);
+            if (response.houseState().equals("NONE")){
+                throw new CustomException(UserErrorCode.CANT_CHANGE_CURRENT_ADDRESS);
+            }
+        } else if(user.getRole().equals(Role.TENANT)){
+            response = houseServiceClient.getHouseInfoByAddress(id,user.getRole().name(),updateAddress);
+            if (response.houseState().equals("TENANT_REQUEST")){
+                throw new CustomException(UserErrorCode.CANT_CHANGE_CURRENT_ADDRESS);
+            }
+        } else if(user.getRole().equals(Role.NONE)){
+            throw new CustomException(UserErrorCode.CANT_CHANGE_CURRENT_ADDRESS);
+        }
+
+        user.changeCurrentAddress(updateAddress);
     }
 
     @Transactional(readOnly = true)

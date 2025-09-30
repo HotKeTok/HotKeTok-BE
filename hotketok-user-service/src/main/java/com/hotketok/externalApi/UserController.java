@@ -1,5 +1,6 @@
 package com.hotketok.externalApi;
 
+import com.hotketok.dto.ChangeCurrentAddressRequest;
 import com.hotketok.dto.MyPageInfoResponse;
 import com.hotketok.dto.UpdateMyPageInfoRequest;
 import com.hotketok.service.UserService;
@@ -28,6 +29,15 @@ public class UserController {
             @RequestPart(value = "data") UpdateMyPageInfoRequest updateMyPageInfoRequest,
             @RequestPart(value = "image") MultipartFile image) {
         userService.UpdateMyPageInfo(userId,image,updateMyPageInfoRequest);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping(value = "/change-currentAddress")
+    public ResponseEntity<Void> changeCurrentAddress(
+            @RequestHeader("userId") Long userId,
+            @RequestBody ChangeCurrentAddressRequest request
+    ){
+        userService.updateCurrentAddress(userId, request.currentAddress());
         return ResponseEntity.ok().build();
     }
 }

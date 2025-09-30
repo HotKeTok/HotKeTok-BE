@@ -3,7 +3,6 @@ package com.hotketok.domain;
 import com.hotketok.domain.enums.Role;
 import com.hotketok.hotketokjpaservice.entity.BaseTimeEntity;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -36,14 +35,17 @@ public class User extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    private String currentAddress;
+
     @Builder(access = AccessLevel.PRIVATE)
-    private User(String logInId, String password, String phoneNumber, String name, String profileImage, Role role) {
+    private User(String logInId, String password, String phoneNumber, String name, String profileImage, Role role, String currentAddress) {
         this.logInId = logInId;
         this.password = password;
         this.phoneNumber = phoneNumber;
         this.name = name;
         this.profileImage = profileImage;
         this.role = role;
+        this.currentAddress = currentAddress;
     }
 
     public static User createUser(String logInId, String password, String phoneNumber, String name) {
@@ -54,6 +56,7 @@ public class User extends BaseTimeEntity {
                 .name(name)
                 .profileImage(null)
                 .role(Role.NONE)
+                .currentAddress(null)
                 .build();
     }
 
@@ -67,5 +70,9 @@ public class User extends BaseTimeEntity {
 
     public void changeName(String name) {
         this.name = name;
+    }
+
+    public void changeCurrentAddress(String currentAddress) {
+        this.currentAddress = currentAddress;
     }
 }
