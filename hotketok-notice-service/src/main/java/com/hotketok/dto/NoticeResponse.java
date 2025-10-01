@@ -2,27 +2,26 @@ package com.hotketok.dto;
 
 import com.hotketok.domain.Notice;
 import com.hotketok.dto.internalApi.UserProfileResponse;
-import lombok.Builder;
-import lombok.Getter;
 
 import java.time.LocalDateTime;
 
-@Getter
-@Builder
-public class NoticeResponse {
-    private final String author;
-    private final String authorProfileImage;
-    private final String title;
-    private final LocalDateTime date;
-    private final boolean isFix;
+public record NoticeResponse(
+        String author,
+        String authorProfileImage,
+        String title,
+        LocalDateTime date,
+        boolean isFix
+) {
+    public static NoticeResponse of(Notice notice, UserProfileResponse authorProfile) {
+        String authorName = (authorProfile != null) ? authorProfile.userName() : "(알 수 없음)";
+        String profileImage = (authorProfile != null) ? authorProfile.profileImageUrl() : null;
 
-    public static NoticeResponse of(Notice notice, UserProfileResponse authorInfo) {
-        return NoticeResponse.builder()
-                .author(authorInfo.userName())
-                .authorProfileImage(authorInfo.profileImageUrl())
-                .title(notice.getTitle())
-                .date(notice.getCreatedAt())
-                .isFix(notice.getIsFix())
-                .build();
+        return new NoticeResponse(
+                authorName,
+                profileImage,
+                notice.getTitle(),
+                notice.getCreatedAt(),
+                notice.getIsFix()
+        );
     }
 }
