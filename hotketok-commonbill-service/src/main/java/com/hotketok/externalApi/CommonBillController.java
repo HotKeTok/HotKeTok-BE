@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/commonBill-service")
+@RequestMapping("/api/commonbill-service")
 @RequiredArgsConstructor
 public class CommonBillController {
 
@@ -24,7 +24,7 @@ public class CommonBillController {
 
     // 입주민/집주인 - 내역 조회
     @GetMapping("/view")
-    public GetCommonBillResponse view(@RequestHeader Long ownerId,
+    public GetCommonBillResponse view(@RequestHeader("userId") Long ownerId,
                                       @RequestParam int year,
                                       @RequestParam int month) {
         return commonBillService.getCommonBills(ownerId, year, month);
