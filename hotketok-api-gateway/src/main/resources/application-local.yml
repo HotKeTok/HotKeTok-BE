@@ -85,6 +85,18 @@ spring:
                       - TENANT
                       - VENDOR
 
+            - id: commonbill-service
+              uri: lb://commonbill-service
+              predicates:
+                - Path=/api/commonbill-service/**
+                - Method=GET,POST,PUT,DELETE
+              filters:
+                - JwtAuthFilter
+                - name: RoleFilter
+                  args:
+                    allowedRoles:
+                      - OWNER
+                      - TENANT
 
 jwt:
   secret: ThisIsHotketokSecretKeyThisIsHotketokSecretKey
