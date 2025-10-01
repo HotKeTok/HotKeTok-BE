@@ -4,6 +4,7 @@ import com.hotketok.domain.Notice;
 import com.hotketok.dto.CreateNoticeRequest;
 import com.hotketok.dto.NoticeDetailResponse;
 import com.hotketok.dto.NoticeResponse;
+import com.hotketok.dto.UpdateNoticeRequest;
 import com.hotketok.dto.internalApi.CurrentAddressResponse;
 import com.hotketok.dto.internalApi.UserProfileResponse;
 import com.hotketok.exception.NoticeErrorCode;
@@ -76,5 +77,19 @@ public class NoticeService {
         );
 
         noticeRepository.save(notice);
+    }
+
+    // 공지사항 수정
+    @Transactional
+    public void updateNotice(Long userId, UpdateNoticeRequest request) {
+        Long noticeId = request.noticeId();
+        Notice notice = noticeRepository.findById(noticeId)
+                .orElseThrow(() -> new CustomException(NoticeErrorCode.NOTICE_NOT_FOUND));
+
+        if (!notice.getAuthorId().equals(userId)) {
+            throw new CustomException(NoticeErrorCode.NO_AUTHORITY_TO_UPDATE);
+        }
+
+        notice.updateNotice(request.title(), request.content(), request.isFix());
     }
 }

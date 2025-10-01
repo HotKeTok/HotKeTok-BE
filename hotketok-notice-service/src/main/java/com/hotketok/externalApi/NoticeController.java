@@ -4,6 +4,7 @@ import com.hotketok.domain.Notice;
 import com.hotketok.dto.CreateNoticeRequest;
 import com.hotketok.dto.NoticeDetailResponse;
 import com.hotketok.dto.NoticeResponse;
+import com.hotketok.dto.UpdateNoticeRequest;
 import com.hotketok.service.NoticeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -37,5 +38,12 @@ public class NoticeController {
     public void createNotice(@RequestBody CreateNoticeRequest request) {
         Long userId = 101L;
         noticeService.createNotice(userId, request);
+    }
+
+    // 공지사항 수정
+    @PatchMapping
+    public void updateNotice(@RequestBody UpdateNoticeRequest request) {
+        Long userId = 101L;
+        noticeService.updateNotice(userId, request);
     }
 }

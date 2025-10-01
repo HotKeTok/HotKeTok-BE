@@ -49,4 +49,16 @@ public class Notice {
                 .isFix(isFix != null && isFix)
                 .build();
     }
+
+    public void updateNotice(String title, String content, Boolean isFix) { // null이 아닌 것만 update
+        if (title != null) {
+            this.title = title;
+        }
+        if (content != null) {
+            this.content = content;
+        }
+        if (isFix != null) {
+            this.isFix = isFix;
+        }
+    }
 }
