@@ -20,8 +20,9 @@ public class CommonBill extends BaseTimeEntity {
 
     private String address;
 
+    @Column(name = "bill_year")
     private int year;
-
+    @Column(name = "bill_month")
     private int month;
 
     private Long totalIncome = 0L;
