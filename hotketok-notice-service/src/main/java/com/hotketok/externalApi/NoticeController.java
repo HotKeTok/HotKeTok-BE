@@ -46,4 +46,11 @@ public class NoticeController {
         Long userId = 101L;
         noticeService.updateNotice(userId, request);
     }
+
+    // 공지사항 삭제
+    @DeleteMapping
+    public void deleteNotice(@RequestParam Long noticeId) {
+        Long userId = 101L;
+        noticeService.deleteNotice(userId, noticeId);
+    }
 }

@@ -92,4 +92,17 @@ public class NoticeService {
 
         notice.updateNotice(request.title(), request.content(), request.isFix());
     }
+
+    // 공지사항 삭제
+    @Transactional
+    public void deleteNotice(Long userId, Long noticeId) {
+        Notice notice = noticeRepository.findById(noticeId)
+                .orElseThrow(() -> new CustomException(NoticeErrorCode.NOTICE_NOT_FOUND));
+
+        if (!notice.getAuthorId().equals(userId)) {
+            throw new CustomException(NoticeErrorCode.NO_AUTHORITY_TO_DELETE);
+        }
+
+        noticeRepository.delete(notice);
+    }
 }
