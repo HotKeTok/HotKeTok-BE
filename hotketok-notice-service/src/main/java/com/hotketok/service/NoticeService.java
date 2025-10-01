@@ -1,9 +1,12 @@
 package com.hotketok.service;
 
 import com.hotketok.domain.Notice;
+import com.hotketok.dto.NoticeDetailResponse;
 import com.hotketok.dto.NoticeResponse;
 import com.hotketok.dto.internalApi.CurrentAddressResponse;
 import com.hotketok.dto.internalApi.UserProfileResponse;
+import com.hotketok.exception.NoticeErrorCode;
+import com.hotketok.hotketokcommonservice.error.exception.CustomException;
 import com.hotketok.internalApi.UserServiceClient;
 import com.hotketok.repository.NoticeRepository;
 import lombok.RequiredArgsConstructor;
@@ -36,9 +39,22 @@ public class NoticeService {
                     Long authorId = notice.getAuthorId();
                     // 기존 메서드 활용을 위해 List 형식으로 요청 (채팅 서비스와 동일한 메서드 사용)
                     List<UserProfileResponse> profiles = userServiceClient.getUserProfilesByIds(List.of(authorId));
-                    UserProfileResponse userProfileResponse = (!profiles.isEmpty()) ? profiles.get(0) : null;
+                    UserProfileResponse userProfileResponse = (!profiles.isEmpty()) ? profiles.get(0) : null; // 없으면 빈 리스트 반환
                     return NoticeResponse.of(notice, userProfileResponse);
                 })
                 .collect(Collectors.toList());
+    }
+
+    // 공지사항 세부 조회
+    public NoticeDetailResponse getNoticeDetail(Long userId, Long noticeId) {
+        Notice notice = noticeRepository.findById(noticeId)
+                .orElseThrow(() -> new CustomException(NoticeErrorCode.NOTICE_NOT_FOUND));
+
+        Long authorId = notice.getAuthorId();
+
+        List<UserProfileResponse> profiles = userServiceClient.getUserProfilesByIds(List.of(authorId));
+        UserProfileResponse authorProfile = (!profiles.isEmpty()) ? profiles.get(0) : null;
+
+        return NoticeDetailResponse.of(notice, authorProfile);
     }
 }

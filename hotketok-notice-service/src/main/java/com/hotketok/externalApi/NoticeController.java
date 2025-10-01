@@ -29,6 +29,7 @@ public class NoticeController {
     // 공지사항 세부 조회
     @GetMapping(" ")
     public NoticeDetailResponse getNoticeDetail(@RequestParam Long noticeId) {
-        return noticeService.getNoticeDetail(noticeId);
+        Long userId = 101L;
+        return noticeService.getNoticeDetail(userId, noticeId);
     }
 }
