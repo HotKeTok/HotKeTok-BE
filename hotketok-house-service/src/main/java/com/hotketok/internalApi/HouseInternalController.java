@@ -34,7 +34,9 @@ public class HouseInternalController {
 
     @GetMapping("/find-house-by-address")
     public GetHouseInfoByAddressResponse getHouseInfoByAddress(@RequestParam("userId") Long userId,
-                                                               @RequestParam("role") String role, @RequestParam("address") String address) {
-        return houseService.getHouseInfoByAddress(userId,role,address);
+                                                               @RequestParam("role") String role,
+                                                               @RequestParam("address") String address,
+                                                               @RequestParam("number") String number) {
+        return houseService.getHouseInfoByAddress(userId,role,address,number);
     }
 }
