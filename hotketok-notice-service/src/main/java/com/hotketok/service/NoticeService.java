@@ -1,6 +1,7 @@
 package com.hotketok.service;
 
 import com.hotketok.domain.Notice;
+import com.hotketok.dto.CreateNoticeRequest;
 import com.hotketok.dto.NoticeDetailResponse;
 import com.hotketok.dto.NoticeResponse;
 import com.hotketok.dto.internalApi.CurrentAddressResponse;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -56,5 +58,23 @@ public class NoticeService {
         UserProfileResponse authorProfile = (!profiles.isEmpty()) ? profiles.get(0) : null;
 
         return NoticeDetailResponse.of(notice, authorProfile);
+    }
+
+    // 공지사항 작성
+    @Transactional
+    public void createNotice(Long userId, CreateNoticeRequest request) {
+        CurrentAddressResponse addressResponse = userServiceClient.getCurrentAddress(userId);
+        String currentAddress = addressResponse.currentAddress();
+
+        Notice notice = Notice.createNotice(
+                currentAddress,
+                userId,
+                request.title(),
+                request.content(),
+                request.isFix(),
+                LocalDateTime.now()
+        );
+
+        noticeRepository.save(notice);
     }
 }

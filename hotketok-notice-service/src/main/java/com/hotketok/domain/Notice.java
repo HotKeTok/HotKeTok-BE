@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "Notice")
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Notice {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -47,7 +47,6 @@ public class Notice {
                 .title(title)
                 .content(content)
                 .isFix(isFix != null && isFix)
-                .created_at(created_at)
                 .build();
     }
 }

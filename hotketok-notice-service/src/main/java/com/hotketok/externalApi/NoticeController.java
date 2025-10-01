@@ -1,14 +1,13 @@
 package com.hotketok.externalApi;
 
 import com.hotketok.domain.Notice;
+import com.hotketok.dto.CreateNoticeRequest;
 import com.hotketok.dto.NoticeDetailResponse;
 import com.hotketok.dto.NoticeResponse;
 import com.hotketok.service.NoticeService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -27,9 +26,16 @@ public class NoticeController {
     }
 
     // 공지사항 세부 조회
-    @GetMapping(" ")
+    @GetMapping
     public NoticeDetailResponse getNoticeDetail(@RequestParam Long noticeId) {
         Long userId = 101L;
         return noticeService.getNoticeDetail(userId, noticeId);
+    }
+
+    // 공지사항 작성
+    @PostMapping
+    public void createNotice(@RequestBody CreateNoticeRequest request) {
+        Long userId = 101L;
+        noticeService.createNotice(userId, request);
     }
 }
