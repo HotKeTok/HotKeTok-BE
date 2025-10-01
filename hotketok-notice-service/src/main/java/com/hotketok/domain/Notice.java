@@ -6,18 +6,21 @@ import lombok.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "houses")
+@Table(name = "Notice")
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
 public class Notice {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long houseId;
+    @Column(name = "notice_id")
+    private Long id;
+
+    @Column(nullable = false)
+    private String address; // 공지사항이 등록된 주택의 주소
 
     private Long authorId;  // 공지사항 작성자 ID
 
-    @Column(nullable = false)
+    @Column(columnDefinition = "TEXT", nullable = false)
     private String title;
 
     @Column(nullable = false)
@@ -27,23 +30,23 @@ public class Notice {
 
     private LocalDateTime createdAt;
 
-    @Builder(access = AccessLevel.PRIVATE)
-    private Notice(Long houseId, Long authorId, String title, String content, Boolean isFix, LocalDateTime created_at) {
-        this.houseId = houseId;
+    @Builder(access = AccessLevel.PROTECTED)
+    private Notice(String address, Long authorId, String title, String content, Boolean isFix, LocalDateTime created_at) {
+        this.address = address;
         this.authorId = authorId;
         this.title = title;
         this.content = content;
         this.isFix = isFix;
-        this.createdAt = created_at
+        this.createdAt = LocalDateTime.now();
     }
 
-    public static Notice createNotice(Long houseId, Long authorId, String title, String content, Boolean isFix, LocalDateTime created_at) {
+    public static Notice createNotice(String address, Long authorId, String title, String content, Boolean isFix, LocalDateTime created_at) {
         return Notice.builder()
-                .houseId(houseId)
+                .address(address)
                 .authorId(authorId)
                 .title(title)
                 .content(content)
-                .isFix(false)
+                .isFix(isFix != null && isFix)
                 .created_at(created_at)
                 .build();
     }

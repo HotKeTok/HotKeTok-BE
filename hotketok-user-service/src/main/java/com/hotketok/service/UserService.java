@@ -102,7 +102,6 @@ public class UserService {
         return UserInfo.of(u.getId(),u.getLogInId(),u.getPassword(),u.getRole());
     }
 
-    // 채팅 서비스에서 호출하는 여러 ID를 받아 사용자를 목록을 조회하는 메서드
     public List<UserProfileResponse> findUserProfilesByIds(List<Long> userIds) {
         return userRepository.findAllByIdIn(userIds).stream()
                 .map(UserProfileResponse::from)
