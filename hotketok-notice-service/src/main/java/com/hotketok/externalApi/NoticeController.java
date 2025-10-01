@@ -21,36 +21,31 @@ public class NoticeController {
 
     // 공지사항 목록 조회
     @GetMapping("/list")
-    public List<NoticeResponse> getNoticeList() {
-        Long userId = 101L;
+    public List<NoticeResponse> getNoticeList(@RequestHeader("userId") Long userId) {
         return noticeService.getNoticeList(userId);
     }
 
     // 공지사항 세부 조회
     @GetMapping
-    public NoticeDetailResponse getNoticeDetail(@RequestParam Long noticeId) {
-        Long userId = 101L;
+    public NoticeDetailResponse getNoticeDetail(@RequestHeader("userId") Long userId, @RequestParam Long noticeId) {
         return noticeService.getNoticeDetail(userId, noticeId);
     }
 
     // 공지사항 작성
     @PostMapping
-    public void createNotice(@RequestBody CreateNoticeRequest request) {
-        Long userId = 101L;
+    public void createNotice(@RequestHeader("userId") Long userId, @RequestBody CreateNoticeRequest request) {
         noticeService.createNotice(userId, request);
     }
 
     // 공지사항 수정
     @PatchMapping
-    public void updateNotice(@RequestBody UpdateNoticeRequest request) {
-        Long userId = 101L;
+    public void updateNotice(@RequestHeader("userId") Long userId, @RequestBody UpdateNoticeRequest request) {
         noticeService.updateNotice(userId, request);
     }
 
     // 공지사항 삭제
     @DeleteMapping
-    public void deleteNotice(@RequestParam Long noticeId) {
-        Long userId = 101L;
+    public void deleteNotice(@RequestHeader("userId") Long userId, @RequestParam Long noticeId) {
         noticeService.deleteNotice(userId, noticeId);
     }
 }
