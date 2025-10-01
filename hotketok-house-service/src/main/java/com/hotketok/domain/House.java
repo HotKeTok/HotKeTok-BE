@@ -5,6 +5,9 @@ import com.hotketok.domain.enums.HouseType;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Entity
 @Table(name = "houses")
 @Getter
@@ -53,6 +56,10 @@ public class House {
         this.proveFile = proveFile;
     }
 
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "house_id")
+    private Set<HouseTag> houseTags = new HashSet<>();
+
     public static House createHouse(Long ownerId, String address, String detailAddress, String proveFile) {
         return House.builder()
                 .tenantId(null)
@@ -68,6 +75,7 @@ public class House {
                 .build();
     }
 
+    public void addHouseTag(HouseTag tag) { this.houseTags.add(tag); }
     public void changeState(HouseState state) {
         this.state = state;
     }

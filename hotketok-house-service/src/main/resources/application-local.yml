@@ -16,8 +16,14 @@ spring:
       path: /h2-console
 
   # ===== 데이터소스 =====
+#  datasource:
+#    url: jdbc:h2:tcp://localhost/~/house
+#    username: sa
+#    password:
+#    driver-class-name: org.h2.Driver
+
   datasource:
-    url: jdbc:h2:tcp://localhost/~/house
+    url: jdbc:h2:file:~/house
     username: sa
     password:
     driver-class-name: org.h2.Driver
@@ -45,6 +51,7 @@ eureka:
 logging:
   level:
     org.hibernate.SQL: debug
+    com.hotketok: info
 
 client:
   user-service:

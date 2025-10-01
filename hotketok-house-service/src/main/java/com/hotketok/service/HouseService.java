@@ -1,9 +1,11 @@
 package com.hotketok.service;
 
 import com.hotketok.domain.House;
+import com.hotketok.domain.HouseTag;
 import com.hotketok.domain.enums.HouseState;
 import com.hotketok.dto.*;
 import com.hotketok.dto.internalApi.GetHouseInfoByAddressResponse;
+import com.hotketok.dto.internalApi.HouseInfoResponse;
 import com.hotketok.dto.internalApi.Role;
 import com.hotketok.dto.internalApi.UploadFileResponse;
 import com.hotketok.exception.HouseErrorCode;
@@ -12,14 +14,16 @@ import com.hotketok.internalApi.InfraServiceClient;
 import com.hotketok.internalApi.UserServiceClient;
 import com.hotketok.repository.HouseRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class HouseService {
     private final HouseRepository houseRepository;
@@ -105,6 +109,55 @@ public class HouseService {
         house.changeTenantId(null);
         house.registerTenant(null, null,null,null);
         house.changeState(HouseState.REGISTERED);
+    }
+
+    public HouseInfoResponse findHouseInfoByUserId(Long userId) {
+        return houseRepository.findByTenantId(userId)
+                .map(house -> {
+                    List<String> tagContents = house.getHouseTags().stream()
+                            .map(HouseTag::getContent)
+                            .collect(Collectors.toList());
+
+                    return new HouseInfoResponse(
+                            userId,
+                            house.getFloor(),
+                            house.getNumber(),
+                            tagContents
+                    );
+                })
+                .orElseThrow(() -> new CustomException(HouseErrorCode.HOUSE_NOT_FOUND));
+    }
+
+    // 내부 통신 API (쪽지에서 집 정보를 가져오기 위함)
+    public List<HouseInfoResponse> getMatchedHousesByTenantAndAddress(Long tenantId, String address) {
+        List<House> matchedHouses = houseRepository.findAllByAddressAndStateAndTenantId(address, HouseState.MATCHED, tenantId);
+
+        return matchedHouses.stream()
+                .map(house -> new HouseInfoResponse(
+                        tenantId,
+                        house.getFloor(),
+                        house.getNumber(),
+                        house.getHouseTags().stream()
+                                .map(tag -> tag.getContent())
+                                .collect(Collectors.toList())
+                ))
+                .collect(Collectors.toList());
+    }
+
+    // 이웃 목록 조회 내부 API
+    public List<HouseInfoResponse> findResidentsByAddress(String address) {
+        List<House> residents = houseRepository.findAllByAddressAndState(address, HouseState.MATCHED);
+
+        return residents.stream()
+                .map(resident -> new HouseInfoResponse(
+                        resident.getTenantId() != null ? resident.getTenantId() : resident.getOwnerId(),
+                        resident.getFloor(),
+                        resident.getNumber(),
+                        resident.getHouseTags().stream()
+                                .map(HouseTag::getContent)
+                                .collect(Collectors.toList())
+                ))
+                .toList();
     }
 
     @Transactional(readOnly = true)
