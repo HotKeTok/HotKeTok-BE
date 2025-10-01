@@ -37,8 +37,10 @@ public class User extends BaseTimeEntity {
 
     private String currentAddress;
 
+    private String currentNumber;
+
     @Builder(access = AccessLevel.PRIVATE)
-    private User(String logInId, String password, String phoneNumber, String name, String profileImage, Role role, String currentAddress) {
+    private User(String logInId, String password, String phoneNumber, String name, String profileImage, Role role, String currentAddress, String currentNumber) {
         this.logInId = logInId;
         this.password = password;
         this.phoneNumber = phoneNumber;
@@ -46,6 +48,7 @@ public class User extends BaseTimeEntity {
         this.profileImage = profileImage;
         this.role = role;
         this.currentAddress = currentAddress;
+        this.currentNumber = currentNumber;
     }
 
     public static User createUser(String logInId, String password, String phoneNumber, String name) {
@@ -57,6 +60,7 @@ public class User extends BaseTimeEntity {
                 .profileImage(null)
                 .role(Role.NONE)
                 .currentAddress(null)
+                .currentNumber(null)
                 .build();
     }
 
@@ -72,7 +76,8 @@ public class User extends BaseTimeEntity {
         this.name = name;
     }
 
-    public void changeCurrentAddress(String currentAddress) {
+    public void changeCurrentAddressAndNumber(String currentAddress, String currentNumber) {
         this.currentAddress = currentAddress;
+        this.currentNumber = currentNumber;
     }
 }
