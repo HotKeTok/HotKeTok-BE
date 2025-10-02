@@ -36,6 +36,11 @@ public class RequestFormController {
     RequestFormInfoResponse getRequestFormInfo(@PathVariable("requestformId") Long requestformId){
         return requestFormService.getRequestFormInfo(requestformId);
     }
-
+    // 진행중인 수리 확인
+    @GetMapping(value = "/in-progress")
+    InProgressRequestFormResponse getInProgressRequestForm(@RequestHeader("userId") Long userId,
+                                                           @RequestHeader("role") String role){
+        return requestFormService.getInProgressRequestForm(userId,role);
+    }
 
 }

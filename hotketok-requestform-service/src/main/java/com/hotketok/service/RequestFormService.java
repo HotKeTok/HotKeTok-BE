@@ -165,4 +165,20 @@ public class RequestFormService {
         );
     }
 
+    // 진행중인 수리요청서 조회
+    public InProgressRequestFormResponse getInProgressRequestForm(Long userId, String role){
+        CurrentAddressAndNumberResponse addressAndNumber = userServiceClient.getCurrentAddressAndNumber(userId);
+        if (role.equals("OWNER")){
+            List<RequestForm> requestForms = requestFormRepository
+                    .findAllByAddressAndStatusNot(addressAndNumber.currentAddress(), Status.COMPLETED);
+            return InProgressRequestFormResponse.fromOwner(requestForms);
+
+        } else if(role.equals("TENANT")){
+            List<RequestForm> requestForms = requestFormRepository
+                    .findAllByAddressAndNumberAndStatusNot(addressAndNumber.currentAddress(), addressAndNumber.currentNumber(), Status.COMPLETED);
+            return InProgressRequestFormResponse.fromTenant(requestForms);
+        } else{
+            throw new CustomException(GlobalErrorCode.BAD_REQUEST);
+        }
+    }
 }
