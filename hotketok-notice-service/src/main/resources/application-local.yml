@@ -1,9 +1,9 @@
 server:
-  port: 8097
+  port: 8098
 
 spring:
   application:
-    name: post-service
+    name: notice-service
 
   # ===== H2 콘솔 =====
   h2:
@@ -13,13 +13,13 @@ spring:
 
   # ===== 데이터소스 =====
 #  datasource:
-#    url: jdbc:h2:tcp://localhost/~/chatting
+#    url: jdbc:h2:tcp://localhost/~/notice
 #    username: sa
 #    password:
 #    driver-class-name: org.h2.Driver
 
   datasource:
-    url: jdbc:h2:file:~/post
+    url: jdbc:h2:file:~/notice
     username: sa
     password:
     driver-class-name: org.h2.Driver
