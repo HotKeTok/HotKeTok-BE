@@ -63,16 +63,16 @@ public class UserService {
     }
 
     @Transactional
-    public void updateCurrentAddress(Long id, String updateAddress){
+    public void updateCurrentAddressAndNumber(Long id, String updateAddress, String updateNumber){
         User user = userRepository.findById(id).orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
         GetHouseInfoByAddressResponse response;
         if (user.getRole().equals(Role.OWNER)){
-            response = houseServiceClient.getHouseInfoByAddress(id, user.getRole().name(), updateAddress);
+            response = houseServiceClient.getHouseInfoByAddress(id, user.getRole().name(), updateAddress, updateNumber);
             if (response.houseState().equals("NONE")){
                 throw new CustomException(UserErrorCode.CANT_CHANGE_CURRENT_ADDRESS);
             }
         } else if(user.getRole().equals(Role.TENANT)){
-            response = houseServiceClient.getHouseInfoByAddress(id,user.getRole().name(),updateAddress);
+            response = houseServiceClient.getHouseInfoByAddress(id,user.getRole().name(),updateAddress, updateNumber);
             if (response.houseState().equals("TENANT_REQUEST")){
                 throw new CustomException(UserErrorCode.CANT_CHANGE_CURRENT_ADDRESS);
             }
@@ -80,7 +80,7 @@ public class UserService {
             throw new CustomException(UserErrorCode.CANT_CHANGE_CURRENT_ADDRESS);
         }
 
-        user.changeCurrentAddress(updateAddress);
+        user.changeCurrentAddressAndNumber(updateAddress, updateNumber);
     }
 
     @Transactional(readOnly = true)

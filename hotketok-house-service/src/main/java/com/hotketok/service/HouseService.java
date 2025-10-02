@@ -161,14 +161,14 @@ public class HouseService {
     }
 
     @Transactional(readOnly = true)
-    public GetHouseInfoByAddressResponse getHouseInfoByAddress(Long userId, String role, String address) {
+    public GetHouseInfoByAddressResponse getHouseInfoByAddress(Long userId, String role, String address, String number) {
         House house = null;
         if (role.equals("OWNER")){
             house = houseRepository.findFirstByAddressAndOwnerId(address, userId).orElseThrow(() -> new CustomException(HouseErrorCode.HOUSE_NOT_FOUND));
         }else if(role.equals("TENANT")){
-            house = houseRepository.findFirstByAddressAndTenantId(address, userId).orElseThrow(() -> new CustomException(HouseErrorCode.HOUSE_NOT_FOUND));
+            house = houseRepository.findByAddressAndNumberAndTenantId(address,number,userId).orElseThrow(() -> new CustomException(HouseErrorCode.HOUSE_NOT_FOUND));
         }
-        return new GetHouseInfoByAddressResponse(address,house.getNumber(),house.getState().toString());
+        return new GetHouseInfoByAddressResponse(address,number,house.getState().toString());
     }
 }
 
