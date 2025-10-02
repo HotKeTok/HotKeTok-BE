@@ -8,6 +8,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 @FeignClient(name = "house-service", url = "${client.house-service.url}")
 public interface HouseServiceClient {
 
-    @GetMapping("/get-ownerId/{userId}")
+    @GetMapping("/internal/house-service/get-ownerId/{userId}")
     Long getOwnerId(@PathVariable("userId") Long userId, @RequestParam("address") String address, @RequestParam("number") String number);
 }
