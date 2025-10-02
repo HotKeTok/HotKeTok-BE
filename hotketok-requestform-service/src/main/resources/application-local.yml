@@ -23,7 +23,7 @@ spring:
 
   # ===== 데이터소스 =====
   datasource:
-    url: jdbc:h2:file:~/requestform
+    url: jdbc:h2:tcp://localhost/~/requestform
     username: sa
     password:
     driver-class-name: org.h2.Driver
