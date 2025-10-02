@@ -3,6 +3,7 @@ package com.hotketok.externalApi;
 import com.hotketok.dto.ChangeCurrentAddressRequest;
 import com.hotketok.dto.MyPageInfoResponse;
 import com.hotketok.dto.UpdateMyPageInfoRequest;
+import com.hotketok.dto.internalApi.CurrentAddressAndNumberResponse;
 import com.hotketok.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -39,5 +40,10 @@ public class UserController {
     ){
         userService.updateCurrentAddressAndNumber(userId, request.currentAddress(), request.currentNumber());
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping(value = "/current-address-and-number")
+    public CurrentAddressAndNumberResponse getCurrentAddressAndNumber(@RequestHeader("userId") Long userId){
+        return userService.getCurrentAddressAndNumberByUserId(userId);
     }
 }

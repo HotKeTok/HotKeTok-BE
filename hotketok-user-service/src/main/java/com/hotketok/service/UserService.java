@@ -1,10 +1,7 @@
 package com.hotketok.service;
 
 import com.hotketok.dto.*;
-import com.hotketok.dto.internalApi.GetHouseInfoByAddressResponse;
-import com.hotketok.dto.internalApi.MyPageHouseInfoResponse;
-import com.hotketok.dto.internalApi.UploadFileResponse;
-import com.hotketok.dto.internalApi.UserProfileResponse;
+import com.hotketok.dto.internalApi.*;
 import com.hotketok.internalApi.HouseServiceClient;
 import com.hotketok.internalApi.InfraServiceClient;
 import com.hotketok.repository.UserRepository;
@@ -113,5 +110,11 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
         return user.getCurrentAddress();
+    }
+
+    public CurrentAddressAndNumberResponse getCurrentAddressAndNumberByUserId(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
+        return new CurrentAddressAndNumberResponse(user.getCurrentAddress(), user.getCurrentNumber());
     }
 }
