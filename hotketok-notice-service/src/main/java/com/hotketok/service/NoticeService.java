@@ -40,10 +40,8 @@ public class NoticeService {
         return notices.stream()
                 .map(notice -> {
                     Long authorId = notice.getAuthorId();
-                    // 기존 메서드 활용을 위해 List 형식으로 요청 (채팅 서비스와 동일한 메서드 사용)
-                    List<UserProfileResponse> profiles = userServiceClient.getUserProfilesByIds(List.of(authorId));
-                    UserProfileResponse userProfileResponse = (!profiles.isEmpty()) ? profiles.get(0) : null; // 없으면 빈 리스트 반환
-                    return NoticeResponse.of(notice, userProfileResponse);
+                    UserProfileResponse authorProfile = userServiceClient.getUserProfileById(authorId);
+                    return NoticeResponse.of(notice, authorProfile);
                 })
                 .collect(Collectors.toList());
     }
@@ -55,9 +53,7 @@ public class NoticeService {
 
         Long authorId = notice.getAuthorId();
 
-        List<UserProfileResponse> profiles = userServiceClient.getUserProfilesByIds(List.of(authorId));
-        UserProfileResponse authorProfile = (!profiles.isEmpty()) ? profiles.get(0) : null;
-
+        UserProfileResponse authorProfile = userServiceClient.getUserProfileById(authorId);
         return NoticeDetailResponse.of(notice, authorProfile);
     }
 

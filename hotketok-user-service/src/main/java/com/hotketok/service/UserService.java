@@ -113,4 +113,10 @@ public class UserService {
                 .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
         return user.getCurrentAddress();
     }
+
+    public UserProfileResponse findUserProfileById(Long userId) {
+        return userRepository.findById(userId)
+                .map(UserProfileResponse::from)
+                .orElseThrow(() -> new RuntimeException("해당하는 사용자가 존재하지 않습니다.")); // 예외 처리
+    }
 }

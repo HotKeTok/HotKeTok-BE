@@ -16,7 +16,7 @@ public interface UserServiceClient {
     @GetMapping("/internal/user-service/{userId}/current-address")
     CurrentAddressResponse getCurrentAddress(@PathVariable("userId") Long userId);
 
-    @PostMapping("/internal/user-service/profiles")
-    List<UserProfileResponse> getUserProfilesByIds(@RequestBody List<Long> userIds);
+    @GetMapping("/internal/user-service/profiles/{userId}")
+    UserProfileResponse getUserProfileById(@PathVariable("userId") Long userId);
 }
 
