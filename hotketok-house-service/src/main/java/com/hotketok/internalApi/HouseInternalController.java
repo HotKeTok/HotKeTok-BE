@@ -39,4 +39,11 @@ public class HouseInternalController {
                                                                @RequestParam("number") String number) {
         return houseService.getHouseInfoByAddress(userId,role,address,number);
     }
+
+    @GetMapping("/get-ownerId/{userId}")
+    public Long getOwnerId(@PathVariable("userId") Long userId,
+                          @RequestParam("address") String address,
+                          @RequestParam("number") String number) {
+        return houseService.getOwnerId(userId,address,number);
+    }
 }
