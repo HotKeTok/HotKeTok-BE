@@ -9,6 +9,8 @@ public record CreateRequestFormRequest(
         PayType payType,
         Category category,
         String description,
-        LocalDateTime requestSchedule
+        LocalDateTime requestSchedule,
+        String address,
+        String number
 ) {
 }

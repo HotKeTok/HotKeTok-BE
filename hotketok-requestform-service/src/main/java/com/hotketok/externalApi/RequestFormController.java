@@ -3,10 +3,10 @@ package com.hotketok.externalApi;
 import com.hotketok.dto.ChatGPTResponse;
 import com.hotketok.dto.CreateRequestFormRequest;
 import com.hotketok.dto.CreateRequestFormResponse;
+import com.hotketok.dto.RequestFormInfoResponse;
 import com.hotketok.service.RequestFormService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 

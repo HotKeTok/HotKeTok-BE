@@ -64,4 +64,8 @@ openai:
 client:
   infra-service:
     url: http://localhost:8089 # infra-service의 주소
+  user-service:
+    url: http://localhost:8088 # user-service의 주소
+  house-service:
+    url: http://localhost:8090 # house-service의 주소
 
