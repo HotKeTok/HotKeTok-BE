@@ -25,10 +25,10 @@ public class ReviewController {
     // 리뷰 작성
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public void createReview(
+            @RequestHeader("userId") Long userId,
             @RequestPart("request") String requestJson,
             @RequestPart(value = "images", required = false) List<MultipartFile> images
     ) throws IOException {
-        Long userId = 101L;
         CreateReviewRequest request = objectMapper.readValue(requestJson, CreateReviewRequest.class);
         reviewService.createReview(userId, request, images);
     }
@@ -40,8 +40,7 @@ public class ReviewController {
     }
 
     @DeleteMapping
-    public void deleteReview(@RequestParam Long reviewId) {
-        Long userId = 101L;
+    public void deleteReview(@RequestHeader("userId") Long userId, @RequestParam Long reviewId) {
         reviewService.deleteReview(userId, reviewId);
     }
 }
