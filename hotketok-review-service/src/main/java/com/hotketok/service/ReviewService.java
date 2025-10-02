@@ -4,8 +4,11 @@ import com.hotketok.domain.Review;
 import com.hotketok.dto.CreateReviewRequest;
 import com.hotketok.dto.ReviewItemResponse;
 import com.hotketok.dto.ReviewListResponse;
-import com.hotketok.dto.UploadFileListResponse;
+import com.hotketok.dto.internalApi.DeleteFileRequest;
+import com.hotketok.dto.internalApi.UploadFileListResponse;
 import com.hotketok.dto.internalApi.UserProfileResponse;
+import com.hotketok.exception.ReviewErrorCode;
+import com.hotketok.hotketokcommonservice.error.exception.CustomException;
 import com.hotketok.internalApi.InfraServiceClient;
 import com.hotketok.internalApi.UserServiceClient;
 import com.hotketok.repository.ReviewRepository;
@@ -15,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -85,5 +87,24 @@ public class ReviewService {
                 .collect(Collectors.toList());
 
         return new ReviewListResponse(reviewItems.size(), reviewItems);
+    }
+
+    // 리뷰 삭제
+    public void deleteReview(Long userId, Long reviewId) {
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new CustomException(ReviewErrorCode.REVIEW_NOT_FOUND));
+
+        if (!review.getUserId().equals(userId)) {
+            throw new CustomException(ReviewErrorCode.NO_AUTHORITY_TO_DELETE);
+        }
+
+        // 리뷰에 연결된 이미지 있으면 인프라 서비스에서도 삭제
+        List<String> imageUrls = review.getReviewImage();
+        if (imageUrls != null && !imageUrls.isEmpty()) {
+            imageUrls.forEach(url -> {
+                infraServiceClient.deleteFile(new DeleteFileRequest(url));
+            });
+        }
+        reviewRepository.delete(review);
     }
 }

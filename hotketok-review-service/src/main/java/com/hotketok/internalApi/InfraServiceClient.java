@@ -1,11 +1,11 @@
 package com.hotketok.internalApi;
 
-import com.hotketok.dto.UploadFileListResponse;
+import com.hotketok.dto.internalApi.DeleteFileRequest;
+import com.hotketok.dto.internalApi.DeleteFileResponse;
+import com.hotketok.dto.internalApi.UploadFileListResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
@@ -17,4 +17,7 @@ public interface InfraServiceClient {
             @RequestPart("images") List<MultipartFile> images,
             @RequestParam("folderName") String folderName
     );
+
+    @DeleteMapping("/internal/infra-service/delete")
+    DeleteFileResponse deleteFile(@RequestBody DeleteFileRequest deleteFileRequest);
 }

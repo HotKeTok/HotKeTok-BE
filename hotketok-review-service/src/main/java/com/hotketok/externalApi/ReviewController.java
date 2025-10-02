@@ -38,4 +38,10 @@ public class ReviewController {
     public ReviewListResponse getReviewsByVendorId(@RequestParam Long vendorId) {
         return reviewService.getReviewsByVendorId(vendorId);
     }
+
+    @DeleteMapping
+    public void deleteReview(@RequestParam Long reviewId) {
+        Long userId = 101L;
+        reviewService.deleteReview(userId, reviewId);
+    }
 }
