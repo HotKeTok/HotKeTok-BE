@@ -1,5 +1,7 @@
 package com.hotketok.externalApi;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hotketok.dto.CreateReviewRequest;
 import com.hotketok.service.ReviewService;
 import lombok.RequiredArgsConstructor;
@@ -17,12 +19,16 @@ import java.util.List;
 public class ReviewController {
 
     private final ReviewService reviewService;
+    private final ObjectMapper objectMapper;
 
     // 리뷰 작성
-    @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-    public ResponseEntity<String> createReview(@RequestPart("request") CreateReviewRequest request, @RequestPart(value = "images", required = false) List<MultipartFile> images) throws IOException {
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public void createReview(
+            @RequestPart("request") String requestJson,
+            @RequestPart(value = "images", required = false) List<MultipartFile> images
+    ) throws IOException {
         Long userId = 101L;
+        CreateReviewRequest request = objectMapper.readValue(requestJson, CreateReviewRequest.class);
         reviewService.createReview(userId, request, images);
-        return ResponseEntity.ok("리뷰가 성공적으로 작성되었습니다.");
     }
 }

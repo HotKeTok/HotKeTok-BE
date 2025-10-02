@@ -2,7 +2,6 @@ package com.hotketok.domain;
 
 import com.hotketok.domain.enums.Category;
 import jakarta.persistence.*;
-import kafka.admin.ConfigCommand;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
