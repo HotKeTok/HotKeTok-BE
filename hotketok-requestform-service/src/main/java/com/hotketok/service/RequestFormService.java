@@ -3,9 +3,11 @@ package com.hotketok.service;
 import com.hotketok.constant.GPTPrompt;
 import com.hotketok.domain.enums.PayType;
 import com.hotketok.dto.*;
+import com.hotketok.dto.internalApi.CurrentAddressAndNumberResponse;
 import com.hotketok.dto.internalApi.UploadFileListResponse;
 import com.hotketok.exception.RequestFormErrorCode;
 import com.hotketok.hotketokcommonservice.error.exception.CustomException;
+import com.hotketok.hotketokcommonservice.error.exception.GlobalErrorCode;
 import com.hotketok.internalApi.HouseServiceClient;
 import com.hotketok.internalApi.UserServiceClient;
 import com.hotketok.parser.OpenAIResponseParser;
@@ -142,4 +144,25 @@ public class RequestFormService {
 
         return new ChatGPTResponse(textOnly);
     }
+
+    // 요청서 조회
+    public RequestFormInfoResponse getRequestFormInfo(Long requestFormId){
+        RequestForm requestForm = requestFormRepository.findById(requestFormId)
+                .orElseThrow(() -> new CustomException(RequestFormErrorCode.REQUEST_FORM_NOT_FOUND));
+
+        List<String> images = requestFormImageRepository
+                .findAllByRequestFormId(requestFormId)
+                .stream().map(RequestFormImage::getImageUrl).toList();
+
+        return new RequestFormInfoResponse(
+                requestForm.getCategory(),
+                requestForm.getRequestSchedule(),
+                requestForm.getAddress(),
+                requestForm.getNumber(),
+                requestForm.getPayType(),
+                images,
+                requestForm.getDescription()
+        );
+    }
+
 }
