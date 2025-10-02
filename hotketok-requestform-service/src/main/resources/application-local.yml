@@ -52,11 +52,11 @@ logging:
   level:
     org.hibernate.SQL: debug
 
-    openai:
-      model: ${GPT_MODEL}
-      api:
-        key: ${GPT_API_KEY}
-        url: ${GPT_API_URL}
+openai:
+  model: ${GPT_MODEL}
+  api:
+    key: ${GPT_API_KEY}
+    url: ${GPT_API_URL}
 
 client:
   infra-service:
