@@ -4,9 +4,7 @@ import com.hotketok.domain.enums.Category;
 import com.hotketok.domain.enums.VendorState;
 import com.hotketok.hotketokjpaservice.entity.BaseTimeEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
@@ -57,4 +55,52 @@ public class Vendor extends BaseTimeEntity {
     @OneToMany(mappedBy = "vendor", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<News> newsList;
 
+    @Builder(access = AccessLevel.PROTECTED)
+    private Vendor(Long userId,
+                   String name,
+                   VendorState state,
+                   Category category,
+                   String address,
+                   String detailAddress,
+                   String introduction,
+                   String image,
+                   String proveFile,
+                   int rate) {
+        this.userId = userId;
+        this.name = name;
+        this.state = state;
+        this.category = category;
+        this.address = address;
+        this.detailAddress = detailAddress;
+        this.introduction = introduction;
+        this.image = image;
+        this.proveFile = proveFile;
+        this.rate = rate;
+    }
+
+    public static Vendor createVendor(Long userId,
+                                      String name,
+                                      Category category,
+                                      String address,
+                                      String detailAddress,
+                                      String introduction,
+                                      String image,
+                                      String proveFile) {
+        return Vendor.builder()
+                .userId(userId)
+                .name(name)
+                .state(VendorState.NONE)
+                .category(category)
+                .address(address)
+                .detailAddress(detailAddress)
+                .introduction(introduction)
+                .image(image)
+                .proveFile(proveFile)
+                .rate(0)
+                .build();
+    }
+
+    public void changeState(VendorState state) {
+        this.state = state;
+    }
 }
