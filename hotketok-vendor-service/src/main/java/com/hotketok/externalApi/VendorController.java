@@ -23,4 +23,18 @@ public class VendorController {
                                                          @RequestPart("data") RegisterVendorRequest request) {
         return vendorService.registerVendor(vendorId, image, file, request);
     }
+
+    // 관리자 승인
+    @PostMapping("/admin-approve/{vendorId}")
+    public ResponseEntity<Void> approveVendor(@PathVariable Long vendorId) {
+        vendorService.approveVendor(vendorId);
+        return ResponseEntity.ok().build();
+    }
+
+    // 관리자 거절
+    @DeleteMapping("/admin-reject/{vendorId}")
+    public ResponseEntity<Void> adminReject(@PathVariable Long vendorId) {
+        vendorService.rejectVendor(vendorId);
+        return ResponseEntity.ok().build();
+    }
 }

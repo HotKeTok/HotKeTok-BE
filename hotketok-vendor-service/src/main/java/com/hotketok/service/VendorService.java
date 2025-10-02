@@ -52,4 +52,22 @@ public class VendorService {
 
         return new RegisterVendorResponse(vendor.getId());
     }
+
+    // 관리자 승인 → VENDOR로 승격
+    @Transactional
+    public void approveVendor(Long vendorId) {
+        Vendor vendor = vendorRepository.findById(vendorId).orElseThrow(() -> new CustomException(VendorErrorCode.VENDOR_NOT_FOUND));
+        if (vendor.getState().equals(VendorState.REGISTERED)) throw new CustomException(VendorErrorCode.ALREADY_REGISTERED);
+        vendor.changeState(VendorState.REGISTERED);
+        userServiceClient.updateRole(vendor.getUserId(), Role.VENDOR);
+    }
+
+    // 관리자 거절 -> 삭제
+    @Transactional
+    public void rejectVendor(Long vendorId) {
+        Vendor vendor = vendorRepository.findById(vendorId).orElseThrow(() -> new CustomException(VendorErrorCode.VENDOR_NOT_FOUND));
+        if (vendor.getState().equals(VendorState.REGISTERED)) throw new CustomException(VendorErrorCode.ALREADY_REGISTERED);
+        vendorRepository.deleteById(vendorId);
+    }
+
 }
