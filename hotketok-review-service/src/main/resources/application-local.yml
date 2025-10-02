@@ -23,10 +23,15 @@ spring:
 
   # ===== 데이터소스 =====
 #  datasource:
-#    url: jdbc:h2:tcp://localhost/~/requestform
+#    url: jdbc:h2:tcp://localhost/~/review
 #    username: sa
 #    password:
 #    driver-class-name: org.h2.Driver
+  datasource:
+    url: jdbc:h2:file:~/review
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
 
   # ===== JPA =====
   jpa:
@@ -64,4 +69,6 @@ openai:
 client:
   infra-service:
     url: http://localhost:8089 # infra-service의 주소
+  user-service:
+    url: http://localhost:8088 # user-service의 주소
 

@@ -3,6 +3,7 @@ package com.hotketok.externalApi;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hotketok.dto.CreateReviewRequest;
+import com.hotketok.dto.ReviewListResponse;
 import com.hotketok.service.ReviewService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -30,5 +31,11 @@ public class ReviewController {
         Long userId = 101L;
         CreateReviewRequest request = objectMapper.readValue(requestJson, CreateReviewRequest.class);
         reviewService.createReview(userId, request, images);
+    }
+
+    // 업체별 후기 목록 조회 (토큰 사용 x)
+    @GetMapping
+    public ReviewListResponse getReviewsByVendorId(@RequestParam Long vendorId) {
+        return reviewService.getReviewsByVendorId(vendorId);
     }
 }
