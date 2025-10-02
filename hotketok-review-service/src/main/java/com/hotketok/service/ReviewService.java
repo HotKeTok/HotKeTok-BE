@@ -10,6 +10,7 @@ import com.hotketok.internalApi.InfraServiceClient;
 import com.hotketok.internalApi.UserServiceClient;
 import com.hotketok.repository.ReviewRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -30,14 +32,20 @@ public class ReviewService {
     private final UserServiceClient userServiceClient;
 
     // 리뷰 작성
-    public void createReview(Long userId, CreateReviewRequest request, List<MultipartFile> images) throws IOException {
+    public void createReview(Long userId, CreateReviewRequest request, List<MultipartFile> images) {
+        log.info("요청받은 이미지 파일 개수: {}", (images != null) ? images.size() : "0");
+
         List<String> imageUrls = Collections.emptyList();
 
-        // 이미지 요청에 포함되면 infra-service 호출
         if (images != null && !images.isEmpty()) {
-            // 'reviews'라는 폴더에 이미지를 저장
-            UploadFileListResponse response = infraServiceClient.uploadImages(images, "reviews");
-            imageUrls = response.urls();
+            try {
+                UploadFileListResponse response = infraServiceClient.uploadImages(images, "reviews");
+                imageUrls = response.fileList();
+            } catch (Exception e) {
+                throw new RuntimeException("이미지 업로드에 실패. 원인: " + e.getMessage());
+            }
+        } else {
+            log.warn("--- 업로드할 이미지가 없음 ---");
         }
 
         Review review = Review.createReview(
@@ -50,6 +58,7 @@ public class ReviewService {
         );
 
         reviewRepository.save(review);
+        log.info("저장된 이미지 URL 개수: {}", review.getReviewImage().size());
     }
 
     // 업체별 리뷰 목록 조회

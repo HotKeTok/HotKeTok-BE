@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -32,7 +33,7 @@ public class Review {
     @ElementCollection
     @CollectionTable(name = "review_images", joinColumns = @JoinColumn(name = "review_id"))
     @Column(name = "review_image_url")
-    private List<String> reviewImage;
+    private List<String> reviewImage = new ArrayList<>(); // 빈 리스트로 초기화해서 NPE 방지
 
     @Builder
     private Review(Long userId, Long vendorId, Category constructCategory, int rate, String review, List<String> reviewImage) {
@@ -41,7 +42,9 @@ public class Review {
         this.constructCategory = constructCategory;
         this.rate = rate;
         this.review = review;
-        this.reviewImage = reviewImage;
+        if (reviewImage != null) {
+            this.reviewImage = reviewImage;
+        } // null 아니면 필드로 교체
     }
 
     public static Review createReview(Long userId, Long vendorId, Category constructCategory, int rate, String review, List<String> reviewImage) {
