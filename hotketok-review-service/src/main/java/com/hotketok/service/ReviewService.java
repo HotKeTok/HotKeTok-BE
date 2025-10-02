@@ -1,6 +1,7 @@
 package com.hotketok.service;
 
 import com.hotketok.domain.Review;
+import com.hotketok.domain.ReviewImage; // 👈 ReviewImage import
 import com.hotketok.dto.CreateReviewRequest;
 import com.hotketok.dto.ReviewItemResponse;
 import com.hotketok.dto.ReviewListResponse;
@@ -34,7 +35,7 @@ public class ReviewService {
     private final UserServiceClient userServiceClient;
 
     // 리뷰 작성
-    public void createReview(Long userId, CreateReviewRequest request, List<MultipartFile> images) {
+    public Review createReview(Long userId, CreateReviewRequest request, List<MultipartFile> images) {
         log.info("요청받은 이미지 파일 개수: {}", (images != null) ? images.size() : "0");
 
         List<String> imageUrls = Collections.emptyList();
@@ -49,7 +50,6 @@ public class ReviewService {
         } else {
             log.warn("--- 업로드할 이미지가 없음 ---");
         }
-
         Review review = Review.createReview(
                 userId,
                 request.vendorId(),
@@ -59,11 +59,13 @@ public class ReviewService {
                 imageUrls
         );
 
-        reviewRepository.save(review);
-        log.info("저장된 이미지 URL 개수: {}", review.getReviewImage().size());
+        Review savedReview = reviewRepository.save(review);
+        log.info("저장된 이미지 URL 개수: {}", savedReview.getReviewImages().size());
+        return savedReview;
     }
 
-    // 업체별 리뷰 목록 조회
+    // 업체별 리뷰 목록 조회 (토큰 사용 x)
+    @Transactional(readOnly = true)
     public ReviewListResponse getReviewsByVendorId(Long vendorId) {
         List<Review> reviews = reviewRepository.findAllByVendorId(vendorId);
 
@@ -98,9 +100,12 @@ public class ReviewService {
             throw new CustomException(ReviewErrorCode.NO_AUTHORITY_TO_DELETE);
         }
 
-        // 리뷰에 연결된 이미지 있으면 인프라 서비스에서도 삭제
-        List<String> imageUrls = review.getReviewImage();
-        if (imageUrls != null && !imageUrls.isEmpty()) {
+        // 리뷰에 연결된 이미지 같이 삭제
+        List<String> imageUrls = review.getReviewImages().stream()
+                .map(ReviewImage::getImageUrl)
+                .collect(Collectors.toList());
+
+        if (!imageUrls.isEmpty()) {
             imageUrls.forEach(url -> {
                 infraServiceClient.deleteFile(new DeleteFileRequest(url));
             });

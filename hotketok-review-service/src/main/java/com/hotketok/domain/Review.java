@@ -30,24 +30,37 @@ public class Review {
     @Column(columnDefinition = "TEXT")
     private String review;
 
-    @ElementCollection
-    @CollectionTable(name = "review_images", joinColumns = @JoinColumn(name = "review_id"))
-    @Column(name = "review_image_url")
-    private List<String> reviewImage = new ArrayList<>(); // 빈 리스트로 초기화해서 NPE 방지
+    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ReviewImage> reviewImages = new ArrayList<>();
 
     @Builder
-    private Review(Long userId, Long vendorId, Category constructCategory, int rate, String review, List<String> reviewImage) {
+    private Review(Long userId, Long vendorId, Category constructCategory, int rate, String review) {
         this.userId = userId;
         this.vendorId = vendorId;
         this.constructCategory = constructCategory;
         this.rate = rate;
         this.review = review;
-        if (reviewImage != null) {
-            this.reviewImage = reviewImage;
-        } // null 아니면 필드로 교체
+    }
+    public static Review createReview(Long userId, Long vendorId, Category constructCategory, int rate, String review, List<String> imageUrls) {
+        Review newReview = Review.builder()
+                .userId(userId)
+                .vendorId(vendorId)
+                .constructCategory(constructCategory)
+                .rate(rate)
+                .review(review)
+                .build();
+
+        if (imageUrls != null) {
+            imageUrls.stream()
+                    .map(url -> ReviewImage.builder().imageUrl(url).build())
+                    .forEach(newReview::addReviewImage);
+        }
+
+        return newReview;
     }
 
-    public static Review createReview(Long userId, Long vendorId, Category constructCategory, int rate, String review, List<String> reviewImage) {
-        return Review.builder().userId(userId).vendorId(vendorId).constructCategory(constructCategory).rate(rate).review(review).reviewImage(reviewImage).build();
+    public void addReviewImage(ReviewImage reviewImage) {
+        this.reviewImages.add(reviewImage);
+        reviewImage.setReview(this);
     }
 }
