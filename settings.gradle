@@ -13,4 +13,6 @@ include(
         "hotketok-house-service",
         "hotketok-commonbill-service",
         "hotketok-post-service",
+        "hotketok-house-service",
+        "hotketok-notice-service",
 )

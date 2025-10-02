@@ -102,7 +102,6 @@ public class UserService {
         return UserInfo.of(u.getId(),u.getLogInId(),u.getPassword(),u.getRole());
     }
 
-    // 채팅 서비스에서 호출하는 여러 ID를 받아 사용자를 목록을 조회하는 메서드
     public List<UserProfileResponse> findUserProfilesByIds(List<Long> userIds) {
         return userRepository.findAllByIdIn(userIds).stream()
                 .map(UserProfileResponse::from)
@@ -113,5 +112,11 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
         return user.getCurrentAddress();
+    }
+
+    public UserProfileResponse findUserProfileById(Long userId) {
+        return userRepository.findById(userId)
+                .map(UserProfileResponse::from)
+                .orElseThrow(() -> new RuntimeException("해당하는 사용자가 존재하지 않습니다.")); // 예외 처리
     }
 }
