@@ -1,7 +1,5 @@
 package com.hotketok.externalApi;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hotketok.dto.CreateReviewRequest;
 import com.hotketok.dto.ReviewListResponse;
 import com.hotketok.service.ReviewService;
@@ -20,16 +18,13 @@ import java.util.List;
 public class ReviewController {
 
     private final ReviewService reviewService;
-    private final ObjectMapper objectMapper;
 
     // 리뷰 작성
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public void createReview(
             @RequestHeader("userId") Long userId,
-            @RequestPart("request") String requestJson,
-            @RequestPart(value = "images", required = false) List<MultipartFile> images
-    ) throws IOException {
-        CreateReviewRequest request = objectMapper.readValue(requestJson, CreateReviewRequest.class);
+            @RequestPart("request") CreateReviewRequest request,
+            @RequestPart(value = "images", required = false) List<MultipartFile> images) {
         reviewService.createReview(userId, request, images);
     }
 
@@ -39,6 +34,7 @@ public class ReviewController {
         return reviewService.getReviewsByVendorId(vendorId);
     }
 
+    // 리뷰 삭제
     @DeleteMapping
     public void deleteReview(@RequestHeader("userId") Long userId, @RequestParam Long reviewId) {
         reviewService.deleteReview(userId, reviewId);

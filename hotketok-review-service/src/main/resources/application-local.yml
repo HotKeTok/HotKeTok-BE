@@ -44,7 +44,7 @@ spring:
 
 eureka:
   instance:
-    hostname: requestform-service
+    hostname: review-service
     preferIpAddress: true
   client:
     registry-fetch-interval-seconds: 3
@@ -56,15 +56,6 @@ eureka:
 logging:
   level:
     org.hibernate.SQL: debug
-
-
-openai:
-  model: ${GPT_MODEL}
-  api:
-    key: ${GPT_API_KEY}
-    url: ${GPT_API_URL}
-
-
 
 client:
   infra-service:
