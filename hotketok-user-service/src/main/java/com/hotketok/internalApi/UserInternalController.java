@@ -29,6 +29,11 @@ public class UserInternalController {
         return userService.findUserProfilesByIds(userIds);
     }
 
+    @GetMapping("/profiles/{userId}")
+    public UserProfileResponse getUserProfileById(@PathVariable Long userId) {
+        return userService.findUserProfileById(userId);
+    }
+
     @PostMapping("/save")
     public void save(@RequestBody SignUpRequest req){ userService.save(req); }
 

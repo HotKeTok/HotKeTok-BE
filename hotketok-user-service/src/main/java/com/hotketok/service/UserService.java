@@ -63,16 +63,16 @@ public class UserService {
     }
 
     @Transactional
-    public void updateCurrentAddress(Long id, String updateAddress){
+    public void updateCurrentAddressAndNumber(Long id, String updateAddress, String updateNumber){
         User user = userRepository.findById(id).orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
         GetHouseInfoByAddressResponse response;
         if (user.getRole().equals(Role.OWNER)){
-            response = houseServiceClient.getHouseInfoByAddress(id, user.getRole().name(), updateAddress);
+            response = houseServiceClient.getHouseInfoByAddress(id, user.getRole().name(), updateAddress, updateNumber);
             if (response.houseState().equals("NONE")){
                 throw new CustomException(UserErrorCode.CANT_CHANGE_CURRENT_ADDRESS);
             }
         } else if(user.getRole().equals(Role.TENANT)){
-            response = houseServiceClient.getHouseInfoByAddress(id,user.getRole().name(),updateAddress);
+            response = houseServiceClient.getHouseInfoByAddress(id,user.getRole().name(),updateAddress, updateNumber);
             if (response.houseState().equals("TENANT_REQUEST")){
                 throw new CustomException(UserErrorCode.CANT_CHANGE_CURRENT_ADDRESS);
             }
@@ -80,7 +80,7 @@ public class UserService {
             throw new CustomException(UserErrorCode.CANT_CHANGE_CURRENT_ADDRESS);
         }
 
-        user.changeCurrentAddress(updateAddress);
+        user.changeCurrentAddressAndNumber(updateAddress, updateNumber);
     }
 
     @Transactional(readOnly = true)
@@ -102,7 +102,6 @@ public class UserService {
         return UserInfo.of(u.getId(),u.getLogInId(),u.getPassword(),u.getRole());
     }
 
-    // 채팅 서비스에서 호출하는 여러 ID를 받아 사용자를 목록을 조회하는 메서드
     public List<UserProfileResponse> findUserProfilesByIds(List<Long> userIds) {
         return userRepository.findAllByIdIn(userIds).stream()
                 .map(UserProfileResponse::from)
@@ -113,5 +112,11 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
         return user.getCurrentAddress();
+    }
+
+    public UserProfileResponse findUserProfileById(Long userId) {
+        return userRepository.findById(userId)
+                .map(UserProfileResponse::from)
+                .orElseThrow(() -> new RuntimeException("해당하는 사용자가 존재하지 않습니다.")); // 예외 처리
     }
 }

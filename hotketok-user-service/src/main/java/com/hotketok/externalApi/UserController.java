@@ -37,7 +37,7 @@ public class UserController {
             @RequestHeader("userId") Long userId,
             @RequestBody ChangeCurrentAddressRequest request
     ){
-        userService.updateCurrentAddress(userId, request.currentAddress());
+        userService.updateCurrentAddressAndNumber(userId, request.currentAddress(), request.currentNumber());
         return ResponseEntity.ok().build();
     }
 }
