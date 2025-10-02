@@ -35,7 +35,7 @@ spring:
 
 eureka:
   instance:
-    hostname: chatting-service
+    hostname: notice-service
     preferIpAddress: true
   client:
     registry-fetch-interval-seconds: 3
