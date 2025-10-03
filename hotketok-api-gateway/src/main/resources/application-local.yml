@@ -97,6 +97,19 @@ spring:
                     allowedRoles:
                       - OWNER
                       - TENANT
+                      -
+            - id: vendor-service
+              uri: lb://vendor-service
+              predicates:
+                - Path=/api/vendor-service/**
+                - Method=GET,POST,PUT,DELETE
+              filters:
+                - JwtAuthFilter
+                - name: RoleFilter
+                  args:
+                    allowedRoles:
+                      - NONE
+                      - VENDOR
 
 jwt:
   secret: ThisIsHotketokSecretKeyThisIsHotketokSecretKey
