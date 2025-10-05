@@ -16,17 +16,17 @@ spring:
       path: /h2-console
 
   # ===== 데이터소스 =====
-  datasource:
-    url: jdbc:h2:tcp://localhost/~/vendor
-    username: sa
-    password:
-    driver-class-name: org.h2.Driver
-
 #  datasource:
-#    url: jdbc:h2:file:~/vendor
+#    url: jdbc:h2:tcp://localhost/~/vendor
 #    username: sa
 #    password:
 #    driver-class-name: org.h2.Driver
+
+  datasource:
+    url: jdbc:h2:file:~/vendor
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
 
   # ===== JPA =====
   jpa:

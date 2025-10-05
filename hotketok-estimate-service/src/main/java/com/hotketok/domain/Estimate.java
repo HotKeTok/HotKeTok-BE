@@ -24,7 +24,7 @@ public class Estimate {
     private Long id;
 
     @Column(nullable = false)
-    private Long requestId;
+    private Long requestFormId;
 
     @Column(nullable = false)
     private Long vendorId;
@@ -43,8 +43,8 @@ public class Estimate {
     private LocalDateTime createdAt;
 
     @Builder(access = AccessLevel.PRIVATE)
-    private Estimate(Long requestId, Long vendorId, BigDecimal estimatePrice, Boolean decisionLater, String comment) {
-        this.requestId = requestId;
+    private Estimate(Long requestFormId, Long vendorId, BigDecimal estimatePrice, Boolean decisionLater, String comment) {
+        this.requestFormId = requestFormId;
         this.vendorId = vendorId;
         this.estimatePrice = estimatePrice;
         this.decisionLater = (decisionLater != null) && decisionLater;
@@ -52,14 +52,14 @@ public class Estimate {
         this.createdAt = LocalDateTime.now();
     }
 
-    public static Estimate createEstimate(Long requestId, Long vendorId, BigDecimal estimatePrice, Boolean decisionLater, String comment) {
+    public static Estimate createEstimate(Long requestFormId, Long vendorId, BigDecimal estimatePrice, Boolean decisionLater, String comment) {
 
         if (Boolean.FALSE.equals(decisionLater) && estimatePrice == null) {
             throw new CustomException(EstimateErrorCode.PRICE_IS_ESSENTIAL);
         }
 
         return Estimate.builder()
-                .requestId(requestId)
+                .requestFormId(requestFormId)
                 .vendorId(vendorId)
                 .estimatePrice(estimatePrice)
                 .decisionLater(decisionLater)

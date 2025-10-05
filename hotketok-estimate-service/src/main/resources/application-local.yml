@@ -52,3 +52,5 @@ logging:
 client:
   requestform-service:
     url: http://localhost:8093
+  vendor-service:
+    url: http://localhost:8099
