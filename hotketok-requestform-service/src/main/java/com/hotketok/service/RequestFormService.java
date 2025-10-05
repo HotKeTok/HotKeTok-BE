@@ -1,8 +1,12 @@
 package com.hotketok.service;
 
 import com.hotketok.constant.GPTPrompt;
+import com.hotketok.domain.enums.Category;
 import com.hotketok.dto.CreateRequestFormResponse;
+import com.hotketok.dto.internalApi.RequestFormDataResponse;
 import com.hotketok.dto.internalApi.UploadFileListResponse;
+import com.hotketok.exception.RequestFormErrorCode;
+import com.hotketok.hotketokcommonservice.error.exception.CustomException;
 import com.hotketok.parser.OpenAIResponseParser;
 import com.hotketok.domain.RequestForm;
 import com.hotketok.domain.RequestFormImage;
@@ -133,5 +137,16 @@ public class RequestFormService {
         String textOnly = OpenAIResponseParser.parse(json).text();
 
         return new ChatGPTResponse(textOnly);
+    }
+
+    public RequestFormDataResponse getRequestFormDataById(Long requestFormId) {
+        RequestForm requestForm = requestFormRepository.findById(requestFormId)
+                .orElseThrow(() -> new CustomException(RequestFormErrorCode.REQUEST_FORM_NOT_FOUND));
+
+        //String address = requestForm.getAddress();
+        Category category = requestForm.getCategory();
+
+        //return new RequestFormDataResponse(address, category);
+        return new RequestFormDataResponse("동작구 핫케톡 스테이 304호", category);
     }
 }

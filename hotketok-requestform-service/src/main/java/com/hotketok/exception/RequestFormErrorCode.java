@@ -13,6 +13,8 @@ public enum RequestFormErrorCode implements ErrorCode {
     ALREADY_REGISTERED(HttpStatus.CONFLICT, "이미 존재하는 요청서입니다"),
 
     REQUEST_FORM_ALREADY_DELETED(HttpStatus.BAD_REQUEST, "이미 삭제된 요청서입니다."),
+
+    REQUEST_FORM_CREATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "요청서 생성에 실패했습니다."),
     ;
 
     private final HttpStatus httpStatus;

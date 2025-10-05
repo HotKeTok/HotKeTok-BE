@@ -2,6 +2,8 @@ package com.hotketok.domain;
 
 import com.hotketok.domain.enums.Category;
 import com.hotketok.domain.enums.Status;
+import com.hotketok.exception.EstimateErrorCode;
+import com.hotketok.hotketokcommonservice.error.exception.CustomException;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -53,7 +55,7 @@ public class Estimate {
     public static Estimate createEstimate(Long requestId, Long vendorId, BigDecimal estimatePrice, Boolean decisionLater, String comment) {
 
         if (Boolean.FALSE.equals(decisionLater) && estimatePrice == null) {
-            throw new IllegalArgumentException("견적 가격(estimatePrice)은 필수입니다.");
+            throw new CustomException(EstimateErrorCode.PRICE_IS_ESSENTIAL);
         }
 
         return Estimate.builder()
