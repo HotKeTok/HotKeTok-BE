@@ -52,6 +52,12 @@ public class Vendor extends BaseTimeEntity {
     @Column
     private int rate;
 
+    @Column
+    private String phoneNumber;
+
+    @Column
+    private String runningTime;
+
     @OneToMany(mappedBy = "vendor", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<News> newsList;
 
@@ -65,7 +71,9 @@ public class Vendor extends BaseTimeEntity {
                    String introduction,
                    String image,
                    String proveFile,
-                   int rate) {
+                   int rate,
+                   String phoneNumber,
+                   String runningTime) {
         this.userId = userId;
         this.name = name;
         this.state = state;
@@ -76,6 +84,8 @@ public class Vendor extends BaseTimeEntity {
         this.image = image;
         this.proveFile = proveFile;
         this.rate = rate;
+        this.phoneNumber = phoneNumber;
+        this.runningTime = runningTime;
     }
 
     public static Vendor createVendor(Long userId,

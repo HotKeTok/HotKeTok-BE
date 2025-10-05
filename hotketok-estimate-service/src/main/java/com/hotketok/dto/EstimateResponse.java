@@ -17,10 +17,7 @@ public record EstimateResponse(
     public static EstimateResponse from(Estimate estimate, VendorInfoResponse vendorInfo) {
         String name = (vendorInfo != null) ? vendorInfo.name() : "알 수 없는 업체";
         String image = (vendorInfo != null) ? vendorInfo.image() : null;
-        //String phone = (vendorInfo != null) ? vendorInfo.phoneNumber() : null;
-
-        // 정보 입력 받는 게 제외 되어 있어 일단 null 처리
-        String phone = null;
+        String phone = (vendorInfo != null) ? vendorInfo.vendorNumber() : null;
 
         return new EstimateResponse(
                 estimate.getId(),

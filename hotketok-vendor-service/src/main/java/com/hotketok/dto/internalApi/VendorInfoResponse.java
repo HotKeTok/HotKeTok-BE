@@ -6,14 +6,16 @@ public record VendorInfoResponse(
         Long vendorId,
         String name,
         String image,
-        Long userId
+        Long userId,
+        String vendorNumber
 ) {
     public static VendorInfoResponse from(Vendor vendor) {
         return new VendorInfoResponse(
                 vendor.getId(),
                 vendor.getName(),
                 vendor.getImage(),
-                vendor.getUserId()
+                vendor.getUserId(),
+                vendor.getPhoneNumber()
         );
     }
 }
