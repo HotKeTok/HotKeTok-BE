@@ -1,11 +1,10 @@
 package com.hotketok.service;
 
 import com.hotketok.domain.Vendor;
+import com.hotketok.domain.VendorIntroductionImage;
 import com.hotketok.domain.enums.VendorState;
 import com.hotketok.dto.*;
-import com.hotketok.dto.internalApi.Role;
-import com.hotketok.dto.internalApi.UploadFileResponse;
-import com.hotketok.dto.internalApi.VendorInfoResponse;
+import com.hotketok.dto.internalApi.*;
 import com.hotketok.exception.VendorErrorCode;
 import com.hotketok.hotketokcommonservice.error.exception.CustomException;
 import com.hotketok.internalApi.InfraServiceClient;
@@ -97,16 +96,32 @@ public class VendorService {
 
     // 업체 프로필 관리
     @Transactional
-    public void updateProfile(Long userId, UpdateVendorProfileRequest request) {
+    public void updateProfile(Long userId, UpdateVendorProfileRequest request, List<MultipartFile> newImages) {
         Vendor vendor = vendorRepository.findByUserId(userId)
                 .orElseThrow(() -> new CustomException(VendorErrorCode.VENDOR_NOT_FOUND));
+
+        // 기존 소개 이미지 목록 조회
+        List<String> oldImageUrls = vendor.getIntroductionImages().stream()
+                .map(VendorIntroductionImage::getImageUrl)
+                .toList();
+
+        List<String> newImageUrls = new ArrayList<>();
+        if (newImages != null && !newImages.isEmpty()) {
+            UploadFileListResponse response = infraServiceClient.uploadImages(newImages, "vendor-introduction/");
+            newImageUrls = response.urls();
+        }
 
         vendor.updateProfile(
                 request.introduction(),
                 request.phoneNumber(),
                 request.runningTime(),
                 request.profileImage(),
-                request.introductionImages()
+                newImageUrls
         );
+
+        // 보상 트랜잭션
+        if (!oldImageUrls.isEmpty()) {
+            oldImageUrls.forEach(url -> infraServiceClient.deleteFile(new DeleteFileRequest(url)));
+        }
     }
 }

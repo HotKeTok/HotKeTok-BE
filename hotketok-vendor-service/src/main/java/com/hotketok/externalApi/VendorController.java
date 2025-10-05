@@ -11,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/vendor-service")
@@ -47,9 +49,12 @@ public class VendorController {
     }
 
     // 업체 프로필 관리
-    @PatchMapping("/profile")
-    public void updateProfile(@RequestBody UpdateVendorProfileRequest request) {
+    @PatchMapping(value = "/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public void updateProfile(
+            @RequestPart("request") UpdateVendorProfileRequest request,
+            @RequestPart(value = "introductionImages", required = false) List<MultipartFile> introductionImages
+    ) {
         Long userId = 103L;
-        vendorService.updateProfile(userId, request);
+        vendorService.updateProfile(userId, request, introductionImages);
     }
 }
