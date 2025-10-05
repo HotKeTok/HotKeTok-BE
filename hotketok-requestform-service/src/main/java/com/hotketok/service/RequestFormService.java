@@ -188,16 +188,13 @@ public class RequestFormService {
             throw new CustomException(GlobalErrorCode.BAD_REQUEST);
         }
     }
-
     public RequestFormDataResponse getRequestFormDataById(Long requestFormId) {
         RequestForm requestForm = requestFormRepository.findById(requestFormId)
                 .orElseThrow(() -> new CustomException(RequestFormErrorCode.REQUEST_FORM_NOT_FOUND));
 
-        //String address = requestForm.getAddress();
+        String addressAndNumber = requestForm.getAddress() + " " + requestForm.getNumber();
         Category category = requestForm.getCategory();
-
-        //return new RequestFormDataResponse(address, category);
-        return new RequestFormDataResponse("동작구 핫케톡 스테이 304호", category);
+        return new RequestFormDataResponse(addressAndNumber, category);
     }
 
     // 요청서 작성자 확인
