@@ -24,15 +24,13 @@ public class EstimateController {
 
     // 받은 견적서 조회
     @GetMapping("/list")
-    public List<EstimateResponse> getEstimatesByRequestFormId(@RequestParam Long requestFormId) {
-        Long userId = 101L;
+    public List<EstimateResponse> getEstimatesByRequestFormId(@RequestHeader("userId") Long userId, @RequestParam Long requestFormId) {
         return estimateService.getEstimatesByRequestFormId(requestFormId);
     }
 
     // 견적서 선택
     @PostMapping("/matching")
-    public void selectEstimate(@RequestParam Long estimateId) {
-        Long userId = 101L;
+    public void selectEstimate(@RequestHeader("userId") Long userId, @RequestParam Long estimateId) {
         estimateService.selectEstimate(userId, estimateId);
     }
 
