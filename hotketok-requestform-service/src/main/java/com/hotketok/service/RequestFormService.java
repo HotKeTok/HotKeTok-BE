@@ -149,4 +149,12 @@ public class RequestFormService {
         //return new RequestFormDataResponse(address, category);
         return new RequestFormDataResponse("동작구 핫케톡 스테이 304호", category);
     }
+
+    // 요청서 상태 변경
+    @Transactional
+    public void updateStatus(Long requestFormId, Status status) {
+        RequestForm requestForm = requestFormRepository.findById(requestFormId)
+                .orElseThrow(() -> new CustomException(RequestFormErrorCode.REQUEST_FORM_NOT_FOUND));
+        requestForm.changeStatus(status);
+    }
 }

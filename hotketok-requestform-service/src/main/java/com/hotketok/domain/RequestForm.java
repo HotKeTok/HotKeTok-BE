@@ -81,4 +81,9 @@ public class RequestForm extends BaseTimeEntity {
                 .status(status)
                 .build();
     }
+
+    // 상태 변경
+    public void changeStatus(Status status) {
+        this.status = status;
+    }
 }

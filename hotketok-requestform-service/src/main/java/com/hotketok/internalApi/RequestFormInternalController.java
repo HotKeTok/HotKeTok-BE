@@ -1,12 +1,10 @@
 package com.hotketok.internalApi;
 
 import com.hotketok.dto.internalApi.RequestFormDataResponse;
+import com.hotketok.dto.internalApi.UpdateStatusRequest;
 import com.hotketok.service.RequestFormService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/internal/requestform-service")
@@ -18,5 +16,14 @@ public class RequestFormInternalController {
     @GetMapping("/{requestFormId}")
     public RequestFormDataResponse getRequestFormData(@PathVariable Long requestFormId) {
         return requestFormService.getRequestFormDataById(requestFormId);
+    }
+
+    // 요청서 상태 변경
+    @PatchMapping("/{requestFormId}/status")
+    public void updateRequestFormStatus(
+            @PathVariable Long requestFormId,
+            @RequestBody UpdateStatusRequest request
+    ) {
+        requestFormService.updateStatus(requestFormId, request.status());
     }
 }
