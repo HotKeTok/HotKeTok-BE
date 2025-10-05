@@ -35,4 +35,11 @@ public class EstimateController {
         Long userId = 101L;
         estimateService.selectEstimate(userId, estimateId);
     }
+
+    // 견적서 삭제
+    @DeleteMapping
+    public void deleteEstimate(@RequestParam Long estimateId) {
+        Long userId = 103L;
+        estimateService.deleteEstimate(userId, estimateId);
+    }
 }

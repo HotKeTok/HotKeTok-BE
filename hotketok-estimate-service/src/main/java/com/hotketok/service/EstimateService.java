@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-@Transactional(readOnly = true)
+@Transactional
 public class EstimateService {
     private final EstimateRepository estimateRepository;
     private final RequestFormServiceClient requestFormClient;
@@ -106,5 +106,23 @@ public class EstimateService {
         });
 
         requestFormClient.updateRequestFormStatus(requestFormId, new UpdateStatusRequest(Status.MATCHING));
+    }
+
+    // 견적서 삭제
+    @Transactional
+    public void deleteEstimate(Long userId, Long estimateId) {
+        Estimate estimate = estimateRepository.findById(estimateId)
+                .orElseThrow(() -> new CustomException(EstimateErrorCode.ESTIMATE_NOT_FOUND));
+
+        // 유저의 삭제 권한 확인
+        Long vendorId = estimate.getVendorId();
+
+        VendorInfoResponse vendorInfo = vendorServiceClient.getVendorInfoById(vendorId);
+
+        if (!vendorInfo.userId().equals(userId)) {
+            throw new CustomException(EstimateErrorCode.NO_AUTHORITY_TO_DELETE);
+        }
+
+        estimateRepository.delete(estimate);
     }
 }

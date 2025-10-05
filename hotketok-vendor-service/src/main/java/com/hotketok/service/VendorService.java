@@ -80,4 +80,11 @@ public class VendorService {
                 .map(VendorInfoResponse::from)
                 .collect(Collectors.toList());
     }
+
+    // 단일 공사업체 정보 조회
+    public VendorInfoResponse findVendorInfoById(Long vendorId) {
+        return vendorRepository.findById(vendorId)
+                .map(VendorInfoResponse::from)
+                .orElseThrow(() -> new CustomException(VendorErrorCode.VENDOR_NOT_FOUND));
+    }
 }
