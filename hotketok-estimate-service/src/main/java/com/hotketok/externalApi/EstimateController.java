@@ -28,4 +28,11 @@ public class EstimateController {
     public List<EstimateResponse> getEstimatesByRequestFormId(@RequestParam Long requestFormId) {
         return estimateService.getEstimatesByRequestFormId(requestFormId);
     }
+
+    // 견적서 선택
+    @PostMapping("/matching")
+    public void selectEstimate(@PathVariable Long estimateId) {
+        Long userId = 101L;
+        estimateService.selectEstimate(userId, estimateId);
+    }
 }

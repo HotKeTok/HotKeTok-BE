@@ -1,11 +1,16 @@
 package com.hotketok.service;
 
 import com.hotketok.domain.Estimate;
+import com.hotketok.domain.enums.Status;
 import com.hotketok.dto.PostEstimateRequest;
 import com.hotketok.dto.PostEstimateResponse;
 import com.hotketok.dto.EstimateResponse;
+import com.hotketok.dto.internalApi.RequestFormAuthorResponse;
 import com.hotketok.dto.internalApi.RequestFormResponse;
+import com.hotketok.dto.internalApi.UpdateStatusRequest;
 import com.hotketok.dto.internalApi.VendorInfoResponse;
+import com.hotketok.exception.EstimateErrorCode;
+import com.hotketok.hotketokcommonservice.error.exception.CustomException;
 import com.hotketok.internalApi.RequestFormServiceClient;
 import com.hotketok.internalApi.VendorServiceClient;
 import com.hotketok.repository.EstimateRepository;
@@ -72,5 +77,30 @@ public class EstimateService {
                     return EstimateResponse.from(estimate, vendorInfo);
                 })
                 .collect(Collectors.toList());
+    }
+
+    // 견적서 선택
+    @Transactional
+    public void selectEstimate(Long userId, Long estimateId) {
+        Estimate selectedEstimate = estimateRepository.findById(estimateId)
+                .orElseThrow(() -> new CustomException(EstimateErrorCode.ESTIMATE_NOT_FOUND));
+
+        // 유저가 견적서 선택 권한있는지 확인
+        Long requestFormId = selectedEstimate.getRequestFormId();
+
+        RequestFormAuthorResponse authorResponse = requestFormClient.getRequestFormAuthor(requestFormId);
+        Long authorId = authorResponse.authorId();
+
+        if (!authorId.equals(userId)) {
+            throw new CustomException(EstimateErrorCode.NO_AUTHORITY_TO_SELECT);
+        }
+
+        selectedEstimate.changeStatus(Status.MATCHING);
+
+        // List<Estimate> otherEstimates = estimateRepository.findAllByRequestFormId(requestFormId);
+
+        // 선택받지 못한 견적서들은 상태 변경 없음
+
+        requestFormClient.updateRequestFormStatus(requestFormId, new UpdateStatusRequest(Status.MATCHING));
     }
 }

@@ -66,4 +66,9 @@ public class Estimate {
                 .comment(comment)
                 .build();
     }
+
+    // 상태 변경
+    public void changeStatus(Status status) {
+        this.status = status;
+    }
 }

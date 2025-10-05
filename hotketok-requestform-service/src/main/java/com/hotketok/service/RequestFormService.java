@@ -3,6 +3,7 @@ package com.hotketok.service;
 import com.hotketok.constant.GPTPrompt;
 import com.hotketok.domain.enums.Category;
 import com.hotketok.dto.CreateRequestFormResponse;
+import com.hotketok.dto.internalApi.RequestFormAuthorResponse;
 import com.hotketok.dto.internalApi.RequestFormDataResponse;
 import com.hotketok.dto.internalApi.UploadFileListResponse;
 import com.hotketok.exception.RequestFormErrorCode;
@@ -148,6 +149,14 @@ public class RequestFormService {
 
         //return new RequestFormDataResponse(address, category);
         return new RequestFormDataResponse("동작구 핫케톡 스테이 304호", category);
+    }
+
+    // 요청서 작성자 확인
+    public RequestFormAuthorResponse getRequestFormAuthorById(Long requestFormId) {
+        RequestForm requestForm = requestFormRepository.findById(requestFormId)
+                .orElseThrow(() -> new CustomException(RequestFormErrorCode.REQUEST_FORM_NOT_FOUND));
+
+        return RequestFormAuthorResponse.from(requestForm);
     }
 
     // 요청서 상태 변경
