@@ -54,3 +54,7 @@ client:
     url: http://localhost:8093
   vendor-service:
     url: http://localhost:8099
+
+feign:
+  httpclient:
+    enabled: true

@@ -26,7 +26,7 @@ public class RequestFormInternalController {
     }
 
     // 요청서 상태 변경
-    @PatchMapping("/{requestFormId}/status")
+    @PutMapping("/{requestFormId}/status")
     public void updateRequestFormStatus(
             @PathVariable Long requestFormId,
             @RequestBody UpdateStatusRequest request

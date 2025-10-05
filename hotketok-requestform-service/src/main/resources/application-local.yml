@@ -72,3 +72,8 @@ client:
   house-service:
     url: http://localhost:8090 # house-service의 주소
 
+feign:
+  httpclient:
+    enabled: false
+  okhttp:
+    enabled: true

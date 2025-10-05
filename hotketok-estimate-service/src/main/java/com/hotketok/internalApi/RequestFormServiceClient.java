@@ -4,10 +4,7 @@ import com.hotketok.dto.internalApi.RequestFormAuthorResponse;
 import com.hotketok.dto.internalApi.RequestFormResponse;
 import com.hotketok.dto.internalApi.UpdateStatusRequest;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
 @FeignClient(name = "requestform-service", url = "${client.requestform-service.url}")
 public interface RequestFormServiceClient {
@@ -18,6 +15,6 @@ public interface RequestFormServiceClient {
     @GetMapping("/internal/requestform-service/{requestFormId}/author")
     RequestFormAuthorResponse getRequestFormAuthor(@PathVariable("requestFormId") Long requestFormId);
 
-    @PatchMapping("/internal/requestform-service/{requestFormId}/status")
+    @PutMapping("/internal/requestform-service/{requestFormId}/status")
     void updateRequestFormStatus(@PathVariable("requestFormId") Long requestFormId, @RequestBody UpdateStatusRequest request);
 }
