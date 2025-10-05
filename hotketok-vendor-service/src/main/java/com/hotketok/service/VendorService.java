@@ -4,6 +4,7 @@ import com.hotketok.domain.Vendor;
 import com.hotketok.domain.enums.VendorState;
 import com.hotketok.dto.RegisterVendorRequest;
 import com.hotketok.dto.RegisterVendorResponse;
+import com.hotketok.dto.VendorInfoAllResponse;
 import com.hotketok.dto.internalApi.Role;
 import com.hotketok.dto.internalApi.UploadFileResponse;
 import com.hotketok.dto.internalApi.VendorInfoResponse;
@@ -86,5 +87,12 @@ public class VendorService {
         return vendorRepository.findById(vendorId)
                 .map(VendorInfoResponse::from)
                 .orElseThrow(() -> new CustomException(VendorErrorCode.VENDOR_NOT_FOUND));
+    }
+
+    // 업체 정보 확인
+    public VendorInfoAllResponse getProfile(Long vendorId) {
+        Vendor vendor = vendorRepository.findById(vendorId)
+                .orElseThrow(() -> new CustomException(VendorErrorCode.VENDOR_NOT_FOUND));
+        return VendorInfoAllResponse.from(vendor);
     }
 }

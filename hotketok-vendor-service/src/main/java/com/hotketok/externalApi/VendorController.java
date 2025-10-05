@@ -2,6 +2,7 @@ package com.hotketok.externalApi;
 
 import com.hotketok.dto.RegisterVendorRequest;
 import com.hotketok.dto.RegisterVendorResponse;
+import com.hotketok.dto.VendorInfoAllResponse;
 import com.hotketok.service.VendorService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -36,5 +37,11 @@ public class VendorController {
     public ResponseEntity<Void> adminReject(@PathVariable Long vendorId) {
         vendorService.rejectVendor(vendorId);
         return ResponseEntity.ok().build();
+    }
+
+    // 업체 정보 확인 (토큰 사용 x)
+    @GetMapping("/profile")
+    public VendorInfoAllResponse getProfile(@RequestParam Long vendorId) {
+        return vendorService.getProfile(vendorId);
     }
 }
