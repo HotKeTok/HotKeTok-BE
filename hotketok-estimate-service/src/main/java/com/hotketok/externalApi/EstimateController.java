@@ -18,28 +18,25 @@ public class EstimateController {
 
     // 견적서 작성
     @PostMapping
-    public PostEstimateResponse postEstimate(@RequestBody PostEstimateRequest request) {
-        Long userId = 101L;
+    public PostEstimateResponse postEstimate(@RequestHeader("userId") Long userId, @RequestBody PostEstimateRequest request) {
         return estimateService.postEstimate(userId, request);
     }
 
     // 받은 견적서 조회
     @GetMapping("/list")
-    public List<EstimateResponse> getEstimatesByRequestFormId(@RequestParam Long requestFormId) {
+    public List<EstimateResponse> getEstimatesByRequestFormId(@RequestHeader("userId") Long userId, @RequestParam Long requestFormId) {
         return estimateService.getEstimatesByRequestFormId(requestFormId);
     }
 
     // 견적서 선택
     @PostMapping("/matching")
-    public void selectEstimate(@PathVariable Long estimateId) {
-        Long userId = 101L;
+    public void selectEstimate(@RequestHeader("userId") Long userId, @PathVariable Long estimateId) {
         estimateService.selectEstimate(userId, estimateId);
     }
 
     // 견적서 삭제
     @DeleteMapping
-    public void deleteEstimate(@RequestParam Long estimateId) {
-        Long userId = 103L;
+    public void deleteEstimate(@RequestHeader("userId") Long userId, @RequestParam Long estimateId) {
         estimateService.deleteEstimate(userId, estimateId);
     }
 }
