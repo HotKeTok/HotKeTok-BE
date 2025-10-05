@@ -2,6 +2,7 @@ package com.hotketok.externalApi;
 
 import com.hotketok.dto.RegisterVendorRequest;
 import com.hotketok.dto.RegisterVendorResponse;
+import com.hotketok.dto.UpdateVendorProfileRequest;
 import com.hotketok.dto.VendorInfoAllResponse;
 import com.hotketok.service.VendorService;
 import lombok.RequiredArgsConstructor;
@@ -43,5 +44,12 @@ public class VendorController {
     @GetMapping("/profile")
     public VendorInfoAllResponse getProfile(@RequestParam Long vendorId) {
         return vendorService.getProfile(vendorId);
+    }
+
+    // 업체 프로필 관리
+    @PatchMapping("/profile")
+    public void updateProfile(@RequestBody UpdateVendorProfileRequest request) {
+        Long userId = 103L;
+        vendorService.updateProfile(userId, request);
     }
 }

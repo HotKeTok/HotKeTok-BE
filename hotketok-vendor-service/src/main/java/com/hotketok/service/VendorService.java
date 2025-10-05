@@ -2,9 +2,7 @@ package com.hotketok.service;
 
 import com.hotketok.domain.Vendor;
 import com.hotketok.domain.enums.VendorState;
-import com.hotketok.dto.RegisterVendorRequest;
-import com.hotketok.dto.RegisterVendorResponse;
-import com.hotketok.dto.VendorInfoAllResponse;
+import com.hotketok.dto.*;
 import com.hotketok.dto.internalApi.Role;
 import com.hotketok.dto.internalApi.UploadFileResponse;
 import com.hotketok.dto.internalApi.VendorInfoResponse;
@@ -19,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -94,5 +93,20 @@ public class VendorService {
         Vendor vendor = vendorRepository.findById(vendorId)
                 .orElseThrow(() -> new CustomException(VendorErrorCode.VENDOR_NOT_FOUND));
         return VendorInfoAllResponse.from(vendor);
+    }
+
+    // 업체 프로필 관리
+    @Transactional
+    public void updateProfile(Long userId, UpdateVendorProfileRequest request) {
+        Vendor vendor = vendorRepository.findByUserId(userId)
+                .orElseThrow(() -> new CustomException(VendorErrorCode.VENDOR_NOT_FOUND));
+
+        vendor.updateProfile(
+                request.introduction(),
+                request.phoneNumber(),
+                request.runningTime(),
+                request.profileImage(),
+                request.introductionImages()
+        );
     }
 }
