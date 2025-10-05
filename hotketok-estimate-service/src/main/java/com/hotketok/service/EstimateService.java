@@ -97,9 +97,13 @@ public class EstimateService {
 
         selectedEstimate.changeStatus(Status.MATCHING);
 
-        // List<Estimate> otherEstimates = estimateRepository.findAllByRequestFormId(requestFormId);
+        List<Estimate> otherEstimates = estimateRepository.findAllByRequestFormId(requestFormId);
 
-        // 선택받지 못한 견적서들은 상태 변경 없음
+        otherEstimates.forEach(estimate -> {
+            if (!estimate.getId().equals(estimateId)) {
+                estimate.changeStatus(Status.REJECTED);
+            }
+        });
 
         requestFormClient.updateRequestFormStatus(requestFormId, new UpdateStatusRequest(Status.MATCHING));
     }
