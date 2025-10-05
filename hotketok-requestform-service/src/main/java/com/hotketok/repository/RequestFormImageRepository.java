@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface RequestFormImageRepository extends JpaRepository<RequestFormImage, Long> {
     void deleteAllByIdIn(List<Long> RequestFormImageIds);
+    List<RequestFormImage> findAllByRequestFormId(Long requestFormId);
 }

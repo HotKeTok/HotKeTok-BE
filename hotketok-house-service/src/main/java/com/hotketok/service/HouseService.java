@@ -170,5 +170,12 @@ public class HouseService {
         }
         return new GetHouseInfoByAddressResponse(address,number,house.getState().toString());
     }
+
+    @Transactional(readOnly = true)
+    public Long getOwnerId(Long userId, String currentAddress, String currentNumber){
+        House house = houseRepository.findByAddressAndNumberAndTenantId(currentAddress, currentNumber, userId)
+                .orElseThrow(() -> new CustomException(HouseErrorCode.HOUSE_NOT_FOUND));
+        return house.getOwnerId();
+    }
 }
 

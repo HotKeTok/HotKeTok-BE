@@ -8,13 +8,19 @@ import com.hotketok.dto.internalApi.RequestFormDataResponse;
 import com.hotketok.dto.internalApi.UploadFileListResponse;
 import com.hotketok.exception.RequestFormErrorCode;
 import com.hotketok.hotketokcommonservice.error.exception.CustomException;
+import com.hotketok.domain.enums.PayType;
+import com.hotketok.dto.*;
+import com.hotketok.dto.internalApi.CurrentAddressAndNumberResponse;
+import com.hotketok.dto.internalApi.UploadFileListResponse;
+import com.hotketok.exception.RequestFormErrorCode;
+import com.hotketok.hotketokcommonservice.error.exception.CustomException;
+import com.hotketok.hotketokcommonservice.error.exception.GlobalErrorCode;
+import com.hotketok.internalApi.HouseServiceClient;
+import com.hotketok.internalApi.UserServiceClient;
 import com.hotketok.parser.OpenAIResponseParser;
 import com.hotketok.domain.RequestForm;
 import com.hotketok.domain.RequestFormImage;
 import com.hotketok.domain.enums.Status;
-import com.hotketok.dto.ChatGPTResponse;
-import com.hotketok.dto.CreateRequestFormRequest;
-import com.hotketok.dto.GetUserInfoResponse;
 import com.hotketok.internalApi.InfraServiceClient;
 import com.hotketok.internalApi.OpenAiClient;
 import com.hotketok.repository.RequestFormImageRepository;
@@ -41,30 +47,35 @@ public class RequestFormService {
     private final RequestFormImageRepository requestFormImageRepository;
     private final InfraServiceClient infraServiceClient;
     private final OpenAiClient openAiClient;
+    private final UserServiceClient userServiceClient;
+    private final HouseServiceClient houseServiceClient;
 
     @Value("${openai.model}")
     private String model;
 
+    // 요청서 생성
     @Transactional
     public CreateRequestFormResponse createRequestForm(
             CreateRequestFormRequest createRequestFormRequest,
             List<MultipartFile> images,
             Long userId) {
 
-        // 사용자 서비스에서 주택주소, authorId, payerId 가져오는 서비스 로직
-        // GetUserInfoResponse getUserInfoResponse = memberClient.getUserInfoByPayType(userId,createRequestFormRequest.payType());
-
-        GetUserInfoResponse getUserInfoResponse = new GetUserInfoResponse(userId, 2L, "동작 핫케톡 스테이 304호");
-
         RequestForm requestForm = RequestForm.createRequestForm(
-                getUserInfoResponse.userId(),
-                getUserInfoResponse.proprietorId(),
                 createRequestFormRequest.payType(),
                 createRequestFormRequest.description(),
                 createRequestFormRequest.requestSchedule(),
                 createRequestFormRequest.category(),
-                Status.CHOOSING
+                Status.CHOOSING,
+                createRequestFormRequest.address(),
+                createRequestFormRequest.number()
         );
+
+        if (createRequestFormRequest.payType().equals(PayType.PROPRIETORSHIP)){
+            Long ownerId = houseServiceClient.getOwnerId(userId, requestForm.getAddress(), requestForm.getNumber());
+            requestForm.setAuthorIdAndPayerId(userId, ownerId);
+        }else {
+            requestForm.setAuthorIdAndPayerId(userId, userId);
+        }
 
         boolean isImageSaved = false;
         List<Long> imageIds = new ArrayList<>();
@@ -93,6 +104,7 @@ public class RequestFormService {
         }
     }
 
+    // 요청서 설명 도우미 (GPT)
     public ChatGPTResponse helpDescriptionByGPT(List<MultipartFile> images) throws Exception {
         UploadFileListResponse uploadFileListResponse = infraServiceClient.uploadImages(images, "requestform-ai/");
 
@@ -138,6 +150,43 @@ public class RequestFormService {
         String textOnly = OpenAIResponseParser.parse(json).text();
 
         return new ChatGPTResponse(textOnly);
+    }
+
+    // 요청서 조회
+    public RequestFormInfoResponse getRequestFormInfo(Long requestFormId){
+        RequestForm requestForm = requestFormRepository.findById(requestFormId)
+                .orElseThrow(() -> new CustomException(RequestFormErrorCode.REQUEST_FORM_NOT_FOUND));
+
+        List<String> images = requestFormImageRepository
+                .findAllByRequestFormId(requestFormId)
+                .stream().map(RequestFormImage::getImageUrl).toList();
+
+        return new RequestFormInfoResponse(
+                requestForm.getCategory(),
+                requestForm.getRequestSchedule(),
+                requestForm.getAddress(),
+                requestForm.getNumber(),
+                requestForm.getPayType(),
+                images,
+                requestForm.getDescription()
+        );
+    }
+
+    // 진행중인 수리요청서 조회
+    public InProgressRequestFormResponse getInProgressRequestForm(Long userId, String role){
+        CurrentAddressAndNumberResponse addressAndNumber = userServiceClient.getCurrentAddressAndNumber(userId);
+        if (role.equals("OWNER")){
+            List<RequestForm> requestForms = requestFormRepository
+                    .findAllByAddressAndStatusNot(addressAndNumber.currentAddress(), Status.COMPLETED);
+            return InProgressRequestFormResponse.fromOwner(requestForms);
+
+        } else if(role.equals("TENANT")){
+            List<RequestForm> requestForms = requestFormRepository
+                    .findAllByAddressAndNumberAndStatusNot(addressAndNumber.currentAddress(), addressAndNumber.currentNumber(), Status.COMPLETED);
+            return InProgressRequestFormResponse.fromTenant(requestForms);
+        } else{
+            throw new CustomException(GlobalErrorCode.BAD_REQUEST);
+        }
     }
 
     public RequestFormDataResponse getRequestFormDataById(Long requestFormId) {
