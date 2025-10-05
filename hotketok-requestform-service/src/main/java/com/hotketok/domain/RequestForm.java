@@ -43,6 +43,9 @@ public class RequestForm extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private Status status; // 요청서 상태
 
+    private String address;
+
+    private String number;
 
     @Builder(access = AccessLevel.PRIVATE)
     private RequestForm(
@@ -52,7 +55,9 @@ public class RequestForm extends BaseTimeEntity {
             String description,
             LocalDateTime requestSchedule,
             Category category,
-            Status status){
+            Status status,
+            String address,
+            String number){
         this.authorId = authorId;
         this.payerId = payerId;
         this.payType = payType;
@@ -60,25 +65,35 @@ public class RequestForm extends BaseTimeEntity {
         this.requestSchedule = requestSchedule;
         this.category = category;
         this.status = status;
+        this.address = address;
+        this.number = number;
     }
 
     public static RequestForm createRequestForm(
-            Long authorId,
-            Long payerId,
             PayType payType,
             String description,
             LocalDateTime requestSchedule,
             Category category,
-            Status status
+            Status status,
+            String address,
+            String number
             ) {
         return RequestForm.builder()
-                .authorId(authorId)
-                .payerId(payerId)
+                .authorId(null)
+                .payerId(null)
                 .payType(payType)
                 .description(description)
                 .requestSchedule(requestSchedule)
                 .category(category)
                 .status(status)
+                .address(address)
+                .number(number)
                 .build();
     }
+
+    public void setAuthorIdAndPayerId(Long authorId, Long payerId) {
+        this.authorId = authorId;
+        this.payerId = payerId;
+    }
+
 }
