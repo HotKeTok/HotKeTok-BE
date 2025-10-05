@@ -12,4 +12,6 @@ public interface VendorRepository extends JpaRepository<Vendor,Long> {
     List<Vendor> findAllByIdIn(List<Long> ids);
 
     Optional<Vendor> findByUserId(Long userId);
+
+    Optional<Vendor> findById(Long id);
 }

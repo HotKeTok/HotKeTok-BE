@@ -1,15 +1,15 @@
 package com.hotketok.domain;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "news")
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
 public class News {
 
     @Id
@@ -21,6 +21,34 @@ public class News {
     @JoinColumn(name = "vendor_id", nullable = false)
     private Vendor vendor;
 
+    @Column(nullable = false)
+    private String title;
+
     @Column(nullable = true)
     private String content;
+
+    @Column(name = "created_at", nullable = false)
+    private LocalDateTime createdAt;
+
+    @PrePersist
+    protected void onCreate() {
+        if (this.createdAt == null) {
+            this.createdAt = LocalDateTime.now();
+        }
+    }
+
+    @Builder(access = AccessLevel.PROTECTED)
+    private News(Vendor vendor, String title, String content) {
+        this.vendor = vendor;
+        this.title = title;
+        this.content = content;
+    }
+
+    public static News createNotice(Vendor vendor, String title, String content) {
+        return News.builder()
+                .vendor(vendor)
+                .title(title)
+                .content(content)
+                .build();
+    }
 }

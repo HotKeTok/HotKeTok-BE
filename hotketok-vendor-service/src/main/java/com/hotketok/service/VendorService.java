@@ -1,5 +1,6 @@
 package com.hotketok.service;
 
+import com.hotketok.domain.News;
 import com.hotketok.domain.Vendor;
 import com.hotketok.domain.VendorIntroductionImage;
 import com.hotketok.domain.enums.VendorState;
@@ -9,6 +10,7 @@ import com.hotketok.exception.VendorErrorCode;
 import com.hotketok.hotketokcommonservice.error.exception.CustomException;
 import com.hotketok.internalApi.InfraServiceClient;
 import com.hotketok.internalApi.UserServiceClient;
+import com.hotketok.repository.NewsRepository;
 import com.hotketok.repository.VendorRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +31,7 @@ public class VendorService {
     private final VendorRepository vendorRepository;
     private final InfraServiceClient infraServiceClient;
     private final UserServiceClient userServiceClient;
+    private final NewsRepository newsRepository;
 
     // 공사업체 등록 (state=0)
     @Transactional
@@ -123,5 +126,20 @@ public class VendorService {
         if (!oldImageUrls.isEmpty()) {
             oldImageUrls.forEach(url -> infraServiceClient.deleteFile(new DeleteFileRequest(url)));
         }
+    }
+
+    // 업체 소식 확인
+    public List<VendorNewsResponse> getVendorNews(Long vendorId) {
+        Vendor vendor = vendorRepository.findById(vendorId)
+                .orElseThrow(() -> new CustomException(VendorErrorCode.VENDOR_NOT_FOUND));
+
+        List<News> newses = newsRepository.findByVendorId(vendorId);
+
+        return newses.stream()
+                .map(news -> {
+                    VendorInfoAllResponse vendorProfile = VendorInfoAllResponse.from(vendor);
+                    return VendorNewsResponse.of(news, vendorProfile);
+                })
+                .collect(Collectors.toList());
     }
 }

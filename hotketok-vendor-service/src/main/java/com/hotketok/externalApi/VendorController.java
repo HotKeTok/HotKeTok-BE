@@ -1,9 +1,6 @@
 package com.hotketok.externalApi;
 
-import com.hotketok.dto.RegisterVendorRequest;
-import com.hotketok.dto.RegisterVendorResponse;
-import com.hotketok.dto.UpdateVendorProfileRequest;
-import com.hotketok.dto.VendorInfoAllResponse;
+import com.hotketok.dto.*;
 import com.hotketok.service.VendorService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -56,5 +53,11 @@ public class VendorController {
     ) {
         Long userId = 103L;
         vendorService.updateProfile(userId, request, introductionImages);
+    }
+
+    // 업체 소식 확인 (토큰 사용 x)
+    @GetMapping("/news")
+    public List<VendorNewsResponse> getVendorNews(@RequestParam Long vendorId) {
+        return vendorService.getVendorNews(vendorId);
     }
 }
