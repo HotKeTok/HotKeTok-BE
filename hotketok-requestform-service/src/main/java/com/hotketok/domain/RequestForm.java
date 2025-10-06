@@ -91,9 +91,12 @@ public class RequestForm extends BaseTimeEntity {
                 .build();
     }
 
+    // 상태 변경
+    public void changeStatus(Status status) {
+        this.status = status;
+    }
     public void setAuthorIdAndPayerId(Long authorId, Long payerId) {
         this.authorId = authorId;
         this.payerId = payerId;
     }
-
 }

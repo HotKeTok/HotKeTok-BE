@@ -6,6 +6,7 @@ import com.hotketok.dto.RegisterVendorRequest;
 import com.hotketok.dto.RegisterVendorResponse;
 import com.hotketok.dto.internalApi.Role;
 import com.hotketok.dto.internalApi.UploadFileResponse;
+import com.hotketok.dto.internalApi.VendorInfoResponse;
 import com.hotketok.exception.VendorErrorCode;
 import com.hotketok.hotketokcommonservice.error.exception.CustomException;
 import com.hotketok.internalApi.InfraServiceClient;
@@ -16,6 +17,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -70,4 +74,17 @@ public class VendorService {
         vendorRepository.deleteById(vendorId);
     }
 
+    // 공사업체 정보 반환
+    public List<VendorInfoResponse> findVendorInfosByIds(List<Long> vendorIds) {
+        return vendorRepository.findAllByIdIn(vendorIds).stream()
+                .map(VendorInfoResponse::from)
+                .collect(Collectors.toList());
+    }
+
+    // 단일 공사업체 정보 조회
+    public VendorInfoResponse findVendorInfoById(Long vendorId) {
+        return vendorRepository.findById(vendorId)
+                .map(VendorInfoResponse::from)
+                .orElseThrow(() -> new CustomException(VendorErrorCode.VENDOR_NOT_FOUND));
+    }
 }

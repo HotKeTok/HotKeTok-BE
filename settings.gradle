@@ -16,5 +16,6 @@ include(
         "hotketok-review-service",
         "hotketok-house-service",
         "hotketok-notice-service",
-        "hotketok-vendor-service"
+        "hotketok-vendor-service",
+        "hotketok-estimate-service",
 )

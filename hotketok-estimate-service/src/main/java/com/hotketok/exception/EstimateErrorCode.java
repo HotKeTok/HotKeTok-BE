@@ -7,15 +7,11 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 @AllArgsConstructor
-public enum RequestFormErrorCode implements ErrorCode {
-    REQUEST_FORM_NOT_FOUND(HttpStatus.NOT_FOUND, "요청서를 찾을 수 없습니다."),
-
-    ALREADY_REGISTERED(HttpStatus.CONFLICT, "이미 존재하는 요청서입니다"),
-
-    REQUEST_FORM_ALREADY_DELETED(HttpStatus.BAD_REQUEST, "이미 삭제된 요청서입니다."),
-
-    REQUEST_FORM_CREATION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "요청서 생성에 실패했습니다."),
-    ;
+public enum EstimateErrorCode implements ErrorCode {
+    ESTIMATE_NOT_FOUND(HttpStatus.NOT_FOUND, "해당하는 견적서가 존재하지 않습니다."),
+    PRICE_IS_ESSENTIAL(HttpStatus.BAD_REQUEST, "'나중에 결정'이 아닐 경우, 견적 가격은 필수입니다."),
+    NO_AUTHORITY_TO_SELECT(HttpStatus.FORBIDDEN, "견적서를 선택할 권한이 없습니다."),
+    NO_AUTHORITY_TO_DELETE(HttpStatus.FORBIDDEN, "견적서를 삭제할 권한이 없습니다.");
 
     private final HttpStatus httpStatus;
     private final String message;
