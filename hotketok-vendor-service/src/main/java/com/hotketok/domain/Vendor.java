@@ -143,4 +143,9 @@ public class Vendor extends BaseTimeEntity {
     public void changeState(VendorState state) {
         this.state = state;
     }
+
+    public void addNews(News news) {
+        this.newsList.add(news);
+        news.setVendor(this);
+    }
 }

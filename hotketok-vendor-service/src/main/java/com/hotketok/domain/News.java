@@ -3,7 +3,6 @@ package com.hotketok.domain;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity
@@ -44,11 +43,14 @@ public class News {
         this.content = content;
     }
 
-    public static News createNotice(Vendor vendor, String title, String content) {
+    public static News createNews(String title, String content) {
         return News.builder()
-                .vendor(vendor)
                 .title(title)
                 .content(content)
                 .build();
+    }
+
+    void setVendor(Vendor vendor) {
+        this.vendor = vendor;
     }
 }

@@ -142,4 +142,13 @@ public class VendorService {
                 })
                 .collect(Collectors.toList());
     }
+
+    // 업체 소식 작성
+    @Transactional
+    public void postNews(Long userId, PostNewsRequest request) {
+        Vendor vendor = vendorRepository.findByUserId(userId)
+                .orElseThrow(() -> new CustomException(VendorErrorCode.VENDOR_NOT_FOUND));
+        News newNews = News.createNews(request.title(), request.content());
+        vendor.addNews(newNews);
+    }
 }

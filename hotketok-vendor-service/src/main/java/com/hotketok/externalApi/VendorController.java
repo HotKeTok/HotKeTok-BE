@@ -62,9 +62,9 @@ public class VendorController {
     }
 
     // 업체 소식 작성
-    @PostMapping("/nes")
-    public PostNewsRequest postNews(@RequestBody PostNewsRequest request) {
+    @PostMapping("/news")
+    public void postNews(@RequestBody PostNewsRequest request) {
         Long userId = 103L;
-        return vendorService.postNews(userId, request);
+        vendorService.postNews(userId, request);
     }
 }
