@@ -2,10 +2,13 @@ package com.hotketok.internalApi;
 
 import com.hotketok.dto.internalApi.RequestFormAuthorResponse;
 import com.hotketok.dto.internalApi.RequestFormDataResponse;
+import com.hotketok.dto.internalApi.RequestFormListResponse;
 import com.hotketok.dto.internalApi.UpdateStatusRequest;
 import com.hotketok.service.RequestFormService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/internal/requestform-service")
@@ -32,5 +35,11 @@ public class RequestFormInternalController {
             @RequestBody UpdateStatusRequest request
     ) {
         requestFormService.updateStatus(requestFormId, request.status());
+    }
+
+    // id로 요청서 목록 조회
+    @PostMapping("/info-list")
+    public List<RequestFormListResponse> getRequestFormsByIds(@RequestBody List<Long> requestFormIds) {
+        return requestFormService.getRequestFormsByIds(requestFormIds);
     }
 }

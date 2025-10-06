@@ -74,4 +74,11 @@ public class VendorController {
         Long userId = 103L;
         vendorService.deleteNews(userId, newsId);
     }
+
+    // 보낸 견적서 조회
+    @GetMapping("/estimate")
+    public VendorEstimateListResponse getMyEstimates() {
+        Long userId = 103L;
+        return vendorService.getMyEstimates(userId);
+    }
 }

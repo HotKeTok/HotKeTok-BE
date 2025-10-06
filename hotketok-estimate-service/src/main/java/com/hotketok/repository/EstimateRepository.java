@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface EstimateRepository extends JpaRepository<Estimate, Long> {
     List<Estimate> findAllByRequestFormId(Long requestFormId);
+    List<Estimate> findAllByVendorId(Long vendorId);
 }

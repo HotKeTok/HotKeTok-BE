@@ -3,14 +3,11 @@ package com.hotketok.service;
 import com.hotketok.constant.GPTPrompt;
 import com.hotketok.domain.enums.Category;
 import com.hotketok.dto.CreateRequestFormResponse;
-import com.hotketok.dto.internalApi.RequestFormAuthorResponse;
-import com.hotketok.dto.internalApi.RequestFormDataResponse;
-import com.hotketok.dto.internalApi.UploadFileListResponse;
+import com.hotketok.dto.internalApi.*;
 import com.hotketok.exception.RequestFormErrorCode;
 import com.hotketok.hotketokcommonservice.error.exception.CustomException;
 import com.hotketok.domain.enums.PayType;
 import com.hotketok.dto.*;
-import com.hotketok.dto.internalApi.CurrentAddressAndNumberResponse;
 import com.hotketok.dto.internalApi.UploadFileListResponse;
 import com.hotketok.exception.RequestFormErrorCode;
 import com.hotketok.hotketokcommonservice.error.exception.CustomException;
@@ -211,5 +208,12 @@ public class RequestFormService {
         RequestForm requestForm = requestFormRepository.findById(requestFormId)
                 .orElseThrow(() -> new CustomException(RequestFormErrorCode.REQUEST_FORM_NOT_FOUND));
         requestForm.changeStatus(status);
+    }
+
+    // id로 요청서 목록 조회
+    public List<RequestFormListResponse> getRequestFormsByIds(List<Long> requestFormIds) {
+        return requestFormRepository.findAllByIdIn(requestFormIds).stream()
+                .map(RequestFormListResponse::from)
+                .collect(Collectors.toList());
     }
 }

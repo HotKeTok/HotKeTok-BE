@@ -8,7 +8,9 @@ import com.hotketok.dto.*;
 import com.hotketok.dto.internalApi.*;
 import com.hotketok.exception.VendorErrorCode;
 import com.hotketok.hotketokcommonservice.error.exception.CustomException;
+import com.hotketok.internalApi.EstimateServiceClient;
 import com.hotketok.internalApi.InfraServiceClient;
+import com.hotketok.internalApi.RequestFormServiceClient;
 import com.hotketok.internalApi.UserServiceClient;
 import com.hotketok.repository.NewsRepository;
 import com.hotketok.repository.VendorRepository;
@@ -19,7 +21,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 
@@ -32,6 +36,8 @@ public class VendorService {
     private final InfraServiceClient infraServiceClient;
     private final UserServiceClient userServiceClient;
     private final NewsRepository newsRepository;
+    private final EstimateServiceClient estimateServiceClient;
+    private final RequestFormServiceClient requestFormServiceClient;
 
     // 공사업체 등록 (state=0)
     @Transactional
@@ -163,5 +169,43 @@ public class VendorService {
             throw new CustomException(VendorErrorCode.NO_AUTHORITY_TO_DELETE_NEWS);
         }
         newsRepository.delete(news);
+    }
+
+    // 보낸 견적서 조회
+    public VendorEstimateListResponse getMyEstimates(Long userId) {
+        Vendor vendor = vendorRepository.findByUserId(userId)
+                .orElseThrow(() -> new CustomException(VendorErrorCode.VENDOR_NOT_FOUND));
+        Long vendorId = vendor.getId();
+
+        // 보낸 견적서 정보 받아옴
+        List<EstimateInfoResponse> estimates = estimateServiceClient.getEstimatesByVendorId(vendorId);
+        if (estimates.isEmpty()) {
+            return new VendorEstimateListResponse(0, Collections.emptyList());
+        }
+
+        // 견적서에서 요청서 id 모음
+        List<Long> requestFormIds = estimates.stream()
+                .map(EstimateInfoResponse::requestFormId)
+                .distinct()
+                .toList();
+
+        // 요청서 정보(주소, 카테고리) 가져옴
+        Map<Long, RequestFormListResponse> requestFormMap = requestFormServiceClient.getRequestFormsByIds(requestFormIds).stream()
+                .collect(Collectors.toMap(RequestFormListResponse::requestFormId, data -> data));
+
+        List<VendorEstimateResponse> resultList = estimates.stream()
+                .map(estimate -> {
+                    RequestFormListResponse formData = requestFormMap.get(estimate.requestFormId());
+                    return new VendorEstimateResponse(
+                            estimate.estimateId(),
+                            formData.category().getKoreanName(), // 카테고리 한글 변환
+                            formData.address(),
+                            estimate.estimateTime(),
+                            estimate.status()
+                    );
+                })
+                .collect(Collectors.toList());
+
+        return new VendorEstimateListResponse(resultList.size(), resultList);
     }
 }

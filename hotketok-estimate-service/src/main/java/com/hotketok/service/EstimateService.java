@@ -5,10 +5,7 @@ import com.hotketok.domain.enums.Status;
 import com.hotketok.dto.PostEstimateRequest;
 import com.hotketok.dto.PostEstimateResponse;
 import com.hotketok.dto.EstimateResponse;
-import com.hotketok.dto.internalApi.RequestFormAuthorResponse;
-import com.hotketok.dto.internalApi.RequestFormResponse;
-import com.hotketok.dto.internalApi.UpdateStatusRequest;
-import com.hotketok.dto.internalApi.VendorInfoResponse;
+import com.hotketok.dto.internalApi.*;
 import com.hotketok.exception.EstimateErrorCode;
 import com.hotketok.hotketokcommonservice.error.exception.CustomException;
 import com.hotketok.internalApi.RequestFormServiceClient;
@@ -124,5 +121,12 @@ public class EstimateService {
         }
 
         estimateRepository.delete(estimate);
+    }
+
+    // 공사업체 id로 견적서 정보 반환
+    public List<EstimateInfoResponse> findEstimatesByVendorId(Long vendorId) {
+        return estimateRepository.findAllByVendorId(vendorId).stream()
+                .map(EstimateInfoResponse::from)
+                .collect(Collectors.toList());
     }
 }
