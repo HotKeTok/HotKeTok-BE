@@ -7,7 +7,6 @@ dependencies {
 
 	// Spring Cloud Kubernetes Discovery Client
 	implementation 'org.springframework.cloud:spring-cloud-starter-kubernetes-client'
-	implementation 'org.springframework.cloud:spring-cloud-starter-kubernetes-discoveryclient'
 
 	// Spring Cloud Kubernetes Config Client
 	implementation 'org.springframework.cloud:spring-cloud-starter-kubernetes-client-config'
