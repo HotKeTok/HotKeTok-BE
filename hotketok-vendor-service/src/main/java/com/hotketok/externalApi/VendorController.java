@@ -60,4 +60,11 @@ public class VendorController {
     public List<VendorNewsResponse> getVendorNews(@RequestParam Long vendorId) {
         return vendorService.getVendorNews(vendorId);
     }
+
+    // 업체 소식 작성
+    @PostMapping("/nes")
+    public PostNewsRequest postNews(@RequestBody PostNewsRequest request) {
+        Long userId = 103L;
+        return vendorService.postNews(userId, request);
+    }
 }

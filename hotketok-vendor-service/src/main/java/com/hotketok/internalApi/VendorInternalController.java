@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/internal/vendors")
+@RequestMapping("/internal/vendor-service")
 @RequiredArgsConstructor
 public class VendorInternalController {
 
