@@ -1,6 +1,6 @@
 package com.hotketok.domain;
 
-import com.hotketok.domain.enums.Category;
+import com.hotketok.domain.enums.ConstructCategory;
 import com.hotketok.domain.enums.PayType;
 import com.hotketok.domain.enums.Status;
 import com.hotketok.hotketokjpaservice.entity.BaseTimeEntity;
@@ -38,7 +38,7 @@ public class RequestForm extends BaseTimeEntity {
     private LocalDateTime requestSchedule;
 
     @Enumerated(EnumType.STRING)
-    private Category category; // 수리 종류
+    private ConstructCategory category; // 수리 종류
 
     @Enumerated(EnumType.STRING)
     private Status status; // 요청서 상태
@@ -54,7 +54,7 @@ public class RequestForm extends BaseTimeEntity {
             PayType payType,
             String description,
             LocalDateTime requestSchedule,
-            Category category,
+            ConstructCategory category,
             Status status,
             String address,
             String number){
@@ -73,7 +73,7 @@ public class RequestForm extends BaseTimeEntity {
             PayType payType,
             String description,
             LocalDateTime requestSchedule,
-            Category category,
+            ConstructCategory category,
             Status status,
             String address,
             String number

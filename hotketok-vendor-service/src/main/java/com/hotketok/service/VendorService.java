@@ -5,6 +5,7 @@ import com.hotketok.domain.Vendor;
 import com.hotketok.domain.VendorIntroductionImage;
 import com.hotketok.domain.enums.VendorState;
 import com.hotketok.dto.*;
+import com.hotketok.dto.UploadFileListResponse;
 import com.hotketok.dto.internalApi.*;
 import com.hotketok.exception.VendorErrorCode;
 import com.hotketok.hotketokcommonservice.error.exception.CustomException;
@@ -198,7 +199,7 @@ public class VendorService {
                     RequestFormListResponse formData = requestFormMap.get(estimate.requestFormId());
                     return new VendorEstimateResponse(
                             estimate.estimateId(),
-                            formData.category().getKoreanName(), // 카테고리 한글 변환
+                            formData.category(),
                             formData.address(),
                             estimate.estimateTime(),
                             estimate.status()

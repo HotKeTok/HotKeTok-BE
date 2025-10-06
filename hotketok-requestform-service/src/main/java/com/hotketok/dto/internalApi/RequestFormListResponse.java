@@ -1,11 +1,11 @@
 package com.hotketok.dto.internalApi;
 import com.hotketok.domain.RequestForm;
-import com.hotketok.domain.enums.Category;
+import com.hotketok.domain.enums.ConstructCategory;
 
 public record RequestFormListResponse(
         Long requestFormId,
         String address,
-        Category category
+        ConstructCategory category
 ) {
     public static RequestFormListResponse from(RequestForm requestForm) {
         return new RequestFormListResponse(

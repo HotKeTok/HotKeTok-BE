@@ -1,4 +1,4 @@
 package com.hotketok.dto.internalApi;
-import com.hotketok.domain.enums.Category;
+import com.hotketok.domain.enums.ConstructCategory;
 
-public record RequestFormDataResponse(String address, Category category) {}
+public record RequestFormDataResponse(String address, ConstructCategory category) {}
