@@ -67,4 +67,11 @@ public class VendorController {
         Long userId = 103L;
         vendorService.postNews(userId, request);
     }
+
+    // 업체 소식 삭제
+    @DeleteMapping("/news")
+    public void deleteNews(@RequestParam Long newsId) {
+        Long userId = 103L;
+        vendorService.deleteNews(userId, newsId);
+    }
 }
