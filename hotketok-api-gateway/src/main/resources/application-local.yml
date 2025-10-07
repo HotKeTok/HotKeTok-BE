@@ -6,110 +6,106 @@ spring:
     name: apigateway-service
   cloud:
     gateway:
-      server:
-        webflux:
-          routes:
-            - id: auth-service
-              uri: lb://auth-service
-              predicates:
-                - Path=/api/auth-service/**
-                - Method=GET,POST,PUT,DELETE
+      routes:
+        - id: auth-service
+          uri: lb://auth-service
+          predicates:
+            - Path=/api/auth-service/**
+            - Method=GET,POST,PUT,DELETE
 
-            - id: requestform-service
-              uri: lb://requestform-service
-              predicates:
-                - Path=/api/requestform-service/**
-                - Method=GET,POST,PUT,DELETE
-              filters:
-                - JwtAuthFilter
-                - name: RoleFilter
-                  args:
-                    allowedRoles:
-                      - OWNER
-                      - TENANT
+        - id: requestform-service
+          uri: lb://requestform-service
+          predicates:
+            - Path=/api/requestform-service/**
+            - Method=GET,POST,PUT,DELETE
+          filters:
+            - JwtAuthFilter
+            - name: RoleFilter
+              args:
+                allowedRoles:
+                  - OWNER
+                  - TENANT
+        - id: chatting-service
+          uri: lb://chatting-service
+          predicates:
+            - Path=/api/chatting-service/**
+            - Method=GET,POST,PUT,DELETE
+          filters:
+            - JwtAuthFilter
+            - name: RoleFilter
+              args:
+                allowedRoles:
+                  - OWNER
+                  - TENANT
+                  - VENDOR
+        - id: infra-service
+          uri: lb://infra-service
+          predicates:
+            - Path=/api/infra-service/**
+            - Method=GET,POST,PUT,DELETE
+          filters:
+            - JwtAuthFilter
+            - name: RoleFilter
+              args:
+                allowedRoles:
+                  - OWNER
+                  - TENANT
 
-            - id: chatting-service
-              uri: lb://chatting-service
-              predicates:
-                - Path=/api/chatting-service/**
-                - Method=GET,POST,PUT,DELETE
-              filters:
-                - JwtAuthFilter
-                - name: RoleFilter
-                  args:
-                    allowedRoles:
-                      - OWNER
-                      - TENANT
-                      - VENDOR
+        - id: house-service
+          uri: lb://house-service
+          predicates:
+            - Path=/api/house-service/**
+            - Method=GET,POST,PUT,DELETE
+          filters:
+            - JwtAuthFilter
+            - name: RoleFilter
+              args:
+                allowedRoles:
+                  - NONE
+                  - OWNER
+                  - TENANT
+                  - VENDOR
 
-            - id: infra-service
-              uri: lb://infra-service
-              predicates:
-                - Path=/api/infra-service/**
-                - Method=GET,POST,PUT,DELETE
-              filters:
-                - JwtAuthFilter
-                - name: RoleFilter
-                  args:
-                    allowedRoles:
-                      - OWNER
-                      - TENANT
+        - id: user-service
+          uri: lb://user-service
+          predicates:
+            - Path=/api/user-service/**
+            - Method=GET,POST,PUT,DELETE
+          filters:
+            - JwtAuthFilter
+            - name: RoleFilter
+              args:
+                allowedRoles:
+                  - NONE
+                  - OWNER
+                  - TENANT
+                  - VENDOR
 
-            - id: house-service
-              uri: lb://house-service
-              predicates:
-                - Path=/api/house-service/**
-                - Method=GET,POST,PUT,DELETE
-              filters:
-                - JwtAuthFilter
-                - name: RoleFilter
-                  args:
-                    allowedRoles:
-                      - NONE
-                      - OWNER
-                      - TENANT
-                      - VENDOR
+        - id: commonbill-service
+          uri: lb://commonbill-service
+          predicates:
+            - Path=/api/commonbill-service/**
+            - Method=GET,POST,PUT,DELETE
+          filters:
+            - JwtAuthFilter
+            - name: RoleFilter
+              args:
+                allowedRoles:
+                  - OWNER
+                  - TENANT
 
-            - id: user-service
-              uri: lb://user-service
-              predicates:
-                - Path=/api/user-service/**
-                - Method=GET,POST,PUT,DELETE
-              filters:
-                - JwtAuthFilter
-                - name: RoleFilter
-                  args:
-                    allowedRoles:
-                      - NONE
-                      - OWNER
-                      - TENANT
-                      - VENDOR
-
-            - id: commonbill-service
-              uri: lb://commonbill-service
-              predicates:
-                - Path=/api/commonbill-service/**
-                - Method=GET,POST,PUT,DELETE
-              filters:
-                - JwtAuthFilter
-                - name: RoleFilter
-                  args:
-                    allowedRoles:
-                      - OWNER
-                      - TENANT
-                      -
-            - id: vendor-service
-              uri: lb://vendor-service
-              predicates:
-                - Path=/api/vendor-service/**
-                - Method=GET,POST,PUT,DELETE
-              filters:
-                - JwtAuthFilter
-                - name: RoleFilter
-                  args:
-                    allowedRoles:
-                      - NONE
-                      - VENDOR
+        - id: vendor-service
+          uri: lb://vendor-service
+          predicates:
+            - Path=/api/vendor-service/**
+            - Method=GET,POST,PUT,DELETE
+          filters:
+            - JwtAuthFilter
+            - name: RoleFilter
+              args:
+                allowedRoles:
+                  - NONE
+                  - VENDOR
 
 jwt:
   secret: ThisIsHotketokSecretKeyThisIsHotketokSecretKey
