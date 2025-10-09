@@ -11,6 +11,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "request_forms")
@@ -68,6 +70,9 @@ public class RequestForm extends BaseTimeEntity {
         this.address = address;
         this.number = number;
     }
+
+    @OneToMany(mappedBy = "requestForm", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<RequestFormImage> images = new ArrayList<>();
 
     public static RequestForm createRequestForm(
             PayType payType,

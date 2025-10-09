@@ -66,5 +66,10 @@ public class UserInternalController {
     public List<UserInfoDetailResponse> getUserInfosByIds(@RequestBody List<Long> userIds) {
         return userService.findUserInfosByIds(userIds);
     }
+
+    @GetMapping("/profiles-detail/{userId}")
+    public UserInfoDetailResponse getUserInfoById(@PathVariable Long userId) {
+        return userService.findUserInfoById(userId);
+    }
 }
 

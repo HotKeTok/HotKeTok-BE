@@ -214,4 +214,25 @@ public class RequestFormService {
                 .map(RequestFormDetailResponse::from)
                 .collect(Collectors.toList());
     }
+
+    @Transactional
+    public RequestFormDetailResponse getRequestFormDetailById(Long requestFormId) {
+        RequestForm requestForm = requestFormRepository.findById(requestFormId)
+                .orElseThrow(() -> new CustomException(RequestFormErrorCode.REQUEST_FORM_NOT_FOUND));
+
+        List<String> images = requestFormImageRepository.findAllByRequestFormId(requestFormId)
+                .stream()
+                .map(RequestFormImage::getImageUrl)
+                .toList();
+
+        return new RequestFormDetailResponse(
+                requestForm.getId(),
+                requestForm.getAddress() + " " + requestForm.getNumber(),
+                requestForm.getCategory(),
+                requestForm.getPayType(),
+                requestForm.getPayerId(),
+                images,
+                requestForm.getDescription()
+        );
+    }
 }

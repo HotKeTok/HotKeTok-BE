@@ -293,4 +293,34 @@ public class VendorService {
 
         return new VendorEstimateListResponse(items.size(), items);
     }
+
+    // 수리 상세 조회
+    public EstimateDetailResponse getEstimateDetail(Long userId, Long estimateId) {
+        SimpleEstimateResponse estimate = estimateServiceClient.getEstimateById(estimateId);
+
+        // 확인 권한 확인
+        Vendor vendor = vendorRepository.findByUserId(userId)
+                .orElseThrow(() -> new CustomException(VendorErrorCode.VENDOR_NOT_FOUND));
+        if (!vendor.getId().equals(estimate.vendorId())) {
+            throw new CustomException(VendorErrorCode.NO_AUTHORITY);
+        }
+
+        RequestFormDetailResponse formData = requestFormServiceClient.getRequestFormDetail(estimate.requestFormId());
+        UserInfoDetailResponse payerInfo = userServiceClient.getUserInfoById(formData.payerId());
+
+        return new EstimateDetailResponse(
+                estimate.estimateId(),
+                formData.category(),
+                formData.address(),
+                estimate.estimateTime(),
+                estimate.estimatePrice(),
+                formData.payType(),
+                payerInfo.name(),
+                payerInfo.phoneNumber(),
+                formData.requestImages(),
+                formData.requestDescription(),
+                estimate.estimateComment(),
+                estimate.status()
+        );
+    }
 }

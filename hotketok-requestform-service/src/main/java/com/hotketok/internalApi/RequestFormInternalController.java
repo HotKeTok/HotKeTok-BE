@@ -42,4 +42,9 @@ public class RequestFormInternalController {
     public List<RequestFormDetailResponse> getRequestFormsByIds(@RequestBody List<Long> requestFormIds) {
         return requestFormService.getRequestFormsByIds(requestFormIds);
     }
+
+    @GetMapping("/{requestFormId}/detail")
+    public RequestFormDetailResponse getRequestFormDetail(@PathVariable Long requestFormId) {
+        return requestFormService.getRequestFormDetailById(requestFormId);
+    }
 }

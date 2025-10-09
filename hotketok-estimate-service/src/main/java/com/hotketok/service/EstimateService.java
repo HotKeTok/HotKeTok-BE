@@ -136,4 +136,11 @@ public class EstimateService {
                 .map(SimpleEstimateResponse::from)
                 .collect(Collectors.toList());
     }
+
+    // 견적서 정보 조회
+    public SimpleEstimateResponse findSimpleEstimateById(Long estimateId) {
+        return estimateRepository.findById(estimateId)
+                .map(SimpleEstimateResponse::from)
+                .orElseThrow(() -> new CustomException(EstimateErrorCode.ESTIMATE_NOT_FOUND));
+    }
 }

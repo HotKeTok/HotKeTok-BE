@@ -16,7 +16,9 @@ public enum VendorErrorCode implements ErrorCode {
 
     NEWS_NOT_FOUND(HttpStatus.NOT_FOUND, "해당하는 소식을 찾을 수 없습니다."),
 
-    NO_AUTHORITY_TO_DELETE_NEWS(HttpStatus.FORBIDDEN, "소식을 삭제할 권한이 없습니다.");
+    NO_AUTHORITY_TO_DELETE_NEWS(HttpStatus.FORBIDDEN, "소식을 삭제할 권한이 없습니다."),
+
+    NO_AUTHORITY(HttpStatus.FORBIDDEN, "해당 정보를 조회할 권한이 없습니다.");
     ;
 
     private final HttpStatus httpStatus;

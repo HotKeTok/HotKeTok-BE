@@ -5,10 +5,7 @@ import com.hotketok.dto.internalApi.EstimateInfoResponse;
 import com.hotketok.dto.internalApi.SimpleEstimateResponse;
 import com.hotketok.service.EstimateService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -31,5 +28,10 @@ public class EstimateInternalController {
     @GetMapping("/completed")
     public List<SimpleEstimateResponse> getCompletedEstimates(@RequestParam Long vendorId) {
         return estimateService.findEstimatesByVendorIdAndStatus(vendorId, Status.COMPLETED);
+    }
+
+    @GetMapping("/{estimateId}")
+    public SimpleEstimateResponse getEstimateById(@PathVariable Long estimateId) {
+        return estimateService.findSimpleEstimateById(estimateId);
     }
 }

@@ -129,4 +129,11 @@ public class UserService {
                 .map(UserInfoDetailResponse::from)
                 .collect(Collectors.toList());
     }
+
+    // 단일 id로 사용자 정보 조회
+    public UserInfoDetailResponse findUserInfoById(Long userId) {
+        return userRepository.findById(userId)
+                .map(UserInfoDetailResponse::from)
+                .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
+    }
 }

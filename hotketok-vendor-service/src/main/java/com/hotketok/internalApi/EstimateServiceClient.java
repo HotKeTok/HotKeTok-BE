@@ -1,8 +1,11 @@
 package com.hotketok.internalApi;
 
+import com.hotketok.dto.EstimateDetailResponse;
 import com.hotketok.dto.internalApi.EstimateInfoResponse;
+import com.hotketok.dto.internalApi.SimpleEstimateResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
@@ -17,4 +20,7 @@ public interface EstimateServiceClient {
 
     @GetMapping("/internal/estimate-service/completed")
     List<EstimateInfoResponse> getCompletedEstimatesByVendorId(@RequestParam("vendorId") Long vendorId);
+
+    @GetMapping("/internal/estimate-service/{estimateId}")
+    SimpleEstimateResponse getEstimateById(@PathVariable("estimateId") Long estimateId);
 }
