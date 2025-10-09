@@ -27,4 +27,9 @@ public class EstimateInternalController {
     public List<SimpleEstimateResponse> getMatchingEstimates(@RequestParam Long vendorId) {
         return estimateService.findEstimatesByVendorIdAndStatus(vendorId, Status.MATCHING);
     }
+
+    @GetMapping("/completed")
+    public List<SimpleEstimateResponse> getCompletedEstimates(@RequestParam Long vendorId) {
+        return estimateService.findEstimatesByVendorIdAndStatus(vendorId, Status.COMPLETED);
+    }
 }

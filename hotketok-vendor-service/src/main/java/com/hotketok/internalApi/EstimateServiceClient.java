@@ -14,4 +14,7 @@ public interface EstimateServiceClient {
 
     @GetMapping("/internal/estimate-service/matching")
     List<EstimateInfoResponse> getMatchingEstimatesByVendorId(@RequestParam("vendorId") Long vendorId);
+
+    @GetMapping("/internal/estimate-service/completed")
+    List<EstimateInfoResponse> getCompletedEstimatesByVendorId(@RequestParam("vendorId") Long vendorId);
 }

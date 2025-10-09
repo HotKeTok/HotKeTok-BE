@@ -265,4 +265,32 @@ public class VendorService {
 
         return new MatchingEstimateListResponse(items.size(), items);
     }
+
+    // 처리 완료 수리 조회
+    public VendorEstimateListResponse getCompletedEstimates(Long userId) {
+        Vendor vendor = vendorRepository.findByUserId(userId)
+                .orElseThrow(() -> new CustomException(VendorErrorCode.VENDOR_NOT_FOUND));
+
+        List<EstimateInfoResponse> completedEstimates = estimateServiceClient.getCompletedEstimatesByVendorId(vendor.getId());
+        if (completedEstimates.isEmpty()) {
+            return new VendorEstimateListResponse(0, Collections.emptyList());
+        }
+
+        List<Long> requestFormIds = completedEstimates.stream().map(EstimateInfoResponse::requestFormId).distinct().toList();
+        Map<Long, RequestFormDetailResponse> requestFormMap = requestFormServiceClient.getRequestFormsByIds(requestFormIds).stream()
+                .collect(Collectors.toMap(RequestFormDetailResponse::requestFormId, data -> data));
+
+        List<VendorEstimateResponse> items = completedEstimates.stream().map(estimate -> {
+            RequestFormDetailResponse formData = requestFormMap.get(estimate.requestFormId());
+            return new VendorEstimateResponse(
+                    estimate.estimateId(),
+                    formData.category(),
+                    formData.address(),
+                    estimate.estimateTime(),
+                    estimate.status()
+            );
+        }).collect(Collectors.toList());
+
+        return new VendorEstimateListResponse(items.size(), items);
+    }
 }
