@@ -81,4 +81,11 @@ public class VendorController {
         Long userId = 103L;
         return vendorService.getMyEstimates(userId);
     }
+
+    // 진행 중인 수리 조회
+    @GetMapping("/processing")
+    public MatchingEstimateListResponse getMatchingEstimates() {
+        Long userId = 103L;
+        return vendorService.getMatchingEstimates(userId);
+    }
 }

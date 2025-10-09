@@ -9,9 +9,6 @@ import java.util.List;
 
 @FeignClient(name = "estimate-service", url = "${client.estimate-service.url}")
 public interface EstimateServiceClient {
-    @GetMapping("/internal/estimate-service")
-    List<EstimateInfoResponse> getEstimatesByVendorId(@RequestParam("vendorId") Long vendorId);
-
-    @GetMapping("/internal/estimate-service/matching")
-    List<EstimateInfoResponse> getMatchingEstimatesByVendorId(@RequestParam("vendorId") Long vendorId);
+    @GetMapping("/internal/estimates")
+    List<EstimateInfoResponse> getEstimatesByRequestFormId(@RequestParam("requestFormId") Long requestFormId);
 }

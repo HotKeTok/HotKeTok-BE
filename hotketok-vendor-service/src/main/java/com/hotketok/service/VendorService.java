@@ -3,6 +3,7 @@ package com.hotketok.service;
 import com.hotketok.domain.News;
 import com.hotketok.domain.Vendor;
 import com.hotketok.domain.VendorIntroductionImage;
+import com.hotketok.domain.enums.Role;
 import com.hotketok.domain.enums.VendorState;
 import com.hotketok.dto.*;
 import com.hotketok.dto.UploadFileListResponse;
@@ -191,12 +192,12 @@ public class VendorService {
                 .toList();
 
         // 요청서 정보(주소, 카테고리) 가져옴
-        Map<Long, RequestFormListResponse> requestFormMap = requestFormServiceClient.getRequestFormsByIds(requestFormIds).stream()
-                .collect(Collectors.toMap(RequestFormListResponse::requestFormId, data -> data));
+        Map<Long, RequestFormDetailResponse> requestFormMap = requestFormServiceClient.getRequestFormsByIds(requestFormIds).stream()
+                .collect(Collectors.toMap(RequestFormDetailResponse::requestFormId, data -> data));
 
         List<VendorEstimateResponse> resultList = estimates.stream()
                 .map(estimate -> {
-                    RequestFormListResponse formData = requestFormMap.get(estimate.requestFormId());
+                    RequestFormDetailResponse formData = requestFormMap.get(estimate.requestFormId());
                     return new VendorEstimateResponse(
                             estimate.estimateId(),
                             formData.category(),
@@ -208,5 +209,60 @@ public class VendorService {
                 .collect(Collectors.toList());
 
         return new VendorEstimateListResponse(resultList.size(), resultList);
+    }
+
+    // 진행 중인 수리 조회
+    public MatchingEstimateListResponse getMatchingEstimates(Long userId) {
+        Vendor vendor = vendorRepository.findByUserId(userId)
+                .orElseThrow(() -> new CustomException(VendorErrorCode.VENDOR_NOT_FOUND));
+
+        // 'MATCHING' 상태인 견적서 목록 조회
+        List<EstimateInfoResponse> matchingEstimates = estimateServiceClient.getMatchingEstimatesByVendorId(vendor.getId());
+        if (matchingEstimates.isEmpty()) {
+            return new MatchingEstimateListResponse(0, Collections.emptyList());
+        }
+
+        List<Long> requestFormIds = matchingEstimates.stream().map(EstimateInfoResponse::requestFormId).distinct().toList();
+
+        Map<Long, RequestFormDetailResponse> requestFormMap = requestFormServiceClient.getRequestFormsByIds(requestFormIds).stream()
+                .collect(Collectors.toMap(RequestFormDetailResponse::requestFormId, data -> data));
+
+        // 비용 부담 주체 정보 가져옴
+        List<Long> payerIds = requestFormMap.values().stream().map(RequestFormDetailResponse::payerId).distinct().toList();
+
+        log.info(">>> Calling user-service with payerIds: {}", payerIds);
+
+        Map<Long, UserInfoDetailResponse> userInfoMap = userServiceClient.getUserInfosByIds(payerIds).stream()
+                .collect(Collectors.toMap(UserInfoDetailResponse::userId, info -> info));
+
+        log.info("<<< Received userInfoMap from user-service: {}", userInfoMap);
+
+        List<MatchingEstimateInfoResponse> items = matchingEstimates.stream().map(estimate -> {
+            RequestFormDetailResponse formData = requestFormMap.get(estimate.requestFormId());
+            UserInfoDetailResponse payerInfo = userInfoMap.get(formData.payerId());
+
+            String payerName = "(알 수 없는 사용자)";
+            String phoneNumber = null;
+            if (payerInfo != null) {
+                payerName = payerInfo.name();
+                phoneNumber = payerInfo.phoneNumber();
+            }
+
+            return new MatchingEstimateInfoResponse(
+                    estimate.estimateId(),
+                    formData.category(),
+                    formData.address(),
+                    estimate.estimateTime(),
+                    estimate.estimatePrice(),
+                    formData.payType(),
+                    //payerInfo.name(),
+                    payerName,
+                    //payerInfo.phoneNumber(),
+                    phoneNumber,
+                    estimate.estimateComment()
+            );
+        }).collect(Collectors.toList());
+
+        return new MatchingEstimateListResponse(items.size(), items);
     }
 }

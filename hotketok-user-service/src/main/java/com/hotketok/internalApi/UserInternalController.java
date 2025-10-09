@@ -3,6 +3,7 @@ package com.hotketok.internalApi;
 // 채팅 서비스에서 호출하는 컨트롤러
 import com.hotketok.dto.internalApi.CurrentAddressAndNumberResponse;
 import com.hotketok.dto.internalApi.CurrentAddressResponse;
+import com.hotketok.dto.internalApi.UserInfoDetailResponse;
 import com.hotketok.dto.internalApi.UserProfileResponse;
 import com.hotketok.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -59,6 +60,11 @@ public class UserInternalController {
     @GetMapping ("/current-address-and-number/{userId}")
     public CurrentAddressAndNumberResponse getCurrentAddressAndNumber(@PathVariable Long userId) {
         return userService.getCurrentAddressAndNumberByUserId(userId);
+    }
+
+    @PostMapping("/profiles-detail")
+    public List<UserInfoDetailResponse> getUserInfosByIds(@RequestBody List<Long> userIds) {
+        return userService.findUserInfosByIds(userIds);
     }
 }
 

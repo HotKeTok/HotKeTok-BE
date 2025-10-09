@@ -209,9 +209,9 @@ public class RequestFormService {
     }
 
     // id로 요청서 목록 조회
-    public List<RequestFormListResponse> getRequestFormsByIds(List<Long> requestFormIds) {
+    public List<RequestFormDetailResponse> getRequestFormsByIds(List<Long> requestFormIds) {
         return requestFormRepository.findAllByIdIn(requestFormIds).stream()
-                .map(RequestFormListResponse::from)
+                .map(RequestFormDetailResponse::from)
                 .collect(Collectors.toList());
     }
 }

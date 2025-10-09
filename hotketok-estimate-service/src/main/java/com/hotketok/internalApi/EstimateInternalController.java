@@ -1,6 +1,8 @@
 package com.hotketok.internalApi;
 
+import com.hotketok.domain.enums.Status;
 import com.hotketok.dto.internalApi.EstimateInfoResponse;
+import com.hotketok.dto.internalApi.SimpleEstimateResponse;
 import com.hotketok.service.EstimateService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,5 +21,10 @@ public class EstimateInternalController {
     @GetMapping
     public List<EstimateInfoResponse> getEstimatesByVendorId(@RequestParam Long vendorId) {
         return estimateService.findEstimatesByVendorId(vendorId);
+    }
+
+    @GetMapping("/matching")
+    public List<SimpleEstimateResponse> getMatchingEstimates(@RequestParam Long vendorId) {
+        return estimateService.findEstimatesByVendorIdAndStatus(vendorId, Status.MATCHING);
     }
 }

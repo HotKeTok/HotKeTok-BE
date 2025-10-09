@@ -129,4 +129,11 @@ public class EstimateService {
                 .map(EstimateInfoResponse::from)
                 .collect(Collectors.toList());
     }
+
+    // 매칭 상태인 견적서 조회
+    public List<SimpleEstimateResponse> findEstimatesByVendorIdAndStatus(Long vendorId, Status status) {
+        return estimateRepository.findAllByVendorIdAndStatus(vendorId, status).stream()
+                .map(SimpleEstimateResponse::from)
+                .collect(Collectors.toList());
+    }
 }

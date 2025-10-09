@@ -1,4 +1,4 @@
-package com.hotketok.dto.internalApi;
+package com.hotketok.domain.enums;
 
 public enum Role {
     NONE, VENDOR;

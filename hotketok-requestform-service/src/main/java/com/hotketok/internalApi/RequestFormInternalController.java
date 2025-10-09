@@ -2,7 +2,7 @@ package com.hotketok.internalApi;
 
 import com.hotketok.dto.internalApi.RequestFormAuthorResponse;
 import com.hotketok.dto.internalApi.RequestFormDataResponse;
-import com.hotketok.dto.internalApi.RequestFormListResponse;
+import com.hotketok.dto.internalApi.RequestFormDetailResponse;
 import com.hotketok.dto.internalApi.UpdateStatusRequest;
 import com.hotketok.service.RequestFormService;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +39,7 @@ public class RequestFormInternalController {
 
     // id로 요청서 목록 조회
     @PostMapping("/info-list")
-    public List<RequestFormListResponse> getRequestFormsByIds(@RequestBody List<Long> requestFormIds) {
+    public List<RequestFormDetailResponse> getRequestFormsByIds(@RequestBody List<Long> requestFormIds) {
         return requestFormService.getRequestFormsByIds(requestFormIds);
     }
 }
