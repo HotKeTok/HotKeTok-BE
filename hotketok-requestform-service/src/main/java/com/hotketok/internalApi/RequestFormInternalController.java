@@ -36,7 +36,7 @@ public class RequestFormInternalController {
     ) {
         requestFormService.updateStatus(requestFormId, request.status());
     }
-
+  
     // id로 요청서 목록 조회
     @PostMapping("/info-list")
     public List<RequestFormDetailResponse> getRequestFormsByIds(@RequestBody List<Long> requestFormIds) {
