@@ -63,43 +63,37 @@ public class VendorController {
 
     // 업체 소식 작성
     @PostMapping("/news")
-    public void postNews(@RequestBody PostNewsRequest request) {
-        Long userId = 103L;
+    public void postNews(@RequestHeader("userId") Long userId, @RequestBody PostNewsRequest request) {
         vendorService.postNews(userId, request);
     }
 
     // 업체 소식 삭제
     @DeleteMapping("/news")
-    public void deleteNews(@RequestParam Long newsId) {
-        Long userId = 103L;
+    public void deleteNews(@RequestHeader("userId") Long userId, @RequestParam Long newsId) {
         vendorService.deleteNews(userId, newsId);
     }
 
     // 보낸 견적서 조회
     @GetMapping("/estimate")
-    public VendorEstimateListResponse getMyEstimates() {
-        Long userId = 103L;
+    public VendorEstimateListResponse getMyEstimates(@RequestHeader("userId") Long userId) {
         return vendorService.getMyEstimates(userId);
     }
 
     // 진행 중인 수리 조회
     @GetMapping("/processing")
-    public MatchingEstimateListResponse getMatchingEstimates() {
-        Long userId = 103L;
+    public MatchingEstimateListResponse getMatchingEstimates(@RequestHeader("userId") Long userId) {
         return vendorService.getMatchingEstimates(userId);
     }
 
     // 처리 완료 수리 조회
     @GetMapping("/done")
-    public VendorEstimateListResponse getDoneEstimates() {
-        Long userId = 103L;
+    public VendorEstimateListResponse getDoneEstimates(@RequestHeader("userId") Long userId) {
         return vendorService.getCompletedEstimates(userId);
     }
 
     // 수리 상세 조회
     @GetMapping("/detail")
-    public EstimateDetailResponse getEstimateDetail(@RequestParam Long estimateId) {
-        Long userId = 103L;
+    public EstimateDetailResponse getEstimateDetail(@RequestHeader("userId") Long userId, @RequestParam Long estimateId) {
         return vendorService.getEstimateDetail(userId, estimateId);
     }
 }
