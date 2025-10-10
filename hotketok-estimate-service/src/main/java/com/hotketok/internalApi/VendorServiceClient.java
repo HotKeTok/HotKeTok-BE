@@ -11,10 +11,10 @@ import java.util.List;
 @FeignClient(name = "vendor-service", url = "${client.vendor-service.url}")
 public interface VendorServiceClient {
 
-    @PostMapping("/internal/vendors/info")
+    @PostMapping("/internal/vendor-service/info")
     List<VendorInfoResponse> getVendorInfosByIds(@RequestBody List<Long> vendorIds);
 
     // 단일 업체 정보 조회
-    @GetMapping("/internal/vendors/{vendorId}")
+    @GetMapping("/internal/vendor-service/{vendorId}")
     VendorInfoResponse getVendorInfoById(@PathVariable("vendorId") Long vendorId);
 }

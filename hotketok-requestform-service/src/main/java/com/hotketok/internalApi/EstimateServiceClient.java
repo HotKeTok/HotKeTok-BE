@@ -9,6 +9,6 @@ import java.util.List;
 
 @FeignClient(name = "estimate-service", url = "${client.estimate-service.url}")
 public interface EstimateServiceClient {
-    @GetMapping("/internal/estimates")
+    @GetMapping("/internal/estimate-service")
     List<EstimateInfoResponse> getEstimatesByRequestFormId(@RequestParam("requestFormId") Long requestFormId);
 }
