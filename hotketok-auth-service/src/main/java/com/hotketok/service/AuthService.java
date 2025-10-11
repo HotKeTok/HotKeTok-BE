@@ -48,7 +48,7 @@ public class AuthService {
         return new SignUpResponse(req.name());
     }
 
-    public JwtToken login(LoginRequest req){
+    public LoginResponse login(LoginRequest req){
         log.info("[AuthService] login: " + req.logInId());
         UserInfo user = userServiceClient.findByLogInId(req.logInId());
 
@@ -59,7 +59,7 @@ public class AuthService {
 
         JwtToken jwtToken = jwtUtil.issue(user.id(), user.role());
         refreshTokenRepository.save(user.id(), jwtToken.refreshToken(), jwtUtil.getRefreshExpMs());
-        return jwtToken;
+        return new LoginResponse(jwtToken, user.role());
     }
 
     public JwtToken refresh(String refreshToken) {

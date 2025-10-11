@@ -30,7 +30,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public JwtToken login(@RequestBody LoginRequest req){
+    public LoginResponse login(@RequestBody LoginRequest req){
         System.out.println("[AuthController] /login: " + req.logInId());
         return authService.login(req);
     }
