@@ -10,4 +10,8 @@ public interface VendorRepository extends JpaRepository<Vendor,Long> {
     Optional<Vendor> findByNameAndAddress(String name, String address);
 
     List<Vendor> findAllByIdIn(List<Long> ids);
+
+    Optional<Vendor> findByUserId(Long userId);
+
+    Optional<Vendor> findById(Long id);
 }

@@ -122,4 +122,18 @@ public class UserService {
                 .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
         return new CurrentAddressAndNumberResponse(user.getCurrentAddress(), user.getCurrentNumber());
     }
+
+    // 여러 id로 사용자 정보 조회
+    public List<UserInfoDetailResponse> findUserInfosByIds(List<Long> userIds) {
+        return userRepository.findAllByIdIn(userIds).stream()
+                .map(UserInfoDetailResponse::from)
+                .collect(Collectors.toList());
+    }
+
+    // 단일 id로 사용자 정보 조회
+    public UserInfoDetailResponse findUserInfoById(Long userId) {
+        return userRepository.findById(userId)
+                .map(UserInfoDetailResponse::from)
+                .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
+    }
 }

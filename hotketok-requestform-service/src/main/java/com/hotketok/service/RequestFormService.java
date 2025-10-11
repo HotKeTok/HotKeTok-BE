@@ -1,6 +1,9 @@
 package com.hotketok.service;
 
 import com.hotketok.constant.GPTPrompt;
+import com.hotketok.domain.enums.ConstructCategory;
+import com.hotketok.dto.CreateRequestFormResponse;
+import com.hotketok.dto.internalApi.*;
 import com.hotketok.domain.enums.Category;
 import com.hotketok.dto.CreateRequestFormResponse;
 import com.hotketok.dto.internalApi.RequestFormAuthorResponse;
@@ -10,10 +13,7 @@ import com.hotketok.exception.RequestFormErrorCode;
 import com.hotketok.hotketokcommonservice.error.exception.CustomException;
 import com.hotketok.domain.enums.PayType;
 import com.hotketok.dto.*;
-import com.hotketok.dto.internalApi.CurrentAddressAndNumberResponse;
 import com.hotketok.dto.internalApi.UploadFileListResponse;
-import com.hotketok.exception.RequestFormErrorCode;
-import com.hotketok.hotketokcommonservice.error.exception.CustomException;
 import com.hotketok.hotketokcommonservice.error.exception.GlobalErrorCode;
 import com.hotketok.internalApi.HouseServiceClient;
 import com.hotketok.internalApi.UserServiceClient;
@@ -193,7 +193,7 @@ public class RequestFormService {
                 .orElseThrow(() -> new CustomException(RequestFormErrorCode.REQUEST_FORM_NOT_FOUND));
 
         String addressAndNumber = requestForm.getAddress() + " " + requestForm.getNumber();
-        Category category = requestForm.getCategory();
+        ConstructCategory category = requestForm.getCategory();
         return new RequestFormDataResponse(addressAndNumber, category);
     }
 
@@ -211,5 +211,33 @@ public class RequestFormService {
         RequestForm requestForm = requestFormRepository.findById(requestFormId)
                 .orElseThrow(() -> new CustomException(RequestFormErrorCode.REQUEST_FORM_NOT_FOUND));
         requestForm.changeStatus(status);
+    }
+
+    // id로 요청서 목록 조회
+    public List<RequestFormDetailResponse> getRequestFormsByIds(List<Long> requestFormIds) {
+        return requestFormRepository.findAllByIdIn(requestFormIds).stream()
+                .map(RequestFormDetailResponse::from)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public RequestFormDetailResponse getRequestFormDetailById(Long requestFormId) {
+        RequestForm requestForm = requestFormRepository.findById(requestFormId)
+                .orElseThrow(() -> new CustomException(RequestFormErrorCode.REQUEST_FORM_NOT_FOUND));
+
+        List<String> images = requestFormImageRepository.findAllByRequestFormId(requestFormId)
+                .stream()
+                .map(RequestFormImage::getImageUrl)
+                .toList();
+
+        return new RequestFormDetailResponse(
+                requestForm.getId(),
+                requestForm.getAddress() + " " + requestForm.getNumber(),
+                requestForm.getCategory(),
+                requestForm.getPayType(),
+                requestForm.getPayerId(),
+                images,
+                requestForm.getDescription()
+        );
     }
 }

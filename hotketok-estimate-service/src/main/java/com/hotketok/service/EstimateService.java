@@ -5,6 +5,7 @@ import com.hotketok.domain.enums.Status;
 import com.hotketok.dto.PostEstimateRequest;
 import com.hotketok.dto.PostEstimateResponse;
 import com.hotketok.dto.EstimateResponse;
+import com.hotketok.dto.internalApi.*;
 import com.hotketok.dto.internalApi.RequestFormAuthorResponse;
 import com.hotketok.dto.internalApi.RequestFormResponse;
 import com.hotketok.dto.internalApi.UpdateStatusRequest;
@@ -124,5 +125,25 @@ public class EstimateService {
         }
 
         estimateRepository.delete(estimate);
+    }
+    // 공사업체 id로 견적서 정보 반환
+    public List<EstimateInfoResponse> findEstimatesByVendorId(Long vendorId) {
+        return estimateRepository.findAllByVendorId(vendorId).stream()
+                .map(EstimateInfoResponse::from)
+                .collect(Collectors.toList());
+    }
+
+    // 매칭 상태인 견적서 조회
+    public List<SimpleEstimateResponse> findEstimatesByVendorIdAndStatus(Long vendorId, Status status) {
+        return estimateRepository.findAllByVendorIdAndStatus(vendorId, status).stream()
+                .map(SimpleEstimateResponse::from)
+                .collect(Collectors.toList());
+    }
+
+    // 견적서 정보 조회
+    public SimpleEstimateResponse findSimpleEstimateById(Long estimateId) {
+        return estimateRepository.findById(estimateId)
+                .map(SimpleEstimateResponse::from)
+                .orElseThrow(() -> new CustomException(EstimateErrorCode.ESTIMATE_NOT_FOUND));
     }
 }

@@ -9,4 +9,5 @@ import java.util.List;
 public interface RequestFormRepository extends JpaRepository<RequestForm, Long> {
     List<RequestForm> findAllByAddressAndNumberAndStatusNot(String address, String number, Status status);
     List<RequestForm> findAllByAddressAndStatusNot(String address, Status status);
+    List<RequestForm> findAllByIdIn(List<Long> requestFormId);
 }

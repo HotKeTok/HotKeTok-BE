@@ -1,7 +1,7 @@
 package com.hotketok.dto;
 
 import com.hotketok.domain.RequestForm;
-import com.hotketok.domain.enums.Category;
+import com.hotketok.domain.enums.ConstructCategory;
 import com.hotketok.domain.enums.PayType;
 import com.hotketok.domain.enums.Status;
 
@@ -15,7 +15,7 @@ public record InProgressRequestFormResponse(
 ) {
     public record InProgressRequestFormInfo(
             Long requestFormId,
-            Category category,
+            ConstructCategory category,
             LocalDateTime requestSchedule,
             PayType payType,
             Status status,
