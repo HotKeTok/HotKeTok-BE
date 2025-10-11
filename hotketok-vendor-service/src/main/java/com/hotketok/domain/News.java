@@ -1,5 +1,6 @@
 package com.hotketok.domain;
 
+import com.hotketok.hotketokjpaservice.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -9,7 +10,7 @@ import java.time.LocalDateTime;
 @Table(name = "news")
 @Getter
 @NoArgsConstructor
-public class News {
+public class News extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,18 +24,8 @@ public class News {
     @Column(nullable = false)
     private String title;
 
-    @Column(nullable = true)
+    @Column(nullable = true, columnDefinition = "TEXT")
     private String content;
-
-    @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
-
-    @PrePersist
-    protected void onCreate() {
-        if (this.createdAt == null) {
-            this.createdAt = LocalDateTime.now();
-        }
-    }
 
     @Builder(access = AccessLevel.PROTECTED)
     private News(Vendor vendor, String title, String content) {
