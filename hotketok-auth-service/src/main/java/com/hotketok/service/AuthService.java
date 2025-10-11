@@ -1,5 +1,6 @@
 package com.hotketok.service;
 
+import com.hotketok.domain.Role;
 import com.hotketok.dto.*;
 import com.hotketok.exception.AuthErrorCode;
 import com.hotketok.hotketokcommonservice.error.exception.CustomException;
@@ -56,6 +57,12 @@ public class AuthService {
 
         if(!passwordEncoder.matches(req.password(), user.password()))
             throw new CustomException(AuthErrorCode.BAD_REQUEST_PASSWORD);
+
+        if (!user.role().equals(req.role())) {
+            if (!user.role().equals(Role.NONE)){
+                throw new CustomException(AuthErrorCode.INVALID_USER_ROLE);
+            }
+        }
 
         JwtToken jwtToken = jwtUtil.issue(user.id(), user.role());
         refreshTokenRepository.save(user.id(), jwtToken.refreshToken(), jwtUtil.getRefreshExpMs());
