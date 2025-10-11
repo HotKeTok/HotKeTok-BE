@@ -10,7 +10,6 @@ import com.hotketok.dto.UploadFileListResponse;
 import com.hotketok.dto.internalApi.*;
 import com.hotketok.dto.RegisterVendorRequest;
 import com.hotketok.dto.RegisterVendorResponse;
-import com.hotketok.dto.internalApi.Role;
 import com.hotketok.dto.internalApi.UploadFileResponse;
 import com.hotketok.dto.internalApi.VendorInfoResponse;
 import com.hotketok.exception.VendorErrorCode;
