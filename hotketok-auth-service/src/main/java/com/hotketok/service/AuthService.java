@@ -86,4 +86,11 @@ public class AuthService {
 
         return jwtToken;
     }
+
+    public VerifyIdAuthResponse verifyId(String logInId){
+        if (userServiceClient.findByLogInId(logInId) != null){
+            throw new CustomException(AuthErrorCode.BAD_REQUEST_LOGINID);
+        }
+        return new VerifyIdAuthResponse(logInId);
+    }
 }

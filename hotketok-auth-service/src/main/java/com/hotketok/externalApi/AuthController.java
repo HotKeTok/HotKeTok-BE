@@ -29,6 +29,11 @@ public class AuthController {
         return phoneAuthService.verify(phone, code);
     }
 
+    @PostMapping("/id/verify")
+    public VerifyIdAuthResponse verifyId(@RequestParam String logInId){
+        return authService.verifyId(logInId);
+    }
+
     @PostMapping("/login")
     public LoginResponse login(@RequestBody LoginRequest req){
         System.out.println("[AuthController] /login: " + req.logInId());
