@@ -239,4 +239,11 @@ public class RequestFormService {
                 requestForm.getDescription()
         );
     }
+
+    // 다중 상태로 요청서 찾기
+    public List<RequestFormSimpleResponse> findRequestFormsByStatuses(List<Status> statuses) {
+        return requestFormRepository.findAllByStatusIn(statuses).stream()
+                .map(RequestFormSimpleResponse::from)
+                .collect(Collectors.toList());
+    }
 }

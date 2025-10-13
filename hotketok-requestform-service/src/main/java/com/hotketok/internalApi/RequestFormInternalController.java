@@ -1,9 +1,7 @@
 package com.hotketok.internalApi;
 
-import com.hotketok.dto.internalApi.RequestFormAuthorResponse;
-import com.hotketok.dto.internalApi.RequestFormDataResponse;
-import com.hotketok.dto.internalApi.RequestFormDetailResponse;
-import com.hotketok.dto.internalApi.UpdateStatusRequest;
+import com.hotketok.domain.enums.Status;
+import com.hotketok.dto.internalApi.*;
 import com.hotketok.service.RequestFormService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -46,5 +44,11 @@ public class RequestFormInternalController {
     @GetMapping("/{requestFormId}/detail")
     public RequestFormDetailResponse getRequestFormDetail(@PathVariable Long requestFormId) {
         return requestFormService.getRequestFormDetailById(requestFormId);
+    }
+
+    // 다중 상태로 요청서 찾기
+    @GetMapping("/by-status")
+    public List<RequestFormSimpleResponse> getRequestFormsByStatus(@RequestParam List<Status> statuses) {
+        return requestFormService.findRequestFormsByStatuses(statuses);
     }
 }

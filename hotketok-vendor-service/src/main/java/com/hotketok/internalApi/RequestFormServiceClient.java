@@ -1,11 +1,10 @@
 package com.hotketok.internalApi;
 
+import com.hotketok.domain.enums.Status;
 import com.hotketok.dto.internalApi.RequestFormDetailResponse;
+import com.hotketok.dto.internalApi.RequestFormSimpleResponse;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -16,4 +15,8 @@ public interface RequestFormServiceClient {
 
     @GetMapping("/internal/requestform-service/{requestFormId}/detail")
     RequestFormDetailResponse getRequestFormDetail(@PathVariable("requestFormId") Long requestFormId);
+
+    // 받은 수리 요청 조회
+    @GetMapping("/internal/requestform-service/by-status")
+    List<RequestFormSimpleResponse> getRequestFormsByStatus(@RequestParam("statuses") List<Status> statuses);
 }

@@ -4,6 +4,7 @@ import com.hotketok.domain.News;
 import com.hotketok.domain.Vendor;
 import com.hotketok.domain.VendorIntroductionImage;
 import com.hotketok.domain.enums.Role;
+import com.hotketok.domain.enums.Status;
 import com.hotketok.domain.enums.VendorState;
 import com.hotketok.dto.*;
 import com.hotketok.dto.UploadFileListResponse;
@@ -26,10 +27,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -326,6 +325,28 @@ public class VendorService {
                 estimate.estimateComment(),
                 estimate.status()
         );
+    }
+
+    // 받은 수리 요청 조회
+    public NewRequestListResponse getNewRequests(Long userId) {
+        // 권한 확인 제외
+        // 추후 요청서를 받은 로직이 추가 / 제외 될 수 있기에 일단 userId는 받는 걸로 설정
+
+        List<Status> activeStatuses = List.of(Status.SEARCHING, Status.CHOOSING);
+        List<RequestFormSimpleResponse> requests = requestFormServiceClient.getRequestFormsByStatus(activeStatuses);
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd / a hh:mm", Locale.KOREAN);
+
+        List<NewRequestItem> items = requests.stream()
+                .map(req -> new NewRequestItem(
+                        req.requestId(),
+                        req.category(),
+                        req.address(),
+                        req.estimateTime().format(formatter) // 시간 포맷 변경
+                ))
+                .collect(Collectors.toList());
+
+        return new NewRequestListResponse(items.size(), items);
     }
 
     // 받은 수리 요청 상세 조회
