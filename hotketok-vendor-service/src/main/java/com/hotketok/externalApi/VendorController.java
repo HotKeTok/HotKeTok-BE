@@ -96,4 +96,11 @@ public class VendorController {
     public EstimateDetailResponse getEstimateDetail(@RequestHeader("userId") Long userId, @RequestParam Long estimateId) {
         return vendorService.getEstimateDetail(userId, estimateId);
     }
+
+    // 받은 수리 요청 상세 조회
+    @GetMapping("/request-detail")
+    public RequestDetailResponse getRequestFormDetail(@RequestParam Long requestId) {
+        Long userId = 103L;
+        return vendorService.getRequestFormDetail(userId, requestId);
+    }
 }

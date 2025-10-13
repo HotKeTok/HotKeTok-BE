@@ -4,7 +4,6 @@ import com.hotketok.constant.GPTPrompt;
 import com.hotketok.domain.enums.ConstructCategory;
 import com.hotketok.dto.CreateRequestFormResponse;
 import com.hotketok.dto.internalApi.*;
-import com.hotketok.domain.enums.Category;
 import com.hotketok.dto.CreateRequestFormResponse;
 import com.hotketok.dto.internalApi.RequestFormAuthorResponse;
 import com.hotketok.dto.internalApi.RequestFormDataResponse;

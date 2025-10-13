@@ -10,7 +10,6 @@ import com.hotketok.dto.UploadFileListResponse;
 import com.hotketok.dto.internalApi.*;
 import com.hotketok.dto.RegisterVendorRequest;
 import com.hotketok.dto.RegisterVendorResponse;
-import com.hotketok.dto.internalApi.Role;
 import com.hotketok.dto.internalApi.UploadFileResponse;
 import com.hotketok.dto.internalApi.VendorInfoResponse;
 import com.hotketok.exception.VendorErrorCode;
@@ -326,6 +325,26 @@ public class VendorService {
                 formData.requestDescription(),
                 estimate.estimateComment(),
                 estimate.status()
+        );
+    }
+
+    // 받은 수리 요청 상세 조회
+    public RequestDetailResponse getRequestFormDetail(Long userId, Long requestId) {
+        // 권한 확인 제외
+        // 추후 요청서를 받은 로직이 추가 / 제외 될 수 있기에 일단 userId는 받는 걸로 설정
+
+        RequestFormDetailResponse formData = requestFormServiceClient.getRequestFormDetail(requestId);
+        UserInfoDetailResponse payerInfo = userServiceClient.getUserInfoById(formData.payerId());
+
+        return new RequestDetailResponse(
+                formData.category(),
+                formData.address(),
+                formData.requestSchedule(),
+                formData.payType(),
+                payerInfo.name(),
+                payerInfo.phoneNumber(),
+                formData.requestDescription(),
+                formData.requestImages()
         );
     }
 }
