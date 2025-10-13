@@ -110,4 +110,11 @@ public class VendorController {
         Long userId = 103L;
         return vendorService.getRequestFormDetail(userId, requestId);
     }
+
+    // 수리 개수 조회
+    @GetMapping("/dashboard")
+    public RequestCountResponse getRequestCounts() {
+        Long userId = 103L;
+        return vendorService.getRequestCounts(userId);
+    }
 }

@@ -368,4 +368,21 @@ public class VendorService {
                 formData.requestImages()
         );
     }
+
+    // 수리 개수 조회
+    public RequestCountResponse getRequestCounts(Long userId) {
+        Vendor vendor = vendorRepository.findByUserId(userId)
+                .orElseThrow(() -> new CustomException(VendorErrorCode.VENDOR_NOT_FOUND));
+
+        List<Status> activeStatuses = List.of(Status.SEARCHING, Status.CHOOSING);
+        List<RequestFormSimpleResponse> requests = requestFormServiceClient.getRequestFormsByStatus(activeStatuses);
+
+        EstimateStatusCountResponse otherCounts = estimateServiceClient.getEstimateCounts(vendor.getId());
+
+        return new RequestCountResponse(
+                requests.size(),
+                otherCounts.processingRequest(),
+                otherCounts.doneRequest()
+        );
+    }
 }

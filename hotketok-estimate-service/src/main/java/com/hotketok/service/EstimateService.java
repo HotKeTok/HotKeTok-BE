@@ -149,12 +149,9 @@ public class EstimateService {
 
     // 특정 상태의 견적서 개수 조회
     public EstimateStatusCountResponse getEstimateCountsByVendorId(Long vendorId) {
-
-        List<Status> newRequestStatuses = List.of(Status.SEARCHING, Status.CHOOSING);
-        long newCount = estimateRepository.countByVendorIdAndStatusIn(vendorId, newRequestStatuses);
         long processingCount = estimateRepository.countByVendorIdAndStatus(vendorId, Status.MATCHING);
         long doneCount = estimateRepository.countByVendorIdAndStatus(vendorId, Status.COMPLETED);
 
-        return new EstimateStatusCountResponse(newCount, processingCount, doneCount);
+        return new EstimateStatusCountResponse(processingCount, doneCount);
     }
 }
