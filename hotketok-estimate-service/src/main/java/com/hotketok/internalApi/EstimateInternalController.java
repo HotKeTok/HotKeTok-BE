@@ -1,7 +1,6 @@
 package com.hotketok.internalApi;
 
 import com.hotketok.domain.enums.Status;
-import com.hotketok.dto.internalApi.EstimateDateResponse;
 import com.hotketok.dto.internalApi.EstimateInfoResponse;
 import com.hotketok.dto.internalApi.EstimateStatusCountResponse;
 import com.hotketok.dto.internalApi.SimpleEstimateResponse;
