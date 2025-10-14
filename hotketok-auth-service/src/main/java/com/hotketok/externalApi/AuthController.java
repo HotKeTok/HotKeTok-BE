@@ -29,8 +29,13 @@ public class AuthController {
         return phoneAuthService.verify(phone, code);
     }
 
+    @PostMapping("/id/verify")
+    public VerifyIdAuthResponse verifyId(@RequestParam String logInId){
+        return authService.verifyId(logInId);
+    }
+
     @PostMapping("/login")
-    public JwtToken login(@RequestBody LoginRequest req){
+    public LoginResponse login(@RequestBody LoginRequest req){
         System.out.println("[AuthController] /login: " + req.logInId());
         return authService.login(req);
     }

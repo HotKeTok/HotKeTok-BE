@@ -33,16 +33,15 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping(value = "/change-currentAddress")
-    public ResponseEntity<Void> changeCurrentAddress(
+    @PutMapping(value = "/change/current-address-and-number")
+    public CurrentAddressAndNumberResponse changeCurrentAddressAndNumber(
             @RequestHeader("userId") Long userId,
             @RequestBody ChangeCurrentAddressRequest request
     ){
-        userService.updateCurrentAddressAndNumber(userId, request.currentAddress(), request.currentNumber());
-        return ResponseEntity.ok().build();
+        return userService.updateCurrentAddressAndNumber(userId, request.currentAddress(), request.currentNumber());
     }
 
-    @GetMapping(value = "/current-address-and-number")
+    @GetMapping(value = "/get/current-address-and-number")
     public CurrentAddressAndNumberResponse getCurrentAddressAndNumber(@RequestHeader("userId") Long userId){
         return userService.getCurrentAddressAndNumberByUserId(userId);
     }
