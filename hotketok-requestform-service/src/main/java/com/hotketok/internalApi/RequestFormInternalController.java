@@ -59,4 +59,12 @@ public class RequestFormInternalController {
                 request.requestFormIds(), request.year(), request.month()
         );
     }
+
+    // 해당 날짜 일정 조회
+    @PostMapping("/scheduled-on-date")
+    public List<RequestFormDetailResponse> getScheduledRequestFormsOnDate(@RequestBody ScheduledOnDateRequest request) {
+        return requestFormService.findScheduledRequestFormsOnDate(
+                request.requestFormIds(), request.year(), request.month(), request.day()
+        );
+    }
 }

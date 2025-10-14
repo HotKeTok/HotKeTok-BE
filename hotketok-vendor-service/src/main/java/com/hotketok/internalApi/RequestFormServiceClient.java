@@ -4,6 +4,7 @@ import com.hotketok.domain.enums.Status;
 import com.hotketok.dto.RequestFormDateResponse;
 import com.hotketok.dto.internalApi.RequestFormDetailResponse;
 import com.hotketok.dto.internalApi.RequestFormSimpleResponse;
+import com.hotketok.dto.internalApi.ScheduledOnDateRequest;
 import com.hotketok.dto.internalApi.ScheduledRequest;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
@@ -24,4 +25,7 @@ public interface RequestFormServiceClient {
 
     @PostMapping("/internal/requestform-service/scheduled-info")
     List<RequestFormDateResponse> getScheduledRequestForms(@RequestBody ScheduledRequest request);
+
+    @PostMapping("/internal/requestform-service/scheduled-on-date")
+    List<RequestFormDetailResponse> getScheduledRequestFormsOnDate(@RequestBody ScheduledOnDateRequest request);
 }

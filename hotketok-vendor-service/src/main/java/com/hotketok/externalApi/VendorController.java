@@ -124,4 +124,11 @@ public class VendorController {
         Long userId = 103L;
         return vendorService.getCalendarData(userId, request.year(), request.month());
     }
+
+    // 특정 날짜 일정 조회
+    @GetMapping("/day")
+    public DailyScheduleResponse getDailySchedule(@RequestBody ScheduleRequest request) {
+        Long userId = 103L;
+        return vendorService.getDailySchedule(userId, request);
+    }
 }

@@ -43,7 +43,7 @@ public class EstimateInternalController {
     }
 
     @GetMapping("/by-status")
-    public List<EstimateDateResponse> getEstimatesByStatus(
+    public List<SimpleEstimateResponse> getEstimatesByStatus(
             @RequestParam Long vendorId, @RequestParam Status status) {
         return estimateService.findSimpleEstimatesByVendorIdAndStatus(vendorId, status);
     }

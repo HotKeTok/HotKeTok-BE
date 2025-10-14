@@ -393,13 +393,13 @@ public class VendorService {
                 .orElseThrow(() -> new CustomException(VendorErrorCode.VENDOR_NOT_FOUND));
 
         // 공사업체가 보낸 것 중 'MATCHING'인 견적서만 조회
-        List<EstimateDateResponse> matchingEstimates = estimateServiceClient.getEstimatesByStatus(vendor.getId(), Status.MATCHING);
+        List<SimpleEstimateResponse> matchingEstimates = estimateServiceClient.getEstimateInfoByStatus(vendor.getId(), Status.MATCHING);
         if (matchingEstimates.isEmpty()) {
             return new CalendarResponse(year, month, Collections.emptyMap());
         }
 
-        // 요청서 젖ㅇ보 가져옴
-        List<Long> requestFormIds = matchingEstimates.stream().map(EstimateDateResponse::requestFormId).toList();
+        // 요청서 정보 가져옴
+        List<Long> requestFormIds = matchingEstimates.stream().map(SimpleEstimateResponse::requestFormId).toList();
         ScheduledRequest scheduledRequest = new ScheduledRequest(requestFormIds, year, month);
         Map<Long, RequestFormDateResponse> scheduledFormsMap = requestFormServiceClient.getScheduledRequestForms(scheduledRequest).stream()
                 .collect(Collectors.toMap(RequestFormDateResponse::requestId, form -> form));
@@ -420,5 +420,59 @@ public class VendorService {
                 ));
 
         return new CalendarResponse(year, month, calendarData);
+    }
+
+    // 특정 날짜 일정 조회
+    public DailyScheduleResponse getDailySchedule(Long userId, ScheduleRequest request) {
+        Vendor vendor = vendorRepository.findByUserId(userId)
+                .orElseThrow(() -> new CustomException(VendorErrorCode.VENDOR_NOT_FOUND));
+
+        // MATCHING 상태인 것만 가져옴
+        List<SimpleEstimateResponse> allEstimates = estimateServiceClient.getEstimateInfoByStatus(vendor.getId(), Status.MATCHING);
+
+        if (allEstimates.isEmpty()) {
+            return new DailyScheduleResponse(request.year(), request.month(), request.day(), 0, Collections.emptyList());
+        }
+
+        List<Long> allRequestFormIds = allEstimates.stream().map(SimpleEstimateResponse::requestFormId).toList();
+        var scheduledRequest = new ScheduledOnDateRequest(allRequestFormIds, request.year(), request.month(), request.day());
+        Map<Long, RequestFormDetailResponse> scheduledFormsMap = requestFormServiceClient.getScheduledRequestFormsOnDate(scheduledRequest).stream()
+                .collect(Collectors.toMap(RequestFormDetailResponse::requestFormId, form -> form));
+
+        List<Long> payerIds = scheduledFormsMap.values().stream().map(RequestFormDetailResponse::payerId).distinct().toList();
+        Map<Long, UserInfoDetailResponse> userInfoMap = userServiceClient.getUserInfosByIds(payerIds).stream()
+                .collect(Collectors.toMap(UserInfoDetailResponse::userId, info -> info));
+
+        List<DailyScheduleItem> items = allEstimates.stream()
+                .filter(estimate -> scheduledFormsMap.containsKey(estimate.requestFormId()))
+                .map(estimate -> {
+                    RequestFormDetailResponse formData = scheduledFormsMap.get(estimate.requestFormId());
+                    UserInfoDetailResponse payerInfo = userInfoMap.get(formData.payerId());
+
+                    // null 방지 (회원탈퇴한 사용자의 경우 에러 방어)
+                    String payerName = "(알 수 없는 사용자)";
+                    String phoneNumber = null;
+
+                    if (payerInfo != null) {
+                        payerName = payerInfo.name();
+                        phoneNumber = payerInfo.phoneNumber();
+                    }
+
+                    return new DailyScheduleItem(
+                            estimate.estimateId(),
+                            formData.category(),
+                            formData.address(),
+                            estimate.estimateTime(),
+                            estimate.estimatePrice(),
+                            formData.payType(),
+                            payerName,
+                            phoneNumber,
+                            estimate.estimateComment(),
+                            estimate.status()
+                    );
+                })
+                .collect(Collectors.toList());
+
+        return new DailyScheduleResponse(request.year(), request.month(), request.day(), items.size(), items);
     }
 }

@@ -156,11 +156,11 @@ public class EstimateService {
     }
 
     // 특정 날짜 일정 조회
-    public List<EstimateDateResponse> findSimpleEstimatesByVendorIdAndStatus(Long vendorId, Status status) {
+    public List<SimpleEstimateResponse> findSimpleEstimatesByVendorIdAndStatus(Long vendorId, Status status) {
         List<Estimate> estimates = estimateRepository.findAllByVendorIdAndStatus(vendorId, status);
 
         return estimates.stream()
-                .map(EstimateDateResponse::from)
+                .map(SimpleEstimateResponse::from)
                 .collect(Collectors.toList());
     }
 }

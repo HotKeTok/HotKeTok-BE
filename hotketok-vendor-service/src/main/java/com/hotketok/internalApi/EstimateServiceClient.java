@@ -29,6 +29,9 @@ public interface EstimateServiceClient {
     @GetMapping("/internal/estimate-service/counts")
     EstimateStatusCountResponse getEstimateCounts(@RequestParam("vendorId") Long vendorId);
 
+//    @GetMapping("/internal/estimate-service/by-status")
+//    List<EstimateDateResponse> getEstimatesByStatus(@RequestParam("vendorId") Long vendorId, @RequestParam("status") Status status);
+
     @GetMapping("/internal/estimate-service/by-status")
-    List<EstimateDateResponse> getEstimatesByStatus(@RequestParam("vendorId") Long vendorId, @RequestParam("status") Status status);
+    List<SimpleEstimateResponse> getEstimateInfoByStatus(@RequestParam("vendorId") Long vendorId, @RequestParam("status") Status status);
 }

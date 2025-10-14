@@ -261,4 +261,19 @@ public class RequestFormService {
                 .map(RequestFormSimpleResponse::from)
                 .collect(Collectors.toList());
     }
+
+    // 특정 날짜 일정 조회
+    public List<RequestFormDetailResponse> findScheduledRequestFormsOnDate(
+            List<Long> requestFormIds, int year, int month, int day) {
+
+        LocalDateTime startOfDay = LocalDate.of(year, month, day).atStartOfDay();
+        LocalDateTime endOfDay = startOfDay.with(LocalTime.MAX);
+
+        List<RequestForm> requestForms = requestFormRepository
+                .findAllByIdInAndRequestScheduleBetween(requestFormIds, startOfDay, endOfDay);
+
+        return requestForms.stream()
+                .map(RequestFormDetailResponse::from)
+                .collect(Collectors.toList());
+    }
 }
