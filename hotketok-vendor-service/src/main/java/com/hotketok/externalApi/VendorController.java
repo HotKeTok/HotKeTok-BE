@@ -99,36 +99,31 @@ public class VendorController {
 
     // 받은 수리 요청 조회
     @GetMapping("/request")
-    public NewRequestListResponse getNewRequests() {
-        Long userId = 103L;
+    public NewRequestListResponse getNewRequests(@RequestHeader("userId") Long userId) {
         return vendorService.getNewRequests(userId);
     }
 
     // 받은 수리 요청 상세 조회
     @GetMapping("/request-detail")
-    public RequestDetailResponse getRequestFormDetail(@RequestParam Long requestId) {
-        Long userId = 103L;
+    public RequestDetailResponse getRequestFormDetail(@RequestHeader("userId") Long userId, @RequestParam Long requestId) {
         return vendorService.getRequestFormDetail(userId, requestId);
     }
 
     // 수리 개수 조회
     @GetMapping("/dashboard")
-    public RequestCountResponse getRequestCounts() {
-        Long userId = 103L;
+    public RequestCountResponse getRequestCounts(@RequestHeader("userId") Long userId) {
         return vendorService.getRequestCounts(userId);
     }
 
     // 수리 일정 캘린더
     @GetMapping("/calendar")
-    public CalendarResponse getCalendarData(@RequestBody CalendarRequest request) {
-        Long userId = 103L;
+    public CalendarResponse getCalendarData(@RequestHeader("userId") Long userId, @RequestBody CalendarRequest request) {
         return vendorService.getCalendarData(userId, request.year(), request.month());
     }
 
     // 특정 날짜 일정 조회
     @GetMapping("/day")
-    public DailyScheduleResponse getDailySchedule(@RequestBody ScheduleRequest request) {
-        Long userId = 103L;
+    public DailyScheduleResponse getDailySchedule(@RequestHeader("userId") Long userId, @RequestBody ScheduleRequest request) {
         return vendorService.getDailySchedule(userId, request);
     }
 }
