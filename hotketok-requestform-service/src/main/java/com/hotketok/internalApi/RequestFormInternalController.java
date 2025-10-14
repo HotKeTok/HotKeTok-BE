@@ -51,4 +51,12 @@ public class RequestFormInternalController {
     public List<RequestFormSimpleResponse> getRequestFormsByStatus(@RequestParam List<Status> statuses) {
         return requestFormService.findRequestFormsByStatuses(statuses);
     }
+
+    // 일정에 맞는 요청서 찾기
+    @PostMapping("/scheduled-info")
+    public List<RequestFormSimpleResponse> getScheduledRequestForms(@RequestBody ScheduledRequest request) {
+        return requestFormService.findScheduledRequestForms(
+                request.requestFormIds(), request.year(), request.month()
+        );
+    }
 }

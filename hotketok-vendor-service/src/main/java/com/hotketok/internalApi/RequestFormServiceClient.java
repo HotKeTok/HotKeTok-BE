@@ -1,8 +1,10 @@
 package com.hotketok.internalApi;
 
 import com.hotketok.domain.enums.Status;
+import com.hotketok.dto.RequestFormDateResponse;
 import com.hotketok.dto.internalApi.RequestFormDetailResponse;
 import com.hotketok.dto.internalApi.RequestFormSimpleResponse;
+import com.hotketok.dto.internalApi.ScheduledRequest;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,4 +21,7 @@ public interface RequestFormServiceClient {
     // 받은 수리 요청 조회
     @GetMapping("/internal/requestform-service/by-status")
     List<RequestFormSimpleResponse> getRequestFormsByStatus(@RequestParam("statuses") List<Status> statuses);
+
+    @PostMapping("/internal/requestform-service/scheduled-info")
+    List<RequestFormDateResponse> getScheduledRequestForms(@RequestBody ScheduledRequest request);
 }

@@ -117,4 +117,11 @@ public class VendorController {
         Long userId = 103L;
         return vendorService.getRequestCounts(userId);
     }
+
+    // 수리 일정 캘린더
+    @GetMapping("/calendar")
+    public CalendarResponse getCalendarData(@RequestBody CalendarRequest request) {
+        Long userId = 103L;
+        return vendorService.getCalendarData(userId, request.year(), request.month());
+    }
 }

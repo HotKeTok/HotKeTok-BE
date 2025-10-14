@@ -7,6 +7,7 @@ import com.hotketok.domain.enums.Role;
 import com.hotketok.domain.enums.Status;
 import com.hotketok.domain.enums.VendorState;
 import com.hotketok.dto.*;
+import com.hotketok.dto.RequestFormDateResponse;
 import com.hotketok.dto.UploadFileListResponse;
 import com.hotketok.dto.internalApi.*;
 import com.hotketok.dto.RegisterVendorRequest;
@@ -384,5 +385,40 @@ public class VendorService {
                 otherCounts.processingRequest(),
                 otherCounts.doneRequest()
         );
+    }
+
+    // 수리 일정 캘린더
+    public CalendarResponse getCalendarData(Long userId, int year, int month) {
+        Vendor vendor = vendorRepository.findByUserId(userId)
+                .orElseThrow(() -> new CustomException(VendorErrorCode.VENDOR_NOT_FOUND));
+
+        // 공사업체가 보낸 것 중 'MATCHING'인 견적서만 조회
+        List<EstimateDateResponse> matchingEstimates = estimateServiceClient.getEstimatesByStatus(vendor.getId(), Status.MATCHING);
+        if (matchingEstimates.isEmpty()) {
+            return new CalendarResponse(year, month, Collections.emptyMap());
+        }
+
+        // 요청서 젖ㅇ보 가져옴
+        List<Long> requestFormIds = matchingEstimates.stream().map(EstimateDateResponse::requestFormId).toList();
+        ScheduledRequest scheduledRequest = new ScheduledRequest(requestFormIds, year, month);
+        Map<Long, RequestFormDateResponse> scheduledFormsMap = requestFormServiceClient.getScheduledRequestForms(scheduledRequest).stream()
+                .collect(Collectors.toMap(RequestFormDateResponse::requestId, form -> form));
+
+        Map<String, List<CalendarItemResponse>> calendarData = matchingEstimates.stream()
+                .filter(estimate -> scheduledFormsMap.containsKey(estimate.requestFormId())) // 해당 월에 스케줄이 있는 것만 필터링
+                .map(estimate -> {
+                    RequestFormDateResponse form = scheduledFormsMap.get(estimate.requestFormId());
+                    // 견적서 id 기준으로 매핑
+                    return new AbstractMap.SimpleEntry<>(
+                            form.estimateTime().toLocalDate().toString(),
+                            new CalendarItemResponse(estimate.estimateId(), form.category())
+                    );
+                })
+                .collect(Collectors.groupingBy(
+                        Map.Entry::getKey,
+                        Collectors.mapping(Map.Entry::getValue, Collectors.toList())
+                ));
+
+        return new CalendarResponse(year, month, calendarData);
     }
 }

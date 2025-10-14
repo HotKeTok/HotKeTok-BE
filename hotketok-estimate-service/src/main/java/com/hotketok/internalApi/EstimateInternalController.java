@@ -1,6 +1,7 @@
 package com.hotketok.internalApi;
 
 import com.hotketok.domain.enums.Status;
+import com.hotketok.dto.internalApi.EstimateDateResponse;
 import com.hotketok.dto.internalApi.EstimateInfoResponse;
 import com.hotketok.dto.internalApi.EstimateStatusCountResponse;
 import com.hotketok.dto.internalApi.SimpleEstimateResponse;
@@ -39,5 +40,11 @@ public class EstimateInternalController {
     @GetMapping("/counts")
     public EstimateStatusCountResponse getEstimateCounts(@RequestParam Long vendorId) {
         return estimateService.getEstimateCountsByVendorId(vendorId);
+    }
+
+    @GetMapping("/by-status")
+    public List<EstimateDateResponse> getEstimatesByStatus(
+            @RequestParam Long vendorId, @RequestParam Status status) {
+        return estimateService.findSimpleEstimatesByVendorIdAndStatus(vendorId, status);
     }
 }

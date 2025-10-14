@@ -154,4 +154,13 @@ public class EstimateService {
 
         return new EstimateStatusCountResponse(processingCount, doneCount);
     }
+
+    // 특정 날짜 일정 조회
+    public List<EstimateDateResponse> findSimpleEstimatesByVendorIdAndStatus(Long vendorId, Status status) {
+        List<Estimate> estimates = estimateRepository.findAllByVendorIdAndStatus(vendorId, status);
+
+        return estimates.stream()
+                .map(EstimateDateResponse::from)
+                .collect(Collectors.toList());
+    }
 }

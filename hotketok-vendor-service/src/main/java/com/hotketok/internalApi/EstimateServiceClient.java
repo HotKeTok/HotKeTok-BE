@@ -1,5 +1,7 @@
 package com.hotketok.internalApi;
 
+import com.hotketok.domain.enums.Status;
+import com.hotketok.dto.internalApi.EstimateDateResponse;
 import com.hotketok.dto.internalApi.EstimateInfoResponse;
 import com.hotketok.dto.internalApi.EstimateStatusCountResponse;
 import com.hotketok.dto.internalApi.SimpleEstimateResponse;
@@ -26,4 +28,7 @@ public interface EstimateServiceClient {
 
     @GetMapping("/internal/estimate-service/counts")
     EstimateStatusCountResponse getEstimateCounts(@RequestParam("vendorId") Long vendorId);
+
+    @GetMapping("/internal/estimate-service/by-status")
+    List<EstimateDateResponse> getEstimatesByStatus(@RequestParam("vendorId") Long vendorId, @RequestParam("status") Status status);
 }

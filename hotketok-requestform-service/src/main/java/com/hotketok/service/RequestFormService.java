@@ -32,6 +32,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -243,6 +247,17 @@ public class RequestFormService {
     // 다중 상태로 요청서 찾기
     public List<RequestFormSimpleResponse> findRequestFormsByStatuses(List<Status> statuses) {
         return requestFormRepository.findAllByStatusIn(statuses).stream()
+                .map(RequestFormSimpleResponse::from)
+                .collect(Collectors.toList());
+    }
+    public List<RequestFormSimpleResponse> findScheduledRequestForms(List<Long> requestFormIds, int year, int month) {
+        LocalDateTime startOfMonth = LocalDate.of(year, month, 1).atStartOfDay();
+        LocalDateTime endOfMonth = startOfMonth.with(TemporalAdjusters.lastDayOfMonth()).with(LocalTime.MAX);
+
+        List<RequestForm> requestForms = requestFormRepository
+                .findAllByIdInAndRequestScheduleBetween(requestFormIds, startOfMonth, endOfMonth);
+
+        return requestForms.stream()
                 .map(RequestFormSimpleResponse::from)
                 .collect(Collectors.toList());
     }
