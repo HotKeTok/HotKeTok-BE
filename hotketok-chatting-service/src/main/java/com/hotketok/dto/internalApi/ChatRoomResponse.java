@@ -16,7 +16,9 @@ public record ChatRoomResponse(
         List<ParticipantResponse> participants
 ) {
 
-    public ChatRoomResponse(ChatRoom chatRoom, ChatMessage lastMessage, long unreadCount, Map<Long, UserProfileResponse> userProfiles) {
+    public ChatRoomResponse(ChatRoom chatRoom, ChatMessage lastMessage, long unreadCount,
+                            Map<Long, UserProfileResponse> userProfiles,
+                            Map<Long, RequestFormDataResponse> requestFormMap) {
         this(
                 chatRoom.getId(),
                 lastMessage != null ? lastMessage.getContent() : "아직 메시지가 없습니다.",
@@ -25,7 +27,14 @@ public record ChatRoomResponse(
                 chatRoom.getParticipants().stream()
                         .map(participant -> {
                             UserProfileResponse userProfile = userProfiles.get(participant.getUserId());
-                            return new ParticipantResponse(participant, userProfile);
+                            // 업체 포함된 채팅방일 경우 추가 정보를 사용
+                            if (chatRoom.getRoomType() == ChatRoomType.VENDOR_ESTIMATE) {
+                                RequestFormAddressStatusResponse formData = (requestFormMap != null) ? requestFormMap.get(chatRoom.getRequestFormId()) : null;
+                                return new ParticipantResponse(participant, userProfile, formData);
+                            } else {
+                                // 일반 채팅방일 경우 기존 생성자 사용
+                                return new ParticipantResponse(participant, userProfile);
+                            }
                         })
                         .collect(Collectors.toList())
         );

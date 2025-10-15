@@ -67,4 +67,16 @@ public class RequestFormInternalController {
                 request.requestFormIds(), request.year(), request.month(), request.day()
         );
     }
+
+    // 요청서 주소 및 상태 반환
+    @GetMapping("/{requestFormId}/address-status")
+    public RequestFormAddressStatusResponse getAddressAndStatus(
+            @RequestHeader("userId") Long userId, // 권한 확인용
+            @PathVariable Long requestFormId
+    ) {
+        // 권한 확인 로직을 추가할 수 있습니다.
+        // requestFormService.checkAuthority(userId, requestFormId);
+
+        return requestFormService.getAddressAndStatusById(requestFormId);
+    }
 }
