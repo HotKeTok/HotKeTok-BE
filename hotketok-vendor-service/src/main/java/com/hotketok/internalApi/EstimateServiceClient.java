@@ -1,7 +1,8 @@
 package com.hotketok.internalApi;
 
-import com.hotketok.dto.EstimateDetailResponse;
+import com.hotketok.domain.enums.Status;
 import com.hotketok.dto.internalApi.EstimateInfoResponse;
+import com.hotketok.dto.internalApi.EstimateStatusCountResponse;
 import com.hotketok.dto.internalApi.SimpleEstimateResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,4 +24,10 @@ public interface EstimateServiceClient {
 
     @GetMapping("/internal/estimate-service/{estimateId}")
     SimpleEstimateResponse getEstimateById(@PathVariable("estimateId") Long estimateId);
+
+    @GetMapping("/internal/estimate-service/counts")
+    EstimateStatusCountResponse getEstimateCounts(@RequestParam("vendorId") Long vendorId);
+
+    @GetMapping("/internal/estimate-service/by-status")
+    List<SimpleEstimateResponse> getEstimateInfoByStatus(@RequestParam("vendorId") Long vendorId, @RequestParam("status") Status status);
 }

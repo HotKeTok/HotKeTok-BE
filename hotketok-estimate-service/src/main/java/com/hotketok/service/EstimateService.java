@@ -146,4 +146,21 @@ public class EstimateService {
                 .map(SimpleEstimateResponse::from)
                 .orElseThrow(() -> new CustomException(EstimateErrorCode.ESTIMATE_NOT_FOUND));
     }
+
+    // 특정 상태의 견적서 개수 조회
+    public EstimateStatusCountResponse getEstimateCountsByVendorId(Long vendorId) {
+        long processingCount = estimateRepository.countByVendorIdAndStatus(vendorId, Status.MATCHING);
+        long doneCount = estimateRepository.countByVendorIdAndStatus(vendorId, Status.COMPLETED);
+
+        return new EstimateStatusCountResponse(processingCount, doneCount);
+    }
+
+    // 특정 날짜 일정 조회
+    public List<SimpleEstimateResponse> findSimpleEstimatesByVendorIdAndStatus(Long vendorId, Status status) {
+        List<Estimate> estimates = estimateRepository.findAllByVendorIdAndStatus(vendorId, status);
+
+        return estimates.stream()
+                .map(SimpleEstimateResponse::from)
+                .collect(Collectors.toList());
+    }
 }

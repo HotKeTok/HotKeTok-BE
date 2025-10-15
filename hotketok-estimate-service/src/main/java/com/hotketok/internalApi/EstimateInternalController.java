@@ -2,6 +2,7 @@ package com.hotketok.internalApi;
 
 import com.hotketok.domain.enums.Status;
 import com.hotketok.dto.internalApi.EstimateInfoResponse;
+import com.hotketok.dto.internalApi.EstimateStatusCountResponse;
 import com.hotketok.dto.internalApi.SimpleEstimateResponse;
 import com.hotketok.service.EstimateService;
 import lombok.RequiredArgsConstructor;
@@ -33,5 +34,16 @@ public class EstimateInternalController {
     @GetMapping("/{estimateId}")
     public SimpleEstimateResponse getEstimateById(@PathVariable Long estimateId) {
         return estimateService.findSimpleEstimateById(estimateId);
+    }
+
+    @GetMapping("/counts")
+    public EstimateStatusCountResponse getEstimateCounts(@RequestParam Long vendorId) {
+        return estimateService.getEstimateCountsByVendorId(vendorId);
+    }
+
+    @GetMapping("/by-status")
+    public List<SimpleEstimateResponse> getEstimatesByStatus(
+            @RequestParam Long vendorId, @RequestParam Status status) {
+        return estimateService.findSimpleEstimatesByVendorIdAndStatus(vendorId, status);
     }
 }

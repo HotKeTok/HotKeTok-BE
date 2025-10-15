@@ -4,6 +4,7 @@ import com.hotketok.constant.GPTPrompt;
 import com.hotketok.domain.enums.ConstructCategory;
 import com.hotketok.dto.CreateRequestFormResponse;
 import com.hotketok.dto.internalApi.*;
+import com.hotketok.dto.CreateRequestFormResponse;
 import com.hotketok.dto.internalApi.RequestFormAuthorResponse;
 import com.hotketok.dto.internalApi.RequestFormDataResponse;
 import com.hotketok.dto.internalApi.UploadFileListResponse;
@@ -30,6 +31,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -236,5 +241,38 @@ public class RequestFormService {
                 images,
                 requestForm.getDescription()
         );
+    }
+
+    // 다중 상태로 요청서 찾기
+    public List<RequestFormSimpleResponse> findRequestFormsByStatuses(List<Status> statuses) {
+        return requestFormRepository.findAllByStatusIn(statuses).stream()
+                .map(RequestFormSimpleResponse::from)
+                .collect(Collectors.toList());
+    }
+    public List<RequestFormSimpleResponse> findScheduledRequestForms(List<Long> requestFormIds, int year, int month) {
+        LocalDateTime startOfMonth = LocalDate.of(year, month, 1).atStartOfDay();
+        LocalDateTime endOfMonth = startOfMonth.with(TemporalAdjusters.lastDayOfMonth()).with(LocalTime.MAX);
+
+        List<RequestForm> requestForms = requestFormRepository
+                .findAllByIdInAndRequestScheduleBetween(requestFormIds, startOfMonth, endOfMonth);
+
+        return requestForms.stream()
+                .map(RequestFormSimpleResponse::from)
+                .collect(Collectors.toList());
+    }
+
+    // 특정 날짜 일정 조회
+    public List<RequestFormDetailResponse> findScheduledRequestFormsOnDate(
+            List<Long> requestFormIds, int year, int month, int day) {
+
+        LocalDateTime startOfDay = LocalDate.of(year, month, day).atStartOfDay();
+        LocalDateTime endOfDay = startOfDay.with(LocalTime.MAX);
+
+        List<RequestForm> requestForms = requestFormRepository
+                .findAllByIdInAndRequestScheduleBetween(requestFormIds, startOfDay, endOfDay);
+
+        return requestForms.stream()
+                .map(RequestFormDetailResponse::from)
+                .collect(Collectors.toList());
     }
 }

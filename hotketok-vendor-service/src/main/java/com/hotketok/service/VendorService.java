@@ -4,8 +4,10 @@ import com.hotketok.domain.News;
 import com.hotketok.domain.Vendor;
 import com.hotketok.domain.VendorIntroductionImage;
 import com.hotketok.domain.enums.Role;
+import com.hotketok.domain.enums.Status;
 import com.hotketok.domain.enums.VendorState;
 import com.hotketok.dto.*;
+import com.hotketok.dto.RequestFormDateResponse;
 import com.hotketok.dto.UploadFileListResponse;
 import com.hotketok.dto.internalApi.*;
 import com.hotketok.dto.RegisterVendorRequest;
@@ -26,10 +28,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -326,5 +326,153 @@ public class VendorService {
                 estimate.estimateComment(),
                 estimate.status()
         );
+    }
+
+    // 받은 수리 요청 조회
+    public NewRequestListResponse getNewRequests(Long userId) {
+        // 권한 확인 제외
+        // 추후 요청서를 받은 로직이 추가 / 제외 될 수 있기에 일단 userId는 받는 걸로 설정
+
+        List<Status> activeStatuses = List.of(Status.SEARCHING, Status.CHOOSING);
+        List<RequestFormSimpleResponse> requests = requestFormServiceClient.getRequestFormsByStatus(activeStatuses);
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd / a hh:mm", Locale.KOREAN);
+
+        List<NewRequestItem> items = requests.stream()
+                .map(req -> new NewRequestItem(
+                        req.requestId(),
+                        req.category(),
+                        req.address(),
+                        req.estimateTime().format(formatter) // 시간 포맷 변경
+                ))
+                .collect(Collectors.toList());
+
+        return new NewRequestListResponse(items.size(), items);
+    }
+
+    // 받은 수리 요청 상세 조회
+    public RequestDetailResponse getRequestFormDetail(Long userId, Long requestId) {
+        // 권한 확인 제외
+        // 추후 요청서를 받은 로직이 추가 / 제외 될 수 있기에 일단 userId는 받는 걸로 설정
+
+        RequestFormDetailResponse formData = requestFormServiceClient.getRequestFormDetail(requestId);
+        UserInfoDetailResponse payerInfo = userServiceClient.getUserInfoById(formData.payerId());
+
+        return new RequestDetailResponse(
+                formData.category(),
+                formData.address(),
+                formData.requestSchedule(),
+                formData.payType(),
+                payerInfo.name(),
+                payerInfo.phoneNumber(),
+                formData.requestDescription(),
+                formData.requestImages()
+        );
+    }
+
+    // 수리 개수 조회
+    public RequestCountResponse getRequestCounts(Long userId) {
+        Vendor vendor = vendorRepository.findByUserId(userId)
+                .orElseThrow(() -> new CustomException(VendorErrorCode.VENDOR_NOT_FOUND));
+
+        List<Status> activeStatuses = List.of(Status.SEARCHING, Status.CHOOSING);
+        List<RequestFormSimpleResponse> requests = requestFormServiceClient.getRequestFormsByStatus(activeStatuses);
+
+        EstimateStatusCountResponse otherCounts = estimateServiceClient.getEstimateCounts(vendor.getId());
+
+        return new RequestCountResponse(
+                requests.size(),
+                otherCounts.processingRequest(),
+                otherCounts.doneRequest()
+        );
+    }
+
+    // 수리 일정 캘린더
+    public CalendarResponse getCalendarData(Long userId, int year, int month) {
+        Vendor vendor = vendorRepository.findByUserId(userId)
+                .orElseThrow(() -> new CustomException(VendorErrorCode.VENDOR_NOT_FOUND));
+
+        // 공사업체가 보낸 것 중 'MATCHING'인 견적서만 조회
+        List<SimpleEstimateResponse> matchingEstimates = estimateServiceClient.getEstimateInfoByStatus(vendor.getId(), Status.MATCHING);
+        if (matchingEstimates.isEmpty()) {
+            return new CalendarResponse(year, month, Collections.emptyMap());
+        }
+
+        // 요청서 정보 가져옴
+        List<Long> requestFormIds = matchingEstimates.stream().map(SimpleEstimateResponse::requestFormId).toList();
+        ScheduledRequest scheduledRequest = new ScheduledRequest(requestFormIds, year, month);
+        Map<Long, RequestFormDateResponse> scheduledFormsMap = requestFormServiceClient.getScheduledRequestForms(scheduledRequest).stream()
+                .collect(Collectors.toMap(RequestFormDateResponse::requestId, form -> form));
+
+        Map<String, List<CalendarItemResponse>> calendarData = matchingEstimates.stream()
+                .filter(estimate -> scheduledFormsMap.containsKey(estimate.requestFormId())) // 해당 월에 스케줄이 있는 것만 필터링
+                .map(estimate -> {
+                    RequestFormDateResponse form = scheduledFormsMap.get(estimate.requestFormId());
+                    // 견적서 id 기준으로 매핑
+                    return new AbstractMap.SimpleEntry<>(
+                            form.estimateTime().toLocalDate().toString(),
+                            new CalendarItemResponse(estimate.estimateId(), form.category())
+                    );
+                })
+                .collect(Collectors.groupingBy(
+                        Map.Entry::getKey,
+                        Collectors.mapping(Map.Entry::getValue, Collectors.toList())
+                ));
+
+        return new CalendarResponse(year, month, calendarData);
+    }
+
+    // 특정 날짜 일정 조회
+    public DailyScheduleResponse getDailySchedule(Long userId, ScheduleRequest request) {
+        Vendor vendor = vendorRepository.findByUserId(userId)
+                .orElseThrow(() -> new CustomException(VendorErrorCode.VENDOR_NOT_FOUND));
+
+        // MATCHING 상태인 것만 가져옴
+        List<SimpleEstimateResponse> allEstimates = estimateServiceClient.getEstimateInfoByStatus(vendor.getId(), Status.MATCHING);
+
+        if (allEstimates.isEmpty()) {
+            return new DailyScheduleResponse(request.year(), request.month(), request.day(), 0, Collections.emptyList());
+        }
+
+        List<Long> allRequestFormIds = allEstimates.stream().map(SimpleEstimateResponse::requestFormId).toList();
+        var scheduledRequest = new ScheduledOnDateRequest(allRequestFormIds, request.year(), request.month(), request.day());
+        Map<Long, RequestFormDetailResponse> scheduledFormsMap = requestFormServiceClient.getScheduledRequestFormsOnDate(scheduledRequest).stream()
+                .collect(Collectors.toMap(RequestFormDetailResponse::requestFormId, form -> form));
+
+        List<Long> payerIds = scheduledFormsMap.values().stream().map(RequestFormDetailResponse::payerId).distinct().toList();
+        Map<Long, UserInfoDetailResponse> userInfoMap = userServiceClient.getUserInfosByIds(payerIds).stream()
+                .collect(Collectors.toMap(UserInfoDetailResponse::userId, info -> info));
+
+        List<DailyScheduleItem> items = allEstimates.stream()
+                .filter(estimate -> scheduledFormsMap.containsKey(estimate.requestFormId()))
+                .map(estimate -> {
+                    RequestFormDetailResponse formData = scheduledFormsMap.get(estimate.requestFormId());
+                    UserInfoDetailResponse payerInfo = userInfoMap.get(formData.payerId());
+
+                    // null 방지 (회원탈퇴한 사용자의 경우 에러 방어)
+                    String payerName = "(알 수 없는 사용자)";
+                    String phoneNumber = null;
+
+                    if (payerInfo != null) {
+                        payerName = payerInfo.name();
+                        phoneNumber = payerInfo.phoneNumber();
+                    }
+
+                    return new DailyScheduleItem(
+                            estimate.estimateId(),
+                            formData.category(),
+                            formData.address(),
+                            estimate.estimateTime(),
+                            estimate.estimatePrice(),
+                            formData.payType(),
+                            payerName,
+                            phoneNumber,
+                            estimate.estimateComment(),
+                            estimate.status()
+                    );
+                })
+                .collect(Collectors.toList());
+
+        return new DailyScheduleResponse(request.year(), request.month(), request.day(), items.size(), items);
     }
 }
