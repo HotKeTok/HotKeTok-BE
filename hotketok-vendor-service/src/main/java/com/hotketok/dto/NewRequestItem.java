@@ -1,6 +1,8 @@
 package com.hotketok.dto;
 
+import com.hotketok.domain.enums.ConstructCategory;
+
 public record NewRequestItem(
-        Long requestId, com.hotketok.domain.enums.ConstructCategory category, String address, String estimateTime
+        Long requestId, ConstructCategory category, String address, String estimateTime
 ) {}
 
