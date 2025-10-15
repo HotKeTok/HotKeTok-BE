@@ -12,7 +12,6 @@ import com.hotketok.exception.RequestFormErrorCode;
 import com.hotketok.hotketokcommonservice.error.exception.CustomException;
 import com.hotketok.domain.enums.PayType;
 import com.hotketok.dto.*;
-import com.hotketok.dto.internalApi.UploadFileListResponse;
 import com.hotketok.hotketokcommonservice.error.exception.GlobalErrorCode;
 import com.hotketok.internalApi.HouseServiceClient;
 import com.hotketok.internalApi.UserServiceClient;

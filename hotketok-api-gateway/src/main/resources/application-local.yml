@@ -38,6 +38,7 @@ spring:
                   - OWNER
                   - TENANT
                   - VENDOR
+
         - id: infra-service
           uri: lb://infra-service
           predicates:
@@ -48,6 +49,7 @@ spring:
             - name: RoleFilter
               args:
                 allowedRoles:
+                  - NONE
                   - OWNER
                   - TENANT
 

@@ -60,7 +60,7 @@ public class UserService {
     }
 
     @Transactional
-    public void updateCurrentAddressAndNumber(Long id, String updateAddress, String updateNumber){
+    public CurrentAddressAndNumberResponse updateCurrentAddressAndNumber(Long id, String updateAddress, String updateNumber){
         User user = userRepository.findById(id).orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
         GetHouseInfoByAddressResponse response;
         if (user.getRole().equals(Role.OWNER)){
@@ -73,11 +73,12 @@ public class UserService {
             if (response.houseState().equals("TENANT_REQUEST")){
                 throw new CustomException(UserErrorCode.CANT_CHANGE_CURRENT_ADDRESS);
             }
-        } else if(user.getRole().equals(Role.NONE)){
+        } else {
             throw new CustomException(UserErrorCode.CANT_CHANGE_CURRENT_ADDRESS);
         }
 
         user.changeCurrentAddressAndNumber(updateAddress, updateNumber);
+        return new CurrentAddressAndNumberResponse(updateAddress, updateNumber);
     }
 
     @Transactional(readOnly = true)
