@@ -1,5 +1,6 @@
 package com.hotketok.service;
 
+import com.hotketok.domain.Role;
 import com.hotketok.dto.*;
 import com.hotketok.exception.AuthErrorCode;
 import com.hotketok.hotketokcommonservice.error.exception.CustomException;
@@ -48,7 +49,7 @@ public class AuthService {
         return new SignUpResponse(req.name());
     }
 
-    public JwtToken login(LoginRequest req){
+    public LoginResponse login(LoginRequest req){
         log.info("[AuthService] login: " + req.logInId());
         UserInfo user = userServiceClient.findByLogInId(req.logInId());
 
@@ -57,9 +58,15 @@ public class AuthService {
         if(!passwordEncoder.matches(req.password(), user.password()))
             throw new CustomException(AuthErrorCode.BAD_REQUEST_PASSWORD);
 
+        if (!user.role().equals(req.role())) {
+            if (!user.role().equals(Role.NONE)){
+                throw new CustomException(AuthErrorCode.INVALID_USER_ROLE);
+            }
+        }
+
         JwtToken jwtToken = jwtUtil.issue(user.id(), user.role());
         refreshTokenRepository.save(user.id(), jwtToken.refreshToken(), jwtUtil.getRefreshExpMs());
-        return jwtToken;
+        return new LoginResponse(jwtToken, user.role());
     }
 
     public JwtToken refresh(String refreshToken) {
@@ -78,5 +85,12 @@ public class AuthService {
         refreshTokenRepository.save(user.id(), jwtToken.refreshToken(), jwtUtil.getRefreshExpMs());
 
         return jwtToken;
+    }
+
+    public VerifyIdAuthResponse verifyId(String logInId){
+        if (userServiceClient.findByLogInId(logInId) != null){
+            throw new CustomException(AuthErrorCode.BAD_REQUEST_LOGINID);
+        }
+        return new VerifyIdAuthResponse(logInId);
     }
 }
