@@ -97,7 +97,7 @@ public class UserService {
     }
 
     private UserInfo toDto(User u){
-        return UserInfo.of(u.getId(),u.getLogInId(),u.getPassword(),u.getRole());
+        return UserInfo.of(u.getId(),u.getLogInId(),u.getPassword(),u.getRole(), u.isOnBoardingStageFlag());
     }
 
     public List<UserProfileResponse> findUserProfilesByIds(List<Long> userIds) {
