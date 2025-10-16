@@ -1,6 +1,7 @@
 package com.hotketok.externalApi;
 
 import com.hotketok.dto.*;
+import com.hotketok.dto.MyPageHouseInfoResponse;
 import com.hotketok.service.HouseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -68,5 +69,11 @@ public class HouseController {
         return ResponseEntity.ok().build();
     }
 
+    // 사용자 주택 리스트 반환
+    @GetMapping("/house-list")
+    public List<MyPageHouseInfoResponse> getHouseInfoListByUserId(@RequestHeader("userId") Long userId,
+                                                                  @RequestHeader("role") String role){
+        return houseService.findHouseInfoListByUserId(userId, role);
+    }
 }
 

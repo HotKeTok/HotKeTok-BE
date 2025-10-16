@@ -4,10 +4,7 @@ import com.hotketok.domain.House;
 import com.hotketok.domain.HouseTag;
 import com.hotketok.domain.enums.HouseState;
 import com.hotketok.dto.*;
-import com.hotketok.dto.internalApi.GetHouseInfoByAddressResponse;
-import com.hotketok.dto.internalApi.HouseInfoResponse;
-import com.hotketok.dto.internalApi.Role;
-import com.hotketok.dto.internalApi.UploadFileResponse;
+import com.hotketok.dto.internalApi.*;
 import com.hotketok.exception.HouseErrorCode;
 import com.hotketok.hotketokcommonservice.error.exception.CustomException;
 import com.hotketok.internalApi.InfraServiceClient;
@@ -176,6 +173,42 @@ public class HouseService {
         House house = houseRepository.findByAddressAndNumberAndTenantId(currentAddress, currentNumber, userId)
                 .orElseThrow(() -> new CustomException(HouseErrorCode.HOUSE_NOT_FOUND));
         return house.getOwnerId();
+    }
+
+    // 마이페이지 사용자가 등록한(요청 포함) 주택 정보 제공하는 기능
+    public List<MyPageHouseInfoResponse> findHouseInfoListByUserId(Long userId , String role) {
+        List<House> houseList;
+        List<MyPageHouseInfoResponse> result;
+
+        CurrentAddressAndNumberResponse currentAddressAndNumber = userServiceClient.getCurrentAddressAndNumber(userId);
+
+        if (role.equals("OWNER")){ // 집주인 인 경우
+            houseList = houseRepository.findAllByOwnerId(userId);
+            result = houseList.stream().distinct().map(h -> new MyPageHouseInfoResponse(
+                    h.getAddress(),
+                    h.getDetailAddress(), // 집주인 인 경우 동호수 대신 상세주소로 반환
+                    null,
+                    null,
+                    null,
+                    h.getState(),
+                    h.getAddress().equals(currentAddressAndNumber.currentAddress())
+            )).toList();
+            return result;
+
+        } else{ // 입주민 인 경우
+            houseList = houseRepository.findAllByTenantId(userId);
+            result = houseList.stream().distinct().map(h -> new MyPageHouseInfoResponse(
+                    h.getAddress(),
+                    h.getNumber(),
+                    h.getHouseTags().stream().map(HouseTag::getContent).collect(Collectors.toList()),
+                    h.getAlias(),
+                    h.getType(),
+                    h.getState(),
+                    ( h.getAddress().equals(currentAddressAndNumber.currentAddress())
+                            && h.getNumber().equals(currentAddressAndNumber.currentNumber()) )
+            )).toList();
+            return result;
+        }
     }
 }
 

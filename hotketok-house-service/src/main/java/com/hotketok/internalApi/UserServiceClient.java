@@ -1,5 +1,6 @@
 package com.hotketok.internalApi;
 
+import com.hotketok.dto.internalApi.CurrentAddressAndNumberResponse;
 import com.hotketok.dto.internalApi.CurrentAddressResponse;
 import com.hotketok.dto.internalApi.Role;
 import com.hotketok.dto.internalApi.TenantInfoResponse;
@@ -20,5 +21,8 @@ public interface UserServiceClient {
 
     @GetMapping("/internal/user-service/{userId}/current-address")
     CurrentAddressResponse getCurrentAddress(@PathVariable("userId") Long userId);
+
+    @GetMapping ("/internal/user-service/current-address-and-number/{userId}")
+    CurrentAddressAndNumberResponse getCurrentAddressAndNumber(@PathVariable("userId") Long userId);
 }
 
