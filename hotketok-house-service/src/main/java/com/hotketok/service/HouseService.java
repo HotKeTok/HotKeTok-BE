@@ -169,6 +169,13 @@ public class HouseService {
         return new GetHouseInfoByAddressResponse(address,number,house.getState().toString());
     }
 
+    // 마이페이지 사용자 정보 조회 -> 주택 태그들을 가져오기 위한 서비스
+    @Transactional(readOnly = true)
+    public List<String> getHouseTag(String address, String number) {
+        House house = houseRepository.findByAddressAndNumber(address,number).orElseThrow(() -> new CustomException(HouseErrorCode.HOUSE_NOT_FOUND));
+        return house.getHouseTags().stream().map(HouseTag::getContent).collect(Collectors.toList());
+    }
+
     @Transactional(readOnly = true)
     public Long getOwnerId(Long userId, String currentAddress, String currentNumber){
         House house = houseRepository.findByAddressAndNumberAndTenantId(currentAddress, currentNumber, userId)
@@ -177,6 +184,7 @@ public class HouseService {
     }
 
     // 마이페이지 사용자가 등록한(요청 포함) 주택 정보 제공하는 기능
+    @Transactional(readOnly = true)
     public List<MyPageHouseInfoResponse> findHouseInfoListByUserId(Long userId , String role) {
         List<House> houseList;
         List<MyPageHouseInfoResponse> result;

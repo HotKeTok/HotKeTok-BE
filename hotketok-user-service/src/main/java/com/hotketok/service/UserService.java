@@ -81,13 +81,19 @@ public class UserService {
         return new CurrentAddressAndNumberResponse(updateAddress, updateNumber);
     }
 
+    // 마이페이지 회원 정보 조회 API 서비스
     @Transactional(readOnly = true)
     public MyPageInfoResponse GetMyPageInfo(Long userId, String role){
         User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
-        if (role.equals("NONE")) return new MyPageInfoResponse(user.getName(),user.getPhoneNumber(),user.getLogInId(),null);
-        return new MyPageInfoResponse(user.getName(), user.getPhoneNumber(), user.getLogInId(), user.getCurrentAddress());
+        if (role.equals("NONE")) return new MyPageInfoResponse(user.getName(),user.getPhoneNumber(),user.getLogInId(),null, null,null);
+        else if (role.equals("OWNER")) return new MyPageInfoResponse(user.getName(), user.getPhoneNumber(), user.getLogInId(), user.getCurrentAddress(), null, null);
+        else { // 입주민 인 경우
+            List<String> houseTag = houseServiceClient.getHouseTag(user.getCurrentAddress(), user.getCurrentNumber());
+            return new MyPageInfoResponse(user.getName(), user.getPhoneNumber(), user.getLogInId(), user.getCurrentAddress(), user.getCurrentNumber(), houseTag);
+        }
     }
 
+    // 마이페이지 회원 정보 수정 API 서비스
     @Transactional
     public void UpdateMyPageInfo(Long userId, MultipartFile image, UpdateMyPageInfoRequest updateMyPageInfoRequest){
         User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
