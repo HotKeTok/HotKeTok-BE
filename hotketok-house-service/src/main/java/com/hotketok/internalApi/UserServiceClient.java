@@ -1,14 +1,8 @@
 package com.hotketok.internalApi;
 
-import com.hotketok.dto.internalApi.CurrentAddressAndNumberResponse;
-import com.hotketok.dto.internalApi.CurrentAddressResponse;
-import com.hotketok.dto.internalApi.Role;
-import com.hotketok.dto.internalApi.TenantInfoResponse;
+import com.hotketok.dto.internalApi.*;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 @FeignClient(name = "user-service", url = "${client.user-service.url}")
 public interface UserServiceClient {
@@ -24,5 +18,8 @@ public interface UserServiceClient {
 
     @GetMapping ("/internal/user-service/current-address-and-number/{userId}")
     CurrentAddressAndNumberResponse getCurrentAddressAndNumber(@PathVariable("userId") Long userId);
+
+    @PostMapping(value = "/internal/user-service/change/current-address-and-number/{userId}")
+    void changeCurrentAddressAndNumber(@PathVariable("userId") Long userId, @RequestParam("address") String address, @RequestParam("number") String number);
 }
 

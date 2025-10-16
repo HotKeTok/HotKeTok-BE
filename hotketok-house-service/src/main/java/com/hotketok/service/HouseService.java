@@ -94,6 +94,7 @@ public class HouseService {
         house.changeState(HouseState.MATCHED);
 
         userServiceClient.updateRole(house.getTenantId(), Role.TENANT);
+        userServiceClient.changeCurrentAddressAndNumber(house.getTenantId(), house.getAddress(), house.getNumber());
     }
 
     // 집주인 거절 -> tenantId null, state=1
