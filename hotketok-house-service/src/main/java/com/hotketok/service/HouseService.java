@@ -40,6 +40,7 @@ public class HouseService {
             houseRepository.save(house);
             registeredHouses.add(house.getHouseId());
         }
+        userServiceClient.updateOnboardingStageFlag(ownerId, true);
         return new RegisterHouseResponse(registeredHouses);
     }
 
@@ -55,6 +56,8 @@ public class HouseService {
     // 관리자 거절 -> 삭제
     @Transactional
     public void rejectHouse(Long houseId) {
+        House house = houseRepository.findById(houseId).orElseThrow(() -> new CustomException(HouseErrorCode.HOUSE_NOT_FOUND));
+        userServiceClient.updateOnboardingStageFlag(house.getOwnerId(), false);
         houseRepository.deleteById(houseId);
     }
 
@@ -71,6 +74,7 @@ public class HouseService {
         house.changeTenantId(tenantId);
         house.registerTenant(registerTenantRequest.floor(), registerTenantRequest.number(), registerTenantRequest.alias(), registerTenantRequest.houseType());
         house.changeState(HouseState.TENANT_REQUEST);
+        userServiceClient.updateOnboardingStageFlag(tenantId, true);
         return new RegisterTenantResponse(tenantId, house.getHouseId());
     }
 
@@ -106,6 +110,7 @@ public class HouseService {
         if (!house.getOwnerId().equals(ownerId)) {
             throw new CustomException(HouseErrorCode.HOUSE_NOT_EQUAL_OWNER);
         }
+        userServiceClient.updateOnboardingStageFlag(house.getTenantId(), false);
         house.changeTenantId(null);
         house.registerTenant(null, null,null,null);
         house.changeState(HouseState.REGISTERED);
@@ -171,6 +176,7 @@ public class HouseService {
         return new GetHouseInfoByAddressResponse(address,number,house.getState().toString());
     }
 
+    // 현재 주소,호수의 집주인 찾기
     @Transactional(readOnly = true)
     public Long getOwnerId(Long userId, String currentAddress, String currentNumber){
         House house = houseRepository.findByAddressAndNumberAndTenantId(currentAddress, currentNumber, userId)

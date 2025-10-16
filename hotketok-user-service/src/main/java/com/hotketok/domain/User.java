@@ -85,4 +85,8 @@ public class User extends BaseTimeEntity {
         this.currentAddress = currentAddress;
         this.currentNumber = currentNumber;
     }
+
+    public void changeOnBoardingStageFlag(boolean onBoardingStageFlag) {
+        this.onBoardingStageFlag = onBoardingStageFlag;
+    }
 }
