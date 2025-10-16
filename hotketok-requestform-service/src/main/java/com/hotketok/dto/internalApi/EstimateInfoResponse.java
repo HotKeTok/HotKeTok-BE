@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 public record EstimateInfoResponse(
         Long estimateId,
         Long requestFormId,
-        LocalDateTime estimateTime,
+        String estimateTime,
         Status status
 ) {
 }

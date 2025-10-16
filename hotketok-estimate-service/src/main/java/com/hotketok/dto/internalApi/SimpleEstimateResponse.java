@@ -4,6 +4,8 @@ import com.hotketok.domain.Estimate;
 import com.hotketok.domain.enums.Status;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 public record SimpleEstimateResponse(
         Long estimateId,
@@ -11,17 +13,20 @@ public record SimpleEstimateResponse(
         Long vendorId,
         BigDecimal estimatePrice,
         String estimateComment,
-        LocalDateTime estimateTime,
+        String estimateTime,
         Status status
 ) {
     public static SimpleEstimateResponse from(Estimate estimate) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd / a hh:mm", Locale.KOREAN);
+        String formattedTime = estimate.getCreatedAt().format(formatter);
+
         return new SimpleEstimateResponse(
                 estimate.getId(),
                 estimate.getRequestFormId(),
                 estimate.getVendorId(),
                 estimate.getEstimatePrice(),
                 estimate.getComment(),
-                estimate.getCreatedAt(),
+                formattedTime,
                 estimate.getStatus()
         );
     }
