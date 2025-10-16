@@ -100,10 +100,15 @@ public class UserService {
         return UserInfo.of(u.getId(),u.getLogInId(),u.getPassword(),u.getRole());
     }
 
-    public List<UserProfileResponse> findUserProfilesByIds(List<Long> userIds) {
-        return userRepository.findAllByIdIn(userIds).stream()
+    public List<UserProfileResponse> findUserInfoByIds(List<Long> userIds) {
+        log.info(">>> Received userIds to find profiles: {}", userIds);
+
+        List<UserProfileResponse> responses = userRepository.findAllByIdIn(userIds).stream()
                 .map(UserProfileResponse::from)
                 .collect(Collectors.toList());
+        log.info("<<< Returning user profiles: {}", responses);
+
+        return responses;
     }
 
     public String getCurrentAddressByUserId(Long userId) {

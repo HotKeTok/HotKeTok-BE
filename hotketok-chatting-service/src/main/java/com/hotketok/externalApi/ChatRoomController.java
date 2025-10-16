@@ -24,9 +24,10 @@ public class ChatRoomController {
         return chatService.createChatRoom(request);
     }
 
-    // 특정 유저의 채팅방 목록 조회
+    // 특정 유저의 채팅방 목록 조회@RequestHeader("userId") Long userId
     @GetMapping("/users/rooms")
-    public List<ChatRoomResponse> findChatRoomsByUserId(@RequestHeader("userId") Long userId) {
+    public List<ChatRoomResponse> findChatRoomsByUserId() {
+        Long userId = 101L;
         return chatService.findChatRoomsByUserId(userId);
     }
 

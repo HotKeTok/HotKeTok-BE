@@ -28,7 +28,7 @@ public class UserInternalController {
 
     @PostMapping("/profiles")
     public List<UserProfileResponse> getUserProfilesByIds(@RequestBody List<Long> userIds) {
-        return userService.findUserProfilesByIds(userIds);
+        return userService.findUserInfoByIds(userIds);
     }
 
     @GetMapping("/profiles/{userId}")

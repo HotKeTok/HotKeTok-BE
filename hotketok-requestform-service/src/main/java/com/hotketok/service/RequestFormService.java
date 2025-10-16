@@ -275,4 +275,15 @@ public class RequestFormService {
                 .map(RequestFormDetailResponse::from)
                 .collect(Collectors.toList());
     }
+
+    // 요청서 목록으로 주소와 상태 반환
+    public List<RequestFormAddressStatusResponse> getRequestFormsAddressAndStatusByIds(List<Long> requestFormIds) {
+        log.info(">>> Received requestFormIds to find address and status: {}", requestFormIds);
+
+        List<RequestFormAddressStatusResponse> responses = requestFormRepository.findAllByIdIn(requestFormIds).stream()
+                .map(RequestFormAddressStatusResponse::from)
+                .collect(Collectors.toList());
+        log.info("<<< Returning address and status responses: {}", responses);
+        return responses;
+    }
 }
