@@ -141,4 +141,16 @@ public class PostService {
                 .map(entry -> new FloorResponse(entry.getKey(), entry.getValue()))
                 .collect(Collectors.toList());
     }
+
+    // 쪽지 신고하기
+    @Transactional
+    public void deletePost(Long userId, Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new CustomException(PostErrorCode.POST_NOT_FOUND));
+
+        if (!post.getSenderId().equals(userId) && !post.getReceiverId().equals(userId)) {
+            throw new CustomException(PostErrorCode.POST_ACCESS_DENIED);
+        }
+        postRepository.delete(post);
+    }
 }

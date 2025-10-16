@@ -41,8 +41,13 @@ public class PostController {
 
     // 이웃 목록 조회
     @GetMapping("/tenant-list")
-    public List<FloorResponse> getAllHouseTags() {
-        Long userId = 101L;
+    public List<FloorResponse> getAllHouseTags(@RequestHeader("userId") Long userId) {
         return postService.getAllHouseTags(userId);
+    }
+
+    // 쪽지 신고하기
+    @DeleteMapping("/delete")
+    public void deletePost(@RequestHeader("userId") Long userId, @RequestParam("postId") Long postId) {
+        postService.deletePost(userId, postId);
     }
 }
