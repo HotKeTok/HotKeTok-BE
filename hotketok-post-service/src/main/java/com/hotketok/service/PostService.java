@@ -78,14 +78,24 @@ public class PostService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new CustomException(PostErrorCode.POST_NOT_FOUND));
 
-        // 유저의 쪽지인지 확인
         if (!post.getSenderId().equals(userId) && !post.getReceiverId().equals(userId)) {
             throw new CustomException(PostErrorCode.POST_ACCESS_DENIED);
         }
 
-        // HouseServiceClient로 집정보 받아옴
-        HouseInfoResponse houseInfo = houseServiceClient.getHouseInfoByUserId(post.getSenderId());
+        // 주소까지 기반으로 해서 필터링
+        CurrentAddressResponse currentAddressResponse = userServiceClient.getCurrentAddress(userId);
+        String currentAddress = currentAddressResponse.currentAddress();
+        List<HouseInfoResponse> residents = houseServiceClient.getResidentsByAddress(currentAddress);
 
+        // 이웃들 id
+        Set<Long> residentIds = residents.stream()
+                .map(HouseInfoResponse::userId)
+                .collect(Collectors.toSet());
+
+        if (!residentIds.contains(post.getSenderId()) || !residentIds.contains(post.getReceiverId())) {
+            throw new CustomException(PostErrorCode.POST_ACCESS_DENIED);
+        }
+        HouseInfoResponse houseInfo = houseServiceClient.getHouseInfoByUserId(post.getSenderId());
         return PostDetailResponse.of(post, houseInfo);
     }
 
