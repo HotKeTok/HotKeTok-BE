@@ -2,6 +2,7 @@ package com.hotketok.domain;
 
 import com.hotketok.domain.enums.Category;
 import com.hotketok.domain.enums.VendorState;
+import com.hotketok.dto.RunningTimeRequest;
 import com.hotketok.hotketokjpaservice.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -56,8 +57,8 @@ public class Vendor extends BaseTimeEntity {
     @Column
     private String phoneNumber;
 
-    @Column
-    private String runningTime;
+    @Embedded
+    private RunningTimeRequest runningTime;
 
     @OneToMany(mappedBy = "vendor", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<News> newsList;
@@ -77,7 +78,7 @@ public class Vendor extends BaseTimeEntity {
                    String proveFile,
                    int rate,
                    String phoneNumber,
-                   String runningTime) {
+                   RunningTimeRequest runningTime) {
         this.userId = userId;
         this.name = name;
         this.state = state;
@@ -114,7 +115,7 @@ public class Vendor extends BaseTimeEntity {
                 .build();
     }
 
-    public void updateProfile(String introduction, String phoneNumber, String runningTime, String image, List<String> introductionImageUrls) {
+    public void updateProfile(String introduction, String phoneNumber, RunningTimeRequest runningTime, String image, List<String> introductionImageUrls) {
         if (introduction != null) {
             this.introduction = introduction;
         }

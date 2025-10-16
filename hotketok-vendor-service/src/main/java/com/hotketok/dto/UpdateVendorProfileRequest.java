@@ -1,8 +1,11 @@
 package com.hotketok.dto;
 
+import java.util.List;
+
 public record UpdateVendorProfileRequest(
         String introduction,
         String phoneNumber,
-        String runningTime,
-        String profileImage
+        RunningTimeRequest runningTime,
+        String profileImage,
+        List<String> introductionImages
 ) {}

@@ -126,10 +126,20 @@ public class VendorService {
             newImageUrls = response.urls();
         }
 
+        RunningTimeRequest newRunningTime = null;
+        if (request.runningTime() != null) {
+            RunningTimeRequest dto = request.runningTime();
+            newRunningTime = new RunningTimeRequest(
+                    dto.openingTime(),
+                    dto.closingTime(),
+                    dto.workingDayOfWeek()
+            );
+        }
+
         vendor.updateProfile(
                 request.introduction(),
                 request.phoneNumber(),
-                request.runningTime(),
+                newRunningTime,
                 request.profileImage(),
                 newImageUrls
         );
