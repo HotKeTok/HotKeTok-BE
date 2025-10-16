@@ -60,6 +60,12 @@ public class UserService {
     }
 
     @Transactional
+    public void updateOnboardingStageFlag(Long userId, boolean onboardingStageFlag){
+        User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
+        user.changeOnBoardingStageFlag(onboardingStageFlag);
+    }
+
+    @Transactional
     public CurrentAddressAndNumberResponse updateCurrentAddressAndNumber(Long id, String updateAddress, String updateNumber){
         User user = userRepository.findById(id).orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
         GetHouseInfoByAddressResponse response;
@@ -103,7 +109,7 @@ public class UserService {
     }
 
     private UserInfo toDto(User u){
-        return UserInfo.of(u.getId(),u.getLogInId(),u.getPassword(),u.getRole());
+        return UserInfo.of(u.getId(),u.getLogInId(),u.getPassword(),u.getRole(), u.isOnBoardingStageFlag());
     }
 
     public List<UserProfileResponse> findUserProfilesByIds(List<Long> userIds) {

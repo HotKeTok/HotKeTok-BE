@@ -13,6 +13,9 @@ public interface UserServiceClient {
     @PostMapping("/internal/user-service/change-role/{userId}")
     void updateRole(@PathVariable("userId") Long userId, @RequestParam("role") Role role);
 
+    @PostMapping("/internal/user-service/change/onboarding-stage-flag/{userId}")
+    void updateOnboardingStageFlag(@PathVariable("userId") Long userId, @RequestParam("flag") boolean flag);
+
     @PostMapping("/internal/user-service/profiles-detail")
     List<UserInfoDetailResponse> getUserInfosByIds(@RequestBody List<Long> userIds);
 

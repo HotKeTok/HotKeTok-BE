@@ -10,6 +10,9 @@ public interface UserServiceClient {
     @PostMapping("/internal/user-service/change-role/{userId}")
     void updateRole(@PathVariable("userId") Long userId, @RequestParam("role") Role role);
 
+    @PostMapping("/internal/user-service/change/onboarding-stage-flag/{userId}")
+    void updateOnboardingStageFlag(@PathVariable("userId") Long userId, @RequestParam("flag") boolean flag);
+
     @GetMapping("/internal/user-service/get-tenantInfo/{userId}")
     TenantInfoResponse getTenantInfo(@PathVariable("userId") Long userId);
 

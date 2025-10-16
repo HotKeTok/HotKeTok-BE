@@ -35,18 +35,22 @@ public class User extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    @Column
+    private boolean onBoardingStageFlag; // true -> 초기정보등록 O, false -> 초기정보등록 X
+
     private String currentAddress;
 
     private String currentNumber;
 
     @Builder(access = AccessLevel.PRIVATE)
-    private User(String logInId, String password, String phoneNumber, String name, String profileImage, Role role, String currentAddress, String currentNumber) {
+    private User(String logInId, String password, String phoneNumber, String name, String profileImage, Role role, boolean onBoardingStageFlag ,String currentAddress, String currentNumber) {
         this.logInId = logInId;
         this.password = password;
         this.phoneNumber = phoneNumber;
         this.name = name;
         this.profileImage = profileImage;
         this.role = role;
+        this.onBoardingStageFlag = onBoardingStageFlag;
         this.currentAddress = currentAddress;
         this.currentNumber = currentNumber;
     }
@@ -59,6 +63,7 @@ public class User extends BaseTimeEntity {
                 .name(name)
                 .profileImage(null)
                 .role(Role.NONE)
+                .onBoardingStageFlag(false)
                 .currentAddress(null)
                 .currentNumber(null)
                 .build();
@@ -79,5 +84,9 @@ public class User extends BaseTimeEntity {
     public void changeCurrentAddressAndNumber(String currentAddress, String currentNumber) {
         this.currentAddress = currentAddress;
         this.currentNumber = currentNumber;
+    }
+
+    public void changeOnBoardingStageFlag(boolean onBoardingStageFlag) {
+        this.onBoardingStageFlag = onBoardingStageFlag;
     }
 }

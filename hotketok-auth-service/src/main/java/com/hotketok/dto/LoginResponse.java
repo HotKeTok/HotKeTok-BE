@@ -4,6 +4,7 @@ import com.hotketok.domain.Role;
 
 public record LoginResponse(
         JwtToken jwtToken,
-        Role role
+        Role role,
+        boolean onBoardingStageFlag
 ) {
 }
