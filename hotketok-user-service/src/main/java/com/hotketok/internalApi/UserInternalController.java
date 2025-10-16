@@ -48,6 +48,9 @@ public class UserInternalController {
     @PostMapping("/change-role/{userId}")
     public void updateRole(@PathVariable("userId") Long userId, @RequestParam("role") Role role){ userService.updateRole(userId, role); };
 
+    @PostMapping("/change/onboarding-stage-flag/{userId}")
+    public void updateOnboardingStageFlag(@PathVariable("userId") Long userId, @RequestParam("flag") boolean flag){ userService.updateOnboardingStageFlag(userId, flag);}
+
     @GetMapping("/get-tenantInfo/{userId}")
     public TenantInfoResponse getTenantInfo(@PathVariable("userId") Long userId){ return userService.getTenantInfo(userId);}
 
