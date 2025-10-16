@@ -8,7 +8,6 @@ import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "vendor")
@@ -44,7 +43,7 @@ public class Vendor extends BaseTimeEntity {
     @Column
     private String introduction;
 
-    @Column(nullable = false)
+    @Column
     private String image;
 
     @Column(nullable = false)
@@ -98,7 +97,6 @@ public class Vendor extends BaseTimeEntity {
                                       String address,
                                       String detailAddress,
                                       String introduction,
-                                      String image,
                                       String proveFile) {
         return Vendor.builder()
                 .userId(userId)
@@ -108,7 +106,6 @@ public class Vendor extends BaseTimeEntity {
                 .address(address)
                 .detailAddress(detailAddress)
                 .introduction(introduction)
-                .image(image)
                 .proveFile(proveFile)
                 .rate(0)
                 .build();
@@ -131,7 +128,7 @@ public class Vendor extends BaseTimeEntity {
             this.introductionImages.clear(); // 기존 이미지 목록 지우고
             List<VendorIntroductionImage> newImages = introductionImageUrls.stream()
                     .map(url -> VendorIntroductionImage.builder().imageUrl(url).build())
-                    .collect(Collectors.toList());
+                    .toList();
             newImages.forEach(this::addIntroductionImage); // 새 이미지 목록을 추가
         }
     }
