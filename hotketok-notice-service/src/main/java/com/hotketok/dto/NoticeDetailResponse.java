@@ -10,7 +10,8 @@ public record NoticeDetailResponse(
         String content,
         String author,
         String authorProfileImage,
-        LocalDateTime createdAt
+        LocalDateTime createdAt,
+        Boolean isFix
 ) {
     public static NoticeDetailResponse of(Notice notice, UserProfileResponse authorProfile) {
         String authorName = (authorProfile != null) ? authorProfile.userName() : "(알 수 없음)";
@@ -21,7 +22,8 @@ public record NoticeDetailResponse(
                 notice.getContent(),
                 authorName,
                 profileImage,
-                notice.getCreatedAt()
+                notice.getCreatedAt(),
+                notice.getIsFix()
         );
     }
 }
