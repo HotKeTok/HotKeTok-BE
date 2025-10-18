@@ -29,15 +29,13 @@ public class PostController {
 
     // 쪽지 내용 상세 조회
     @GetMapping("/detail")
-    public PostDetailResponse getPostDetail(@RequestParam Long postId) {
-        Long userId = 101L;
+    public PostDetailResponse getPostDetail(@RequestHeader("userId") Long userId, @RequestParam Long postId) {
         return postService.getPostDetail(postId, userId);
     }
 
     // 쪽지 쓰기
     @PostMapping("/write")
-    public void sendPost(@RequestBody SendPostRequest request) {
-        Long userId = 101L;
+    public void sendPost(@RequestHeader("userId") Long userId, @RequestBody SendPostRequest request) {
         postService.sendPost(userId, request);
     }
 
