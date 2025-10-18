@@ -112,20 +112,21 @@ public class PostService {
     }
 
     // 이웃 목록 조회
-    public List<FloorResponse> getAllHouseTags(Long userId) {
-        log.info(">>>userId:{}", userId);
+    public NeighborListResponse getAllHouseTagsWithCurrentUser(Long userId) {
+        log.info(">>> 요청 사용자 ID (currentUserId): {}", userId);
         CurrentAddressResponse currentAddressResponse = userServiceClient.getCurrentAddress(userId);
         String currentAddress = currentAddressResponse.currentAddress();
+
         List<HouseInfoResponse> residents = houseServiceClient.getResidentsByAddress(currentAddress);
 
-        // 층 별로 그룹화
         Map<String, List<HouseInfoResponse>> residentsByFloor = residents.stream()
                 .collect(Collectors.groupingBy(HouseInfoResponse::floor));
 
-        return residentsByFloor.entrySet().stream()
+        List<FloorResponse> floorResponses = residentsByFloor.entrySet().stream()
                 .map(floorEntry -> {
                     String floor = floorEntry.getKey();
                     List<HouseInfoResponse> residentsOnThisFloor = floorEntry.getValue();
+
                     List<UnitResponse> units = residentsOnThisFloor.stream()
                             .map(resident -> new UnitResponse(
                                     resident.userId(),
@@ -136,6 +137,9 @@ public class PostService {
 
                     return new FloorResponse(floor, units);
                 })
+                .sorted((f1, f2) -> f1.floor().compareTo(f2.floor())) // 층별로 정렬
                 .collect(Collectors.toList());
+
+        return new NeighborListResponse(userId, floorResponses);
     }
 }
