@@ -14,7 +14,8 @@ public record PostDetailResponse(
         LocalDateTime createdAt,
         List<String> tags,
         String content,
-        Boolean isAnonymous
+        Boolean isAnonymous,
+        String silentTime
 ) {
     public static PostDetailResponse of(Post post, HouseInfoResponse houseInfo) {
         List<String> tagNames;
@@ -41,7 +42,8 @@ public record PostDetailResponse(
                 post.getCreatedAt(),
                 tagNames,
                 post.getContent(),
-                post.getIsAnonymous()
+                post.getIsAnonymous(),
+                post.getSilentTime()
         );
     }
 }
