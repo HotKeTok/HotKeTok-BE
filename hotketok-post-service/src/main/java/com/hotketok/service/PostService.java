@@ -1,6 +1,5 @@
 package com.hotketok.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hotketok.domain.Post;
 import com.hotketok.domain.PostTag;
 import com.hotketok.domain.PostToTag;
@@ -92,7 +91,6 @@ public class PostService {
     // 쪽지 쓰기
     @Transactional
     public void sendPost(Long senderId, SendPostRequest request) {
-        // 1. Post 엔티티 먼저 생성 (태그 연결 없이)
         Post post = Post.builder()
                 .senderId(senderId)
                 .receiverId(request.receiverId())
@@ -101,19 +99,15 @@ public class PostService {
                 .silentTime(request.silentTime())
                 .build();
 
-        List<String> tagNames = request.tags();
+        List<String> tagNames = request.tag();
 
-        // 2. 태그 존재하면 각 태그 처리
         if (tagNames != null && !tagNames.isEmpty()) {
             for (String tagName : tagNames) {
                 PostTag tag = postTagRepository.findByContent(tagName)
                         .orElseGet(() -> postTagRepository.save(PostTag.createPostTag(tagName)));
-
                 post.addTag(tag);
             }
         }
-
-        // 4. Post 저장 -> PostToTag도 같이 저장됨
         postRepository.save(post);
     }
 

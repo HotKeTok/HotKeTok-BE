@@ -5,7 +5,7 @@ import java.util.List;
 public record SendPostRequest(
         Long receiverId,
         Boolean isAnonymous,
-        List<String> tags, // 다중 선택 가능
+        List<String> tag, // 다중 선택 가능
         String silentTime,
         String detailContent
 ) {}
