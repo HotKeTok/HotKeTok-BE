@@ -119,26 +119,29 @@ public class PostService {
 
     // 이웃 목록 조회
     public List<FloorResponse> getAllHouseTags(Long userId) {
+        log.info(">>>userId:{}", userId);
         CurrentAddressResponse currentAddressResponse = userServiceClient.getCurrentAddress(userId);
         String currentAddress = currentAddressResponse.currentAddress();
-
         List<HouseInfoResponse> residents = houseServiceClient.getResidentsByAddress(currentAddress);
 
-        Map<String, Map<String, String>> tagsByFloor = new LinkedHashMap<>();
-        for (HouseInfoResponse resident : residents) {
-            String floor = resident.floor();
-            String number = resident.number();
+        // 층 별로 그룹화
+        Map<String, List<HouseInfoResponse>> residentsByFloor = residents.stream()
+                .collect(Collectors.groupingBy(HouseInfoResponse::floor));
 
-            String tagsAsString = null;
-            if (resident.houseTags() != null && !resident.houseTags().isEmpty()) {
-                tagsAsString = String.join(", ", resident.houseTags());
-            }
+        return residentsByFloor.entrySet().stream()
+                .map(floorEntry -> {
+                    String floor = floorEntry.getKey();
+                    List<HouseInfoResponse> residentsOnThisFloor = floorEntry.getValue();
+                    List<UnitResponse> units = residentsOnThisFloor.stream()
+                            .map(resident -> new UnitResponse(
+                                    resident.userId(),
+                                    resident.number(),
+                                    resident.houseTags()
+                            ))
+                            .collect(Collectors.toList());
 
-            tagsByFloor.computeIfAbsent(floor, k -> new LinkedHashMap<>()).put(number, tagsAsString);
-        }
-
-        return tagsByFloor.entrySet().stream()
-                .map(entry -> new FloorResponse(entry.getKey(), entry.getValue()))
+                    return new FloorResponse(floor, units);
+                })
                 .collect(Collectors.toList());
     }
 }
