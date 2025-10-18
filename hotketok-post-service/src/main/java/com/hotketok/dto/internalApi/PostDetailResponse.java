@@ -13,7 +13,8 @@ public record PostDetailResponse(
         String senderNumber,
         LocalDateTime createdAt,
         List<String> tags,
-        String content
+        String content,
+        Boolean isAnonymous
 ) {
     public static PostDetailResponse of(Post post, HouseInfoResponse houseInfo) {
         List<String> tagNames;
@@ -39,7 +40,8 @@ public record PostDetailResponse(
                 senderNumber,
                 post.getCreatedAt(),
                 tagNames,
-                post.getContent()
+                post.getContent(),
+                post.getIsAnonymous()
         );
     }
 }
