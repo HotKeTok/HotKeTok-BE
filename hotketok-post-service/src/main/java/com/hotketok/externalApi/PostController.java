@@ -41,8 +41,7 @@ public class PostController {
 
     // 이웃 목록 조회
     @GetMapping("/tenant-list")
-    public List<FloorResponse> getAllHouseTags() {
-        Long userId = 101L;
+    public List<FloorResponse> getAllHouseTags(@RequestHeader("userId") Long userId) {
         return postService.getAllHouseTags(userId);
     }
 }
