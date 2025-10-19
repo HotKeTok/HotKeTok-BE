@@ -489,4 +489,13 @@ public class VendorService {
 
         return new DailyScheduleResponse(request.year(), request.month(), request.day(), items.size(), items);
     }
+
+    // 카테고리 조회
+    public List<VendorCategoryResponse> findCategoriesByVendorIds(List<Long> vendorIds) {
+        List<Vendor> vendors = vendorRepository.findAllById(vendorIds);
+
+        return vendors.stream()
+                .map(vendor -> new VendorCategoryResponse(vendor.getId(), vendor.getCategory()))
+                .collect(Collectors.toList());
+    }
 }
