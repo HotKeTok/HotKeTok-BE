@@ -17,11 +17,11 @@ spring:
     username: sa
     password:
     driver-class-name: org.h2.Driver
-  #datasource:
-  #  url: jdbc:h2:file:~/chatting
-  #  username: sa
-  #  password:
-  #  driver-class-name: org.h2.Driver
+#  datasource:
+#    url: jdbc:h2:file:~/chatting
+#    username: sa
+#    password:
+#    driver-class-name: org.h2.Driver
 
   # ===== JPA =====
   jpa:
