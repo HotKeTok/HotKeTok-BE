@@ -15,19 +15,13 @@ public record ChatRoomResponse(
         long unreadCount,
         List<ParticipantResponse> participants
 ) {
-
-    public ChatRoomResponse(ChatRoom chatRoom, ChatMessage lastMessage, long unreadCount, Map<Long, UserProfileResponse> userProfiles) {
+    public ChatRoomResponse(ChatRoom chatRoom, ChatMessage lastMessage, long unreadCount, List<ParticipantResponse> participants) {
         this(
                 chatRoom.getId(),
                 lastMessage != null ? lastMessage.getContent() : "아직 메시지가 없습니다.",
                 lastMessage != null ? lastMessage.getCreatedAt() : chatRoom.getCreatedAt(),
                 unreadCount,
-                chatRoom.getParticipants().stream()
-                        .map(participant -> {
-                            UserProfileResponse userProfile = userProfiles.get(participant.getUserId());
-                            return new ParticipantResponse(participant, userProfile);
-                        })
-                        .collect(Collectors.toList())
+                participants
         );
     }
 }

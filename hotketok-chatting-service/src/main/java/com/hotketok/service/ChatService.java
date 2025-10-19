@@ -5,7 +5,9 @@ import com.hotketok.domain.ChatRoom;
 import com.hotketok.domain.Participant;
 import com.hotketok.domain.enums.SenderType;
 import com.hotketok.dto.internalApi.*;
+import com.hotketok.internalApi.HouseServiceClient;
 import com.hotketok.internalApi.UserServiceClient;
+import com.hotketok.internalApi.VendorServiceClient;
 import com.hotketok.repository.ChatMessageRepository;
 import com.hotketok.repository.ChatRoomRepository;
 import com.hotketok.repository.ParticipantRepository;
@@ -30,6 +32,8 @@ public class ChatService {
     private final ChatMessageRepository chatMessageRepository;
 
     private final UserServiceClient userServiceClient;
+    private final VendorServiceClient vendorServiceClient;
+    private final HouseServiceClient houseServiceClient;
 
     // 채팅방 생성 요청
     @Transactional
@@ -59,42 +63,63 @@ public class ChatService {
     // 특정 유저의 채팅방 목록 조회
     public List<ChatRoomResponse> findChatRoomsByUserId(Long userId) {
         List<Participant> participants = participantRepository.findByUserId(userId);
+        List<ChatRoom> chatRooms = participants.stream().map(Participant::getChatRoom).toList();
 
-        List<ChatRoom> chatRooms = participants.stream()
-                .map(Participant::getChatRoom)
-                .toList();
+        List<Long> allUserIds = chatRooms.stream()
+                .flatMap(room -> room.getParticipants().stream().map(Participant::getUserId))
+                .distinct().toList();
 
-        List<Long> allParticipantIds = chatRooms.stream()
-                .flatMap(room -> room.getParticipants().stream())
-                .map(Participant::getUserId)
-                .distinct() // 중복 제거 포함
-                .toList();
+        if (allUserIds.isEmpty()) {
+            return List.of();
+        }
 
-        Map<Long, UserProfileResponse> userProfiles = userServiceClient.getUserProfilesByIds(allParticipantIds).stream()
+        Map<Long, UserProfileResponse> userProfiles = userServiceClient.getUserProfilesByIds(allUserIds).stream()
                 .collect(Collectors.toMap(UserProfileResponse::userId, profile -> profile));
 
-        // 각 채팅방에 대해 안 읽은 메시지 수 계산
-        return participants.stream()
-                .map(participant -> {
-                    ChatRoom chatRoom = participant.getChatRoom();
+        // 호수 반환 추가
+        Map<Long, HouseUnitResponse> unitNumbers = houseServiceClient.getUnitNumbersByUserIds(allUserIds).stream()
+                .collect(Collectors.toMap(HouseUnitResponse::userId, info -> info));
 
-                    // 마지막 메시지를 조회
-                    Optional<ChatMessage> lastMessageOpt = chatMessageRepository.findTopByChatRoomOrderByCreatedAtDesc(chatRoom);
-                    ChatMessage lastMessage = lastMessageOpt.orElse(null);
+        // 공사업체의 경우 카테고리 반환 추가
+        List<Long> vendorIds = userProfiles.values().stream()
+                .filter(p -> "VENDOR".equals(p.role()))
+                .map(UserProfileResponse::userId).toList();
 
-                    // 안 읽은 메시지 수
-                    LocalDateTime lastReadAt = participant.getLastReadAt();
-                    long unreadCount;
-                    if (lastReadAt == null) {
-                        unreadCount = chatMessageRepository.countByChatRoomAndSenderIdNot(chatRoom, userId);
-                    } else {
-                        // 마지막으로 읽은 시간 이후에 온, 내가 보내지 않은 메시지의 수 카운드
-                        unreadCount = chatMessageRepository.countByChatRoomAndCreatedAtAfterAndSenderIdNot(chatRoom, lastReadAt, userId);
-                    }
+        Map<Long, VendorCategoryResponse> vendorCategories = Map.of();
+        if (!vendorIds.isEmpty()) {
+            vendorCategories = vendorServiceClient.getVendorCategoriesByIds(vendorIds).stream()
+                    .collect(Collectors.toMap(VendorCategoryResponse::vendorId, vc -> vc));
+        }
 
-                    return new ChatRoomResponse(chatRoom, lastMessage, unreadCount, userProfiles);
-                })
-                .collect(Collectors.toList());
+        final Map<Long, VendorCategoryResponse> finalVendorCategories = vendorCategories;
+
+        return participants.stream().map(participant -> {
+            ChatRoom chatRoom = participant.getChatRoom();
+            List<ParticipantResponse> detailedParticipants = chatRoom.getParticipants().stream().map(p -> {
+                UserProfileResponse profile = userProfiles.get(p.getUserId());
+                HouseUnitResponse unit = unitNumbers.get(p.getUserId());
+                VendorCategoryResponse category = finalVendorCategories.get(p.getUserId());
+
+                return new ParticipantResponse(
+                        p.getUserId(),
+                        profile != null ? profile.userName() : "알 수 없는 사용자",
+                        profile != null ? profile.profileImageUrl() : null,
+                        p.getSenderType(), p.getJoinedAt(),
+                        unit != null ? unit.unitNumber() : null,
+                        category != null ? category.category() : null
+                );
+            }).collect(Collectors.toList());
+
+            Optional<ChatMessage> lastMsgOpt = chatMessageRepository.findTopByChatRoomOrderByCreatedAtDesc(chatRoom);
+            long unread = calculateUnreadCount(participant, chatRoom, userId);
+            return new ChatRoomResponse(chatRoom, lastMsgOpt.orElse(null), unread, detailedParticipants);
+        }).collect(Collectors.toList());
+    }
+
+    private long calculateUnreadCount(Participant p, ChatRoom cr, Long userId) {
+        return (p.getLastReadAt() == null)
+                ? chatMessageRepository.countByChatRoomAndSenderIdNot(cr, userId)
+                : chatMessageRepository.countByChatRoomAndCreatedAtAfterAndSenderIdNot(cr, p.getLastReadAt(), userId);
     }
 
     // 채팅방 삭제

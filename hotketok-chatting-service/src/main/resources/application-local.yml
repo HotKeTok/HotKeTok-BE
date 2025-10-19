@@ -12,16 +12,16 @@ spring:
       path: /h2-console
 
   # ===== 데이터소스 =====
-  datasource:
-    url: jdbc:h2:tcp://localhost/~/chatting
-    username: sa
-    password:
-    driver-class-name: org.h2.Driver
 #  datasource:
-#    url: jdbc:h2:file:~/chatting
+#    url: jdbc:h2:tcp://localhost/~/chatting
 #    username: sa
 #    password:
 #    driver-class-name: org.h2.Driver
+  datasource:
+    url: jdbc:h2:file:~/chatting
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
 
   # ===== JPA =====
   jpa:
@@ -46,3 +46,11 @@ eureka:
 logging:
   level:
     org.hibernate.SQL: debug
+
+client:
+  user-service:
+    url: http://localhost:8088
+  vendor-service:
+    url: http://localhost:8099
+  house-service:
+    url: http://localhost:8090

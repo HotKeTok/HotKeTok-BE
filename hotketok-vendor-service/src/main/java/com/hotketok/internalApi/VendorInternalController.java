@@ -1,5 +1,6 @@
 package com.hotketok.internalApi;
 
+import com.hotketok.dto.internalApi.VendorCategoryResponse;
 import com.hotketok.dto.internalApi.VendorInfoResponse;
 import com.hotketok.service.VendorService;
 import lombok.RequiredArgsConstructor;
@@ -23,5 +24,11 @@ public class VendorInternalController {
     @GetMapping("/{vendorId}")
     public VendorInfoResponse getVendorInfoById(@PathVariable Long vendorId) {
         return vendorService.findVendorInfoById(vendorId);
+    }
+
+    // 카테고리 조회
+    @PostMapping("/categories")
+    public List<VendorCategoryResponse> getVendorCategoriesByIds(@RequestBody List<Long> vendorIds) {
+        return vendorService.findCategoriesByVendorIds(vendorIds);
     }
 }
