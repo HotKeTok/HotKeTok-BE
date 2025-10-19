@@ -9,6 +9,6 @@ import java.util.List;
 
 @FeignClient(name = "user-service")
 public interface UserServiceClient {
-    @PostMapping("/internal/users/profiles") // 채팅방 목록 조회에서 프로필 정보 조회에 사용
+    @PostMapping("/internal/user-service/profiles") // 채팅방 목록 조회에서 프로필 정보 조회에 사용
     List<UserProfileResponse> getUserProfilesByIds(@RequestBody List<Long> userIds);
 }
