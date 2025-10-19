@@ -135,14 +135,48 @@ public class ChatService {
     }
 
     // 채팅 내용 조회
-    public List<ChatMessageResponse> findMessagesByRoomId(Long userId, Long roomId) {
+    public ChatRoomDetailResponse findMessagesByRoomId(Long userId, Long roomId) {
         boolean isParticipant = participantRepository.existsByChatRoomIdAndUserId(roomId, userId);
         if (!isParticipant) {
             throw new SecurityException("해당 채팅방에 접근할 권한이 없습니다.");
         }
-        return chatMessageRepository.findByChatRoomIdOrderByCreatedAtAsc(roomId).stream()
+
+        ChatRoom chatRoom = chatRoomRepository.findById(roomId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 채팅방입니다. ID: " + roomId));
+
+        // 참여자 정보 반환 추가
+        List<ChatParticipantResponse> participants = getDetailedParticipants(chatRoom);
+
+        // 메시지 반환
+        List<ChatMessageResponse> messages = chatMessageRepository.findByChatRoomIdOrderByCreatedAtAsc(roomId).stream()
                 .map(ChatMessageResponse::new)
                 .collect(Collectors.toList());
+
+        return new ChatRoomDetailResponse(participants, messages);
+    }
+
+    // 유저 정보 반환 함수 분리
+    private List<ChatParticipantResponse> getDetailedParticipants(ChatRoom chatRoom) {
+        List<Long> userIds = chatRoom.getParticipants().stream()
+                .map(Participant::getUserId)
+                .distinct().toList();
+
+        if (userIds.isEmpty()) {
+            return List.of();
+        }
+
+        Map<Long, UserProfileResponse> userProfiles = userServiceClient.getUserProfilesByIds(userIds).stream()
+                .collect(Collectors.toMap(UserProfileResponse::userId, profile -> profile));
+
+        return chatRoom.getParticipants().stream().map(p -> {
+            UserProfileResponse profile = userProfiles.get(p.getUserId());
+
+            return new ChatParticipantResponse(
+                    p.getUserId(),
+                    profile != null ? profile.userName() : "알 수 없는 사용자",
+                    profile != null ? profile.profileImageUrl() : null
+            );
+        }).collect(Collectors.toList());
     }
 
     // 채팅을 보냈을 때 저장
