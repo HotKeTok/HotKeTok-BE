@@ -1,6 +1,7 @@
 package com.hotketok.externalApi;
 
 import com.hotketok.dto.internalApi.ChatMessageResponse;
+import com.hotketok.dto.internalApi.ChatRoomDetailResponse;
 import com.hotketok.dto.internalApi.ChatRoomResponse;
 import com.hotketok.dto.internalApi.CreateChatRoomRequest;
 // import com.hotketok.security.UserPrincipal; // 토큰 적용 후 도입
@@ -40,8 +41,8 @@ public class ChatRoomController {
 
     // 특정 채팅방의 채팅 내용 조회
     @GetMapping("/rooms/messages")
-    public List<ChatMessageResponse> findMessagesByRoomId(@RequestHeader("userId") Long userId,
-                                                          @RequestParam Long roomId) {
+    public ChatRoomDetailResponse findMessagesByRoomId(@RequestHeader("userId") Long userId,
+                                                       @RequestParam Long roomId) {
         return chatService.findMessagesByRoomId(userId, roomId);
     }
 }

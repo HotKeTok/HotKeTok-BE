@@ -1,6 +1,7 @@
 package com.hotketok.internalApi;
 
 import com.hotketok.dto.internalApi.HouseInfoResponse;
+import com.hotketok.dto.internalApi.HouseUnitResponse;
 import com.hotketok.service.HouseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -45,5 +46,10 @@ public class HouseInternalController {
                           @RequestParam("address") String address,
                           @RequestParam("number") String number) {
         return houseService.getOwnerId(userId,address,number);
+    }
+
+    @PostMapping("/units")
+    public List<HouseUnitResponse> getUnitNumbersByUserIds(@RequestBody List<Long> userIds) {
+        return houseService.findUnitNumbersByUserIds(userIds);
     }
 }

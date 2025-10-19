@@ -4,10 +4,7 @@ import com.hotketok.domain.House;
 import com.hotketok.domain.HouseTag;
 import com.hotketok.domain.enums.HouseState;
 import com.hotketok.dto.*;
-import com.hotketok.dto.internalApi.GetHouseInfoByAddressResponse;
-import com.hotketok.dto.internalApi.HouseInfoResponse;
-import com.hotketok.dto.internalApi.Role;
-import com.hotketok.dto.internalApi.UploadFileResponse;
+import com.hotketok.dto.internalApi.*;
 import com.hotketok.exception.HouseErrorCode;
 import com.hotketok.hotketokcommonservice.error.exception.CustomException;
 import com.hotketok.internalApi.InfraServiceClient;
@@ -182,6 +179,14 @@ public class HouseService {
         House house = houseRepository.findByAddressAndNumberAndTenantId(currentAddress, currentNumber, userId)
                 .orElseThrow(() -> new CustomException(HouseErrorCode.HOUSE_NOT_FOUND));
         return house.getOwnerId();
+    }
+
+    // 유저 아이디로 호수 반환
+    public List<HouseUnitResponse> findUnitNumbersByUserIds(List<Long> userIds) {
+        List<House> houses = houseRepository.findAllByTenantIdIn(userIds);
+        return houses.stream()
+                .map(house -> new HouseUnitResponse(house.getTenantId(), house.getNumber()))
+                .collect(Collectors.toList());
     }
 }
 
