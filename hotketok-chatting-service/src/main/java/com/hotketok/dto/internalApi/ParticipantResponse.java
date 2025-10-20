@@ -1,6 +1,7 @@
 package com.hotketok.dto.internalApi;
 
 import com.hotketok.domain.Participant;
+import com.hotketok.domain.enums.Category;
 import com.hotketok.domain.enums.SenderType;
 import com.hotketok.domain.enums.Status;
 
@@ -11,15 +12,8 @@ public record ParticipantResponse(
         String userName,
         String profileImageUrl,
         SenderType senderType,
-        LocalDateTime joinedAt
+        LocalDateTime joinedAt,
+        String unitNumber, // TENANT일 경우 호수 정보
+        Category category // VENDOR일 경우 카테고리
 ) {
-    public ParticipantResponse(Participant participant, UserProfileResponse userProfile) {
-        this(
-                participant.getUserId(),
-                userProfile != null ? userProfile.userName() : "알 수 없는 사용자",
-                userProfile != null ? userProfile.profileImageUrl() : null,
-                participant.getSenderType(),
-                participant.getJoinedAt()
-        );
-    }
 }

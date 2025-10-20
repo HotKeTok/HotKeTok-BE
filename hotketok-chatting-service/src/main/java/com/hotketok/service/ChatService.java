@@ -7,7 +7,9 @@ import com.hotketok.domain.enums.ChatRoomType;
 import com.hotketok.domain.enums.SenderType;
 import com.hotketok.dto.internalApi.*;
 import com.hotketok.internalApi.RequestFormServiceClient;
+import com.hotketok.internalApi.HouseServiceClient;
 import com.hotketok.internalApi.UserServiceClient;
+import com.hotketok.internalApi.VendorServiceClient;
 import com.hotketok.repository.ChatMessageRepository;
 import com.hotketok.repository.ChatRoomRepository;
 import com.hotketok.repository.ParticipantRepository;
@@ -36,6 +38,8 @@ public class ChatService {
 
     private final UserServiceClient userServiceClient;
     private final RequestFormServiceClient requestFormServiceClient;
+    private final VendorServiceClient vendorServiceClient;
+    private final HouseServiceClient houseServiceClient;
 
     // 채팅방 생성 요청
     @Transactional
@@ -57,18 +61,17 @@ public class ChatService {
         return chatRoom.getId();
     }
 
-    // 특정 유저의 채팅방 목록 조회
+    // 특정 유저의 채팅방 목록 조회 
     public List<ChatRoomResponse> findChatRoomsByUserId(Long userId) {
         List<Participant> participants = participantRepository.findByUserId(userId);
         List<ChatRoom> chatRooms = participants.stream().map(Participant::getChatRoom).toList();
 
-        // 함께톡인 것들만 목록
+        // 주소, 상태 반환
         List<Long> requestFormIds = chatRooms.stream()
                 .filter(room -> room.getRoomType() == ChatRoomType.VENDOR_ESTIMATE)
                 .map(ChatRoom::getRequestFormId)
                 .distinct().toList();
 
-        // address, status 반환 추가
         Map<Long, RequestFormAddressStatusResponse> requestFormMap = Collections.emptyMap();
         if (!requestFormIds.isEmpty()) {
             log.info(">>> Calling requestform-service with requestFormIds: {}", requestFormIds);
@@ -76,39 +79,81 @@ public class ChatService {
                     .collect(Collectors.toMap(RequestFormAddressStatusResponse::requestFormId, data -> data));
             log.info("<<< Received requestFormMap from requestform-service: {}", requestFormMap);
         }
+        final Map<Long, RequestFormAddressStatusResponse> finalRequestFormMap = requestFormMap;
 
-        List<Long> allParticipantIds = chatRooms.stream()
-                .flatMap(room -> room.getParticipants().stream())
-                .map(Participant::getUserId)
-                .distinct() // 중복 제거 포함
-                .toList();
 
-        Map<Long, UserProfileResponse> userProfiles = userServiceClient.getUserProfilesByIds(allParticipantIds).stream()
+        // 호수, 카테고리 반환
+        List<Long> allUserIds = chatRooms.stream()
+                .flatMap(room -> room.getParticipants().stream().map(Participant::getUserId))
+                .distinct().toList();
+
+        if (allUserIds.isEmpty()) {
+            return List.of();
+        }
+
+        Map<Long, UserProfileResponse> userProfiles = userServiceClient.getUserProfilesByIds(allUserIds).stream()
                 .collect(Collectors.toMap(UserProfileResponse::userId, profile -> profile));
 
-        // 각 채팅방에 대해 안 읽은 메시지 수 계산
-        final Map<Long, RequestFormAddressStatusResponse> finalRequestFormMap = requestFormMap;
-        return participants.stream()
-                .map(participant -> {
-                    ChatRoom chatRoom = participant.getChatRoom();
+        Map<Long, HouseUnitResponse> unitNumbers = houseServiceClient.getUnitNumbersByUserIds(allUserIds).stream()
+                .collect(Collectors.toMap(HouseUnitResponse::userId, info -> info));
 
-                    // 마지막 메시지를 조회
-                    Optional<ChatMessage> lastMessageOpt = chatMessageRepository.findTopByChatRoomOrderByCreatedAtDesc(chatRoom);
-                    ChatMessage lastMessage = lastMessageOpt.orElse(null);
+        // 공사업체의 경우 카테고리 반환 추가
+        List<Long> vendorIds = userProfiles.values().stream()
+                // 병합 수정: "VENDOR" 문자열 비교가 아닌 SenderType Enum으로 비교
+                .filter(p -> p.role() == SenderType.VENDOR) 
+                .map(UserProfileResponse::userId).toList();
 
-                    // 안 읽은 메시지 수
-                    LocalDateTime lastReadAt = participant.getLastReadAt();
-                    long unreadCount;
-                    if (lastReadAt == null) {
-                        unreadCount = chatMessageRepository.countByChatRoomAndSenderIdNot(chatRoom, userId);
-                    } else {
-                        // 마지막으로 읽은 시간 이후에 온, 내가 보내지 않은 메시지의 수 카운드
-                        unreadCount = chatMessageRepository.countByChatRoomAndCreatedAtAfterAndSenderIdNot(chatRoom, lastReadAt, userId);
-                    }
+        Map<Long, VendorCategoryResponse> vendorCategories = Map.of();
+        if (!vendorIds.isEmpty()) {
+            vendorCategories = vendorServiceClient.getVendorCategoriesByIds(vendorIds).stream()
+                    .collect(Collectors.toMap(VendorCategoryResponse::vendorId, vc -> vc));
+        }
+        final Map<Long, VendorCategoryResponse> finalVendorCategories = vendorCategories;
 
-                    return new ChatRoomResponse(chatRoom, lastMessage, unreadCount, userProfiles, finalRequestFormMap);
-                })
-                .collect(Collectors.toList());
+        return participants.stream().map(participant -> {
+            ChatRoom chatRoom = participant.getChatRoom();
+
+            // 상세 참여자 목록 생성
+            List<ParticipantResponse> detailedParticipants = chatRoom.getParticipants().stream().map(p -> {
+                UserProfileResponse profile = userProfiles.get(p.getUserId());
+                HouseUnitResponse unit = unitNumbers.get(p.getUserId());
+                VendorCategoryResponse category = finalVendorCategories.get(p.getUserId());
+
+                // ParticipantResponse 생성자
+                return new ParticipantResponse(
+                        p.getUserId(),
+                        profile != null ? profile.userName() : "알 수 없는 사용자",
+                        profile != null ? profile.profileImageUrl() : null,
+                        p.getSenderType(), p.getJoinedAt(),
+                        unit != null ? unit.unitNumber() : null,
+                        category != null ? category.category() : null
+                );
+            }).collect(Collectors.toList());
+
+            // develop: 마지막 메시지 및 안 읽은 수
+            Optional<ChatMessage> lastMsgOpt = chatMessageRepository.findTopByChatRoomOrderByCreatedAtDesc(chatRoom);
+            long unread = calculateUnreadCount(participant, chatRoom, userId);
+
+            // 주소 및 상태값 추출
+            String address = null;
+            String estimateStatus = null;
+            if (chatRoom.getRoomType() == ChatRoomType.VENDOR_ESTIMATE && finalRequestFormMap != null) {
+                RequestFormAddressStatusResponse formData = finalRequestFormMap.get(chatRoom.getRequestFormId());
+                if (formData != null) {
+                    address = formData.address();
+                    estimateStatus = formData.status().name(); // Enum을 String으로
+                }
+            }
+
+            return new ChatRoomResponse(chatRoom, lastMsgOpt.orElse(null), unread, detailedParticipants, address, estimateStatus);
+            
+        }).collect(Collectors.toList());
+    }
+  
+    private long calculateUnreadCount(Participant p, ChatRoom cr, Long userId) {
+        return (p.getLastReadAt() == null)
+                ? chatMessageRepository.countByChatRoomAndSenderIdNot(cr, userId)
+                : chatMessageRepository.countByChatRoomAndCreatedAtAfterAndSenderIdNot(cr, p.getLastReadAt(), userId);
     }
 
     // 채팅방 삭제
@@ -124,14 +169,48 @@ public class ChatService {
     }
 
     // 채팅 내용 조회
-    public List<ChatMessageResponse> findMessagesByRoomId(Long userId, Long roomId) {
+    public ChatRoomDetailResponse findMessagesByRoomId(Long userId, Long roomId) {
         boolean isParticipant = participantRepository.existsByChatRoomIdAndUserId(roomId, userId);
         if (!isParticipant) {
             throw new SecurityException("해당 채팅방에 접근할 권한이 없습니다.");
         }
-        return chatMessageRepository.findByChatRoomIdOrderByCreatedAtAsc(roomId).stream()
+
+        ChatRoom chatRoom = chatRoomRepository.findById(roomId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 채팅방입니다. ID: " + roomId));
+
+        // 참여자 정보 반환 추가
+        List<ChatParticipantResponse> participants = getDetailedParticipants(chatRoom);
+
+        // 메시지 반환
+        List<ChatMessageResponse> messages = chatMessageRepository.findByChatRoomIdOrderByCreatedAtAsc(roomId).stream()
                 .map(ChatMessageResponse::new)
                 .collect(Collectors.toList());
+
+        return new ChatRoomDetailResponse(participants, messages);
+    }
+
+    // 유저 정보 반환 함수 분리
+    private List<ChatParticipantResponse> getDetailedParticipants(ChatRoom chatRoom) {
+        List<Long> userIds = chatRoom.getParticipants().stream()
+                .map(Participant::getUserId)
+                .distinct().toList();
+
+        if (userIds.isEmpty()) {
+            return List.of();
+        }
+
+        Map<Long, UserProfileResponse> userProfiles = userServiceClient.getUserProfilesByIds(userIds).stream()
+                .collect(Collectors.toMap(UserProfileResponse::userId, profile -> profile));
+
+        return chatRoom.getParticipants().stream().map(p -> {
+            UserProfileResponse profile = userProfiles.get(p.getUserId());
+
+            return new ChatParticipantResponse(
+                    p.getUserId(),
+                    profile != null ? profile.userName() : "알 수 없는 사용자",
+                    profile != null ? profile.profileImageUrl() : null
+            );
+        }).collect(Collectors.toList());
     }
 
     // 채팅을 보냈을 때 저장

@@ -18,11 +18,11 @@ public class VendorController {
 
     // 공사업체 등록
     @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public RegisterVendorResponse registerHouse(@RequestHeader("userId") Long vendorId,
-                                                         @RequestPart("image") MultipartFile image,
+    public RegisterVendorResponse registerVendor(@RequestHeader("userId") Long vendorId,
+                                                         @RequestPart("images") List<MultipartFile> images,
                                                          @RequestPart("file") MultipartFile file,
                                                          @RequestPart("data") RegisterVendorRequest request) {
-        return vendorService.registerVendor(vendorId, image, file, request);
+        return vendorService.registerVendor(vendorId, images, file, request);
     }
 
     // 관리자 승인
