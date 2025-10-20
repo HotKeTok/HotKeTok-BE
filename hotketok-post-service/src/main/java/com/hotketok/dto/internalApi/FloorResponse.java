@@ -1,9 +1,8 @@
 package com.hotketok.dto.internalApi;
 
-import java.util.Map;
+import java.util.List;
 
 public record FloorResponse(
         String floor,
-        Map<String, String> number
-) {
-}
+        List<UnitResponse> units
+) {}

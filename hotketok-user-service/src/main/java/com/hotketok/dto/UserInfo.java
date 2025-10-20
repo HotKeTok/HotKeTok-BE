@@ -6,9 +6,10 @@ public record UserInfo (
         Long id,
         String logInId,
         String password,
-        Role role
+        Role role,
+        boolean onBoardingStageFlag
 ){
-    public static UserInfo of(Long id, String logInId, String password, Role role) {
-        return new UserInfo(id, logInId, password, role);
+    public static UserInfo of(Long id, String logInId, String password, Role role, boolean onBoardingStageFlag) {
+        return new UserInfo(id, logInId, password, role, onBoardingStageFlag);
     }
 }

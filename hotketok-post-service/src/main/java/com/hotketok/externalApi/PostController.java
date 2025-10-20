@@ -41,8 +41,8 @@ public class PostController {
 
     // 이웃 목록 조회
     @GetMapping("/tenant-list")
-    public List<FloorResponse> getAllHouseTags(@RequestHeader("userId") Long userId) {
-        return postService.getAllHouseTags(userId);
+    public NeighborListResponse getAllHouseTags(@RequestHeader("userId") Long userId) {
+        return postService.getAllHouseTagsWithCurrentUser(userId);
     }
 
     // 쪽지 신고하기

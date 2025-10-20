@@ -22,6 +22,7 @@ import com.hotketok.internalApi.InfraServiceClient;
 import com.hotketok.internalApi.RequestFormServiceClient;
 import com.hotketok.internalApi.UserServiceClient;
 import com.hotketok.repository.NewsRepository;
+import com.hotketok.repository.VendorIntroductionImageRepository;
 import com.hotketok.repository.VendorRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,6 +41,7 @@ import java.util.stream.Collectors;
 public class VendorService {
 
     private final VendorRepository vendorRepository;
+    private final VendorIntroductionImageRepository imageRepository;
     private final InfraServiceClient infraServiceClient;
     private final UserServiceClient userServiceClient;
     private final NewsRepository newsRepository;
@@ -48,11 +50,15 @@ public class VendorService {
 
     // 공사업체 등록 (state=0)
     @Transactional
-    public RegisterVendorResponse registerVendor(Long userId, MultipartFile image, MultipartFile file, RegisterVendorRequest request) {
-
+    public RegisterVendorResponse registerVendor(Long userId, List<MultipartFile> images, MultipartFile file, RegisterVendorRequest request) {
+        if (images.size() == 0) { // 소개사진 필수
+            throw new CustomException(VendorErrorCode.NEED_INTRODUCTION_IMAGE);
+        }
         Vendor vendor = vendorRepository.findByNameAndAddress(request.name(), request.address())
                 .orElseGet(() -> {
-                    UploadFileResponse imageFile = infraServiceClient.uploadFile(image, "VendorImage/");
+                    UploadFileListResponse imageUrls = infraServiceClient.uploadImages(images, "vendor-introduction/");
+
+                    // log.info(imageUrls.urls().get(0));
                     UploadFileResponse proveFile = infraServiceClient.uploadFile(file, "proveVendor/");
 
                     Vendor newVendor = Vendor.createVendor(
@@ -62,13 +68,20 @@ public class VendorService {
                             request.address(),
                             request.detailAddress(),
                             request.introduction(),
-                            imageFile.fileUrl(),
                             proveFile.fileUrl()
                     );
 
+                    List<VendorIntroductionImage> introductionImages = imageUrls.fileList().stream().map(imageUrl -> {
+                        return imageRepository.save(VendorIntroductionImage.builder().imageUrl(imageUrl).build());
+                    }).toList();
+
+                    for (VendorIntroductionImage image : introductionImages) {
+                        newVendor.addIntroductionImage(image);
+                    }
+
                     return vendorRepository.save(newVendor); // newVendor 저장 후 리턴
                 });
-
+        userServiceClient.updateOnboardingStageFlag(userId, true);
         return new RegisterVendorResponse(vendor.getId());
     }
 
@@ -86,6 +99,7 @@ public class VendorService {
     public void rejectVendor(Long vendorId) {
         Vendor vendor = vendorRepository.findById(vendorId).orElseThrow(() -> new CustomException(VendorErrorCode.VENDOR_NOT_FOUND));
         if (vendor.getState().equals(VendorState.REGISTERED)) throw new CustomException(VendorErrorCode.ALREADY_REGISTERED);
+        userServiceClient.updateOnboardingStageFlag(vendor.getUserId(), false);
         vendorRepository.deleteById(vendorId);
     }
 
@@ -124,7 +138,7 @@ public class VendorService {
         List<String> newImageUrls = new ArrayList<>();
         if (newImages != null && !newImages.isEmpty()) {
             UploadFileListResponse response = infraServiceClient.uploadImages(newImages, "vendor-introduction/");
-            newImageUrls = response.urls();
+            newImageUrls = response.fileList();
         }
 
         RunningTime newRunningTime = null;
@@ -485,5 +499,14 @@ public class VendorService {
                 .collect(Collectors.toList());
 
         return new DailyScheduleResponse(request.year(), request.month(), request.day(), items.size(), items);
+    }
+
+    // 카테고리 조회
+    public List<VendorCategoryResponse> findCategoriesByVendorIds(List<Long> vendorIds) {
+        List<Vendor> vendors = vendorRepository.findAllById(vendorIds);
+
+        return vendors.stream()
+                .map(vendor -> new VendorCategoryResponse(vendor.getId(), vendor.getCategory()))
+                .collect(Collectors.toList());
     }
 }

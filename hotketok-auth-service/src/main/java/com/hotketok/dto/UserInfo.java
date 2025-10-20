@@ -6,5 +6,6 @@ public record UserInfo (
      Long id,
      String logInId,
      String password,
-     Role role
+     Role role,
+     boolean onBoardingStageFlag
 ){}

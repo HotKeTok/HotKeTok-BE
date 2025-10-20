@@ -4,10 +4,7 @@ import com.hotketok.domain.House;
 import com.hotketok.domain.HouseTag;
 import com.hotketok.domain.enums.HouseState;
 import com.hotketok.dto.*;
-import com.hotketok.dto.internalApi.GetHouseInfoByAddressResponse;
-import com.hotketok.dto.internalApi.HouseInfoResponse;
-import com.hotketok.dto.internalApi.Role;
-import com.hotketok.dto.internalApi.UploadFileResponse;
+import com.hotketok.dto.internalApi.*;
 import com.hotketok.exception.HouseErrorCode;
 import com.hotketok.hotketokcommonservice.error.exception.CustomException;
 import com.hotketok.internalApi.InfraServiceClient;
@@ -40,6 +37,7 @@ public class HouseService {
             houseRepository.save(house);
             registeredHouses.add(house.getHouseId());
         }
+        userServiceClient.updateOnboardingStageFlag(ownerId, true);
         return new RegisterHouseResponse(registeredHouses);
     }
 
@@ -55,6 +53,8 @@ public class HouseService {
     // 관리자 거절 -> 삭제
     @Transactional
     public void rejectHouse(Long houseId) {
+        House house = houseRepository.findById(houseId).orElseThrow(() -> new CustomException(HouseErrorCode.HOUSE_NOT_FOUND));
+        userServiceClient.updateOnboardingStageFlag(house.getOwnerId(), false);
         houseRepository.deleteById(houseId);
     }
 
@@ -71,6 +71,7 @@ public class HouseService {
         house.changeTenantId(tenantId);
         house.registerTenant(registerTenantRequest.floor(), registerTenantRequest.number(), registerTenantRequest.alias(), registerTenantRequest.houseType());
         house.changeState(HouseState.TENANT_REQUEST);
+        userServiceClient.updateOnboardingStageFlag(tenantId, true);
         return new RegisterTenantResponse(tenantId, house.getHouseId());
     }
 
@@ -106,6 +107,7 @@ public class HouseService {
         if (!house.getOwnerId().equals(ownerId)) {
             throw new CustomException(HouseErrorCode.HOUSE_NOT_EQUAL_OWNER);
         }
+        userServiceClient.updateOnboardingStageFlag(house.getTenantId(), false);
         house.changeTenantId(null);
         house.registerTenant(null, null,null,null);
         house.changeState(HouseState.REGISTERED);
@@ -171,11 +173,20 @@ public class HouseService {
         return new GetHouseInfoByAddressResponse(address,number,house.getState().toString());
     }
 
+    // 현재 주소,호수의 집주인 찾기
     @Transactional(readOnly = true)
     public Long getOwnerId(Long userId, String currentAddress, String currentNumber){
         House house = houseRepository.findByAddressAndNumberAndTenantId(currentAddress, currentNumber, userId)
                 .orElseThrow(() -> new CustomException(HouseErrorCode.HOUSE_NOT_FOUND));
         return house.getOwnerId();
+    }
+
+    // 유저 아이디로 호수 반환
+    public List<HouseUnitResponse> findUnitNumbersByUserIds(List<Long> userIds) {
+        List<House> houses = houseRepository.findAllByTenantIdIn(userIds);
+        return houses.stream()
+                .map(house -> new HouseUnitResponse(house.getTenantId(), house.getNumber()))
+                .collect(Collectors.toList());
     }
 }
 

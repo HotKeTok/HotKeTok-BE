@@ -22,28 +22,16 @@ public record ChatRoomResponse(
 ) {
 
     public ChatRoomResponse(ChatRoom chatRoom, ChatMessage lastMessage, long unreadCount,
-                            Map<Long, UserProfileResponse> userProfiles,
-                            Map<Long, RequestFormAddressStatusResponse> requestFormMap) {
+                            List<ParticipantResponse> participants,
+                            String address, String estimateStatus) {
         this(
                 chatRoom.getId(),
                 lastMessage != null ? lastMessage.getContent() : "아직 메시지가 없습니다.",
                 lastMessage != null ? lastMessage.getCreatedAt() : chatRoom.getCreatedAt(),
                 unreadCount,
-                chatRoom.getParticipants().stream()
-                        .map(participant -> {
-                            UserProfileResponse userProfile = userProfiles.get(participant.getUserId());
-                            return new ParticipantResponse(participant, userProfile);
-                        })
-                        .collect(Collectors.toList()),
-
-                // 공사업체 포함됐다면 address, status 반환 포함
-                (chatRoom.getRoomType() == ChatRoomType.VENDOR_ESTIMATE && requestFormMap != null)
-                        ? requestFormMap.get(chatRoom.getRequestFormId()).address()
-                        : null,
-
-                (chatRoom.getRoomType() == ChatRoomType.VENDOR_ESTIMATE && requestFormMap != null)
-                        ? requestFormMap.get(chatRoom.getRequestFormId()).status().name()
-                        : null
+                participants,
+                address,     
+                estimateStatus
         );
     }
 }
