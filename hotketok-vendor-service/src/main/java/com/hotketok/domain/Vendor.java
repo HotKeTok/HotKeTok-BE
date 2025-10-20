@@ -58,7 +58,7 @@ public class Vendor extends BaseTimeEntity {
     private String phoneNumber;
 
     @Embedded
-    private RunningTimeRequest runningTime;
+    private RunningTime runningTime;
 
     @OneToMany(mappedBy = "vendor", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<News> newsList;
@@ -78,7 +78,7 @@ public class Vendor extends BaseTimeEntity {
                    String proveFile,
                    int rate,
                    String phoneNumber,
-                   RunningTimeRequest runningTime) {
+                   RunningTime runningTime) {
         this.userId = userId;
         this.name = name;
         this.state = state;
@@ -115,7 +115,7 @@ public class Vendor extends BaseTimeEntity {
                 .build();
     }
 
-    public void updateProfile(String introduction, String phoneNumber, RunningTimeRequest runningTime, String image, List<String> introductionImageUrls) {
+    public void updateProfile(String introduction, String phoneNumber, RunningTime runningTime, String image, List<String> introductionImageUrls) {
         if (introduction != null) {
             this.introduction = introduction;
         }

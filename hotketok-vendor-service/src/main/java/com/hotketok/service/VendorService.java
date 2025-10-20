@@ -1,6 +1,7 @@
 package com.hotketok.service;
 
 import com.hotketok.domain.News;
+import com.hotketok.domain.RunningTime;
 import com.hotketok.domain.Vendor;
 import com.hotketok.domain.VendorIntroductionImage;
 import com.hotketok.domain.enums.Role;
@@ -126,10 +127,10 @@ public class VendorService {
             newImageUrls = response.urls();
         }
 
-        RunningTimeRequest newRunningTime = null;
+        RunningTime newRunningTime = null;
         if (request.runningTime() != null) {
             RunningTimeRequest dto = request.runningTime();
-            newRunningTime = new RunningTimeRequest(
+            newRunningTime = new RunningTime(
                     dto.openingTime(),
                     dto.closingTime(),
                     dto.workingDayOfWeek()
