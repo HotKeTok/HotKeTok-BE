@@ -3,6 +3,7 @@ package com.hotketok.service;
 import com.hotketok.domain.CommonBill;
 import com.hotketok.domain.CommonBillDetail;
 import com.hotketok.dto.AddCommonBillDetailRequest;
+import com.hotketok.dto.GetCommonBillDuringYearResponse;
 import com.hotketok.dto.GetCommonBillResponse;
 import com.hotketok.exception.CommonBillErrorCode;
 import com.hotketok.hotketokcommonservice.error.exception.CustomException;
@@ -13,6 +14,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @Slf4j
@@ -52,5 +55,21 @@ public class CommonBillService {
 
         return GetCommonBillResponse.from(commonBill);
     }
+
+    // 입주민/집주인 조회용: 해당 년도의 월 공통관리비 내역 조회
+    public List<GetCommonBillDuringYearResponse> getCommonBillDuringYear(Long userId, int year) {
+        String address = userServiceClient.getCurrentAddress(userId).currentAddress();
+
+        List<CommonBill> commonBillList = commonBillRepository.findAllByAddressAndYearOrderByMonth(address, year);
+        if (commonBillList.isEmpty()) {
+            throw new CustomException(CommonBillErrorCode.COMMON_BILL_NOT_FOUND);
+        }
+
+        List<GetCommonBillDuringYearResponse> result = commonBillList.stream().map(commonBill -> {
+            return new GetCommonBillDuringYearResponse(commonBill.getYear(), commonBill.getMonth(), commonBill.getBalance());
+        }).toList();
+
+        return result;
+    };
 }
 
