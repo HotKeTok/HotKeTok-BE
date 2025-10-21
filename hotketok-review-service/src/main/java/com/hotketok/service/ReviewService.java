@@ -5,11 +5,13 @@ import com.hotketok.domain.ReviewImage; // 👈 ReviewImage import
 import com.hotketok.dto.CreateReviewRequest;
 import com.hotketok.dto.ReviewItemResponse;
 import com.hotketok.dto.ReviewListResponse;
+import com.hotketok.dto.ReviewStatusResponse;
 import com.hotketok.dto.internalApi.DeleteFileRequest;
 import com.hotketok.dto.internalApi.UploadFileListResponse;
 import com.hotketok.dto.internalApi.UserProfileResponse;
 import com.hotketok.exception.ReviewErrorCode;
 import com.hotketok.hotketokcommonservice.error.exception.CustomException;
+import com.hotketok.internalApi.EstimateServiceClient;
 import com.hotketok.internalApi.InfraServiceClient;
 import com.hotketok.internalApi.UserServiceClient;
 import com.hotketok.repository.ReviewRepository;
@@ -33,6 +35,7 @@ public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final InfraServiceClient infraServiceClient;
     private final UserServiceClient userServiceClient;
+    private final EstimateServiceClient estimateServiceClient;
 
     // 리뷰 작성
     public Review createReview(Long userId, CreateReviewRequest request, List<MultipartFile> images) {
@@ -116,5 +119,11 @@ public class ReviewService {
     public int getReviewCountByVendorId(Long vendorId) {
         long count = reviewRepository.countByVendorId(vendorId);
         return (int) count;
+    }
+
+    // 리뷰 작성 가능 여부 확인
+    public ReviewStatusResponse statusReview(Long userId, Long vendorId) {
+        boolean canWriteReview = estimateServiceClient.hasCompletedWork(userId, vendorId);
+        return new ReviewStatusResponse(canWriteReview);
     }
 }

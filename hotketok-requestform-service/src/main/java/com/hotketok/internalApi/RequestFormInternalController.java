@@ -73,4 +73,10 @@ public class RequestFormInternalController {
     public List<RequestFormAddressStatusResponse> getRequestFormsAddressAndStatus(@RequestBody List<Long> requestFormIds) {
         return requestFormService.getRequestFormsAddressAndStatusByIds(requestFormIds);
     }
+
+    // 작성자로 요청서 찾기
+    @GetMapping("/by-author")
+    public List<Long> getRequestFormIdsByAuthorId(@RequestParam Long authorId) {
+        return requestFormService.findRequestFormIdsByAuthorId(authorId);
+    }
 }

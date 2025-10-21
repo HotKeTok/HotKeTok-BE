@@ -13,4 +13,5 @@ public interface RequestFormRepository extends JpaRepository<RequestForm, Long> 
     List<RequestForm> findAllByIdIn(List<Long> requestFormId);
     List<RequestForm> findAllByStatusIn(List<Status> statuses);
     List<RequestForm> findAllByIdInAndRequestScheduleBetween(List<Long> ids, LocalDateTime start, LocalDateTime end);
+    List<RequestForm> findAllByAuthorId(Long authorId);
 }

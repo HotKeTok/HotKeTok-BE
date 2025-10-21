@@ -286,4 +286,10 @@ public class RequestFormService {
         log.info("<<< Returning address and status responses: {}", responses);
         return responses;
     }
+
+    public List<Long> findRequestFormIdsByAuthorId(Long authorId) {
+        return requestFormRepository.findAllByAuthorId(authorId).stream()
+                .map(RequestForm::getId)
+                .collect(Collectors.toList());
+    }
 }
