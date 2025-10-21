@@ -8,7 +8,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface HouseRepository extends JpaRepository<House, Long> {
-    List<House> findAllByOwnerIdAndState(Long ownerId, HouseState state);
+    // 입주민 요청에 대한 집 리스트 반환
+    List<House> findAllByOwnerIdAndAddressAndState(Long ownerId, String address, HouseState state);
     Optional<House> findFirstByAddressAndState(String address, HouseState state);
     Optional<House> findByTenantId(Long tenantId);
 

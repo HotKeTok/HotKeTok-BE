@@ -78,7 +78,8 @@ public class HouseService {
     // 집주인 요청 목록 조회 (state=2)
     @Transactional
     public List<TenantRequestResponse> getTenantRequestList(Long ownerId) {
-        List<House> houseList = houseRepository.findAllByOwnerIdAndState(ownerId, HouseState.TENANT_REQUEST);
+        CurrentAddressResponse currentAddress = userServiceClient.getCurrentAddress(ownerId);
+        List<House> houseList = houseRepository.findAllByOwnerIdAndAddressAndState(ownerId, currentAddress.currentAddress(), HouseState.TENANT_REQUEST);
         List<TenantRequestResponse> response = houseList.stream()
                 .map(house -> TenantRequestResponse.of(house.getHouseId(),userServiceClient.getTenantInfo(house.getTenantId()), house.getNumber()))
                 .toList();
