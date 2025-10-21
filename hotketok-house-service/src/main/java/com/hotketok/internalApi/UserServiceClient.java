@@ -24,5 +24,10 @@ public interface UserServiceClient {
 
     @PostMapping(value = "/internal/user-service/change/current-address-and-number/{userId}")
     void changeCurrentAddressAndNumber(@PathVariable("userId") Long userId, @RequestParam("address") String address, @RequestParam("number") String number);
+
+    @PostMapping(value = "/internal/user-service/change/current-address-and-number/first/{userId}")
+    void changeCurrentAddressAndNumberFirst(@PathVariable("userId") Long userId,
+                                                   @RequestParam("address") String address,
+                                                   @RequestParam(value = "number", required = false) String number);
 }
 

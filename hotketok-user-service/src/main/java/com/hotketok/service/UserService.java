@@ -66,6 +66,13 @@ public class UserService {
     }
 
     @Transactional
+    public void updateCurrentAddressAndNumberFirst(Long id, String updateAddress, String updateNumber){
+        User user = userRepository.findById(id).orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
+        user.changeCurrentAddressAndNumber(updateAddress,updateNumber);
+    }
+
+    // 사용자 현재 설정된 주소와 동호수를 변경해주는 API 서비스
+    @Transactional
     public CurrentAddressAndNumberResponse updateCurrentAddressAndNumber(Long id, String updateAddress, String updateNumber){
         User user = userRepository.findById(id).orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
         GetHouseInfoByAddressResponse response;

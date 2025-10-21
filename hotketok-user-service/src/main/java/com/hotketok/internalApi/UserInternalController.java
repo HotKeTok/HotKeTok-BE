@@ -65,6 +65,14 @@ public class UserInternalController {
         return userService.getCurrentAddressAndNumberByUserId(userId);
     }
 
+    @PostMapping(value = "/change/current-address-and-number/first/{userId}")
+    public void changeCurrentAddressAndNumberFirst(@PathVariable("userId") Long userId,
+                                                   @RequestParam("address") String address,
+                                                   @RequestParam(value = "number", required = false) String number) {
+        userService.updateCurrentAddressAndNumberFirst(userId, address, number);
+    }
+
+
     @PostMapping(value = "/change/current-address-and-number/{userId}")
     public void changeCurrentAddressAndNumber(
             @PathVariable("userId") Long userId,

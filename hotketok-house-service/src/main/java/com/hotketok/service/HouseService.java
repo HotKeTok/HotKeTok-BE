@@ -48,6 +48,7 @@ public class HouseService {
         house.changeState(HouseState.REGISTERED);
 
         userServiceClient.updateRole(house.getOwnerId(), Role.OWNER);
+        userServiceClient.changeCurrentAddressAndNumberFirst(house.getOwnerId(), house.getAddress(),house.getNumber());
     }
 
     // 관리자 거절 -> 삭제
@@ -99,7 +100,7 @@ public class HouseService {
         house.changeState(HouseState.MATCHED);
 
         userServiceClient.updateRole(house.getTenantId(), Role.TENANT);
-        userServiceClient.changeCurrentAddressAndNumber(house.getTenantId(), house.getAddress(), house.getNumber());
+        userServiceClient.changeCurrentAddressAndNumberFirst(house.getTenantId(), house.getAddress(), house.getNumber());
     }
 
     // 집주인 거절 -> tenantId null, state=1
