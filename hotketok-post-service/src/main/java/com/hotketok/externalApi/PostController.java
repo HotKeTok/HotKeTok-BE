@@ -44,4 +44,10 @@ public class PostController {
     public NeighborListResponse getAllHouseTags(@RequestHeader("userId") Long userId) {
         return postService.getAllHouseTagsWithCurrentUser(userId);
     }
+
+    // 쪽지 신고하기
+    @DeleteMapping("/delete")
+    public void deletePost(@RequestHeader("userId") Long userId, @RequestParam("postId") Long postId) {
+        postService.deletePost(userId, postId);
+    }
 }

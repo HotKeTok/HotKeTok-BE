@@ -3,8 +3,10 @@ package com.hotketok.service;
 import com.hotketok.domain.ChatMessage;
 import com.hotketok.domain.ChatRoom;
 import com.hotketok.domain.Participant;
+import com.hotketok.domain.enums.ChatRoomType;
 import com.hotketok.domain.enums.SenderType;
 import com.hotketok.dto.internalApi.*;
+import com.hotketok.internalApi.RequestFormServiceClient;
 import com.hotketok.internalApi.HouseServiceClient;
 import com.hotketok.internalApi.UserServiceClient;
 import com.hotketok.internalApi.VendorServiceClient;
@@ -12,10 +14,12 @@ import com.hotketok.repository.ChatMessageRepository;
 import com.hotketok.repository.ChatRoomRepository;
 import com.hotketok.repository.ParticipantRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.Optional;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +29,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Slf4j
 public class ChatService {
 
     private final ChatRoomRepository chatRoomRepository;
@@ -32,6 +37,7 @@ public class ChatService {
     private final ChatMessageRepository chatMessageRepository;
 
     private final UserServiceClient userServiceClient;
+    private final RequestFormServiceClient requestFormServiceClient;
     private final VendorServiceClient vendorServiceClient;
     private final HouseServiceClient houseServiceClient;
 
@@ -39,32 +45,44 @@ public class ChatService {
     @Transactional
     public Long createChatRoom(CreateChatRoomRequest request) {
         List<Long> userIds = request.participantUserIds();
+        ChatRoomType roomType = request.roomType();
+
+        ChatRoom chatRoom = ChatRoom.createChatRoom(request.roomType(), request.requestFormId());
 
         Map<Long, SenderType> userRoles = userServiceClient.getUserProfilesByIds(userIds).stream()
                 .collect(Collectors.toMap(UserProfileResponse::userId, UserProfileResponse::role));
 
-        // 채팅방 객체 먼저 생성 후 저장
-        ChatRoom chatRoom = ChatRoom.createChatRoom();
+        userIds.forEach(userId -> {
+            SenderType userRole = userRoles.getOrDefault(userId, SenderType.OWNER);
+            Participant participant = Participant.createParticipant(chatRoom, userId, userRole);
+            chatRoom.addParticipant(participant);
+        });
         chatRoomRepository.save(chatRoom);
-
-        // 조회한 역할 정보를 사용하여 참여자 목록 생성
-        List<Participant> participants = userIds.stream()
-                .map(userId -> {
-                    // 역할 정보가 없을 경우 기본값(OWNER)을 사용
-                    SenderType userRole = userRoles.getOrDefault(userId, SenderType.OWNER);
-                    return Participant.createParticipant(chatRoom, userId, userRole);
-                })
-                .collect(Collectors.toList());
-        participantRepository.saveAll(participants);
-
         return chatRoom.getId();
     }
 
-    // 특정 유저의 채팅방 목록 조회
+    // 특정 유저의 채팅방 목록 조회 
     public List<ChatRoomResponse> findChatRoomsByUserId(Long userId) {
         List<Participant> participants = participantRepository.findByUserId(userId);
         List<ChatRoom> chatRooms = participants.stream().map(Participant::getChatRoom).toList();
 
+        // 주소, 상태 반환
+        List<Long> requestFormIds = chatRooms.stream()
+                .filter(room -> room.getRoomType() == ChatRoomType.VENDOR_ESTIMATE)
+                .map(ChatRoom::getRequestFormId)
+                .distinct().toList();
+
+        Map<Long, RequestFormAddressStatusResponse> requestFormMap = Collections.emptyMap();
+        if (!requestFormIds.isEmpty()) {
+            log.info(">>> Calling requestform-service with requestFormIds: {}", requestFormIds);
+            requestFormMap = requestFormServiceClient.getRequestFormsAddressAndStatus(requestFormIds).stream()
+                    .collect(Collectors.toMap(RequestFormAddressStatusResponse::requestFormId, data -> data));
+            log.info("<<< Received requestFormMap from requestform-service: {}", requestFormMap);
+        }
+        final Map<Long, RequestFormAddressStatusResponse> finalRequestFormMap = requestFormMap;
+
+
+        // 호수, 카테고리 반환
         List<Long> allUserIds = chatRooms.stream()
                 .flatMap(room -> room.getParticipants().stream().map(Participant::getUserId))
                 .distinct().toList();
@@ -76,13 +94,13 @@ public class ChatService {
         Map<Long, UserProfileResponse> userProfiles = userServiceClient.getUserProfilesByIds(allUserIds).stream()
                 .collect(Collectors.toMap(UserProfileResponse::userId, profile -> profile));
 
-        // 호수 반환 추가
         Map<Long, HouseUnitResponse> unitNumbers = houseServiceClient.getUnitNumbersByUserIds(allUserIds).stream()
                 .collect(Collectors.toMap(HouseUnitResponse::userId, info -> info));
 
         // 공사업체의 경우 카테고리 반환 추가
         List<Long> vendorIds = userProfiles.values().stream()
-                .filter(p -> "VENDOR".equals(p.role()))
+                // 병합 수정: "VENDOR" 문자열 비교가 아닌 SenderType Enum으로 비교
+                .filter(p -> p.role() == SenderType.VENDOR) 
                 .map(UserProfileResponse::userId).toList();
 
         Map<Long, VendorCategoryResponse> vendorCategories = Map.of();
@@ -90,16 +108,18 @@ public class ChatService {
             vendorCategories = vendorServiceClient.getVendorCategoriesByIds(vendorIds).stream()
                     .collect(Collectors.toMap(VendorCategoryResponse::vendorId, vc -> vc));
         }
-
         final Map<Long, VendorCategoryResponse> finalVendorCategories = vendorCategories;
 
         return participants.stream().map(participant -> {
             ChatRoom chatRoom = participant.getChatRoom();
+
+            // 상세 참여자 목록 생성
             List<ParticipantResponse> detailedParticipants = chatRoom.getParticipants().stream().map(p -> {
                 UserProfileResponse profile = userProfiles.get(p.getUserId());
                 HouseUnitResponse unit = unitNumbers.get(p.getUserId());
                 VendorCategoryResponse category = finalVendorCategories.get(p.getUserId());
 
+                // ParticipantResponse 생성자
                 return new ParticipantResponse(
                         p.getUserId(),
                         profile != null ? profile.userName() : "알 수 없는 사용자",
@@ -110,12 +130,26 @@ public class ChatService {
                 );
             }).collect(Collectors.toList());
 
+            // develop: 마지막 메시지 및 안 읽은 수
             Optional<ChatMessage> lastMsgOpt = chatMessageRepository.findTopByChatRoomOrderByCreatedAtDesc(chatRoom);
             long unread = calculateUnreadCount(participant, chatRoom, userId);
-            return new ChatRoomResponse(chatRoom, lastMsgOpt.orElse(null), unread, detailedParticipants);
+
+            // 주소 및 상태값 추출
+            String address = null;
+            String estimateStatus = null;
+            if (chatRoom.getRoomType() == ChatRoomType.VENDOR_ESTIMATE && finalRequestFormMap != null) {
+                RequestFormAddressStatusResponse formData = finalRequestFormMap.get(chatRoom.getRequestFormId());
+                if (formData != null) {
+                    address = formData.address();
+                    estimateStatus = formData.status().name(); // Enum을 String으로
+                }
+            }
+
+            return new ChatRoomResponse(chatRoom, lastMsgOpt.orElse(null), unread, detailedParticipants, address, estimateStatus);
+            
         }).collect(Collectors.toList());
     }
-
+  
     private long calculateUnreadCount(Participant p, ChatRoom cr, Long userId) {
         return (p.getLastReadAt() == null)
                 ? chatMessageRepository.countByChatRoomAndSenderIdNot(cr, userId)

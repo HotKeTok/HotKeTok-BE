@@ -11,7 +11,7 @@ public record SimpleEstimateResponse(
         Long vendorId,
         BigDecimal estimatePrice,
         String estimateComment,
-        LocalDateTime estimateTime,
+        String estimateTime,
         Status status
 ) {
 }

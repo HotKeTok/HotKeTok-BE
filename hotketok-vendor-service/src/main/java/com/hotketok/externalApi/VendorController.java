@@ -48,7 +48,7 @@ public class VendorController {
     // 업체 프로필 관리
     @PatchMapping(value = "/profile", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public void updateProfile(
-            @RequestParam Long userId,
+            @RequestHeader("userId") Long userId,
             @RequestPart("request") UpdateVendorProfileRequest request,
             @RequestPart(value = "introductionImages", required = false) List<MultipartFile> introductionImages
     ) {
