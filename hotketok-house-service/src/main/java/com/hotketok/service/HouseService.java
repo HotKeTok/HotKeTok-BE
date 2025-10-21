@@ -189,6 +189,14 @@ public class HouseService {
         return house.getOwnerId();
     }
 
+    // 유저 아이디로 호수 반환
+    public List<HouseUnitResponse> findUnitNumbersByUserIds(List<Long> userIds) {
+        List<House> houses = houseRepository.findAllByTenantIdIn(userIds);
+        return houses.stream()
+                .map(house -> new HouseUnitResponse(house.getTenantId(), house.getNumber()))
+                .collect(Collectors.toList());
+    }
+
     // 마이페이지 사용자가 등록한(요청 포함) 주택 정보 제공하는 기능
     @Transactional(readOnly = true)
     public List<MyPageHouseInfoResponse> findHouseInfoListByUserId(Long userId , String role) {

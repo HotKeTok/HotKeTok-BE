@@ -6,6 +6,7 @@ import com.hotketok.dto.internalApi.UserProfileResponse;
 import java.time.LocalDateTime;
 
 public record NoticeResponse(
+        Long noticeId,
         String author,
         String authorProfileImage,
         String title,
@@ -17,6 +18,7 @@ public record NoticeResponse(
         String profileImage = (authorProfile != null) ? authorProfile.profileImageUrl() : null;
 
         return new NoticeResponse(
+                notice.getId(),
                 authorName,
                 profileImage,
                 notice.getTitle(),

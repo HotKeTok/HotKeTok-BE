@@ -22,6 +22,7 @@ public interface HouseRepository extends JpaRepository<House, Long> {
 
     Optional<House> findByAddressAndNumberAndTenantId(String address,String number,Long tenantId);
     Optional<House> findFirstByAddressAndOwnerId(String address, Long ownerId);
+    List<House> findAllByTenantIdIn(List<Long> userIds);
 
     // // 마이페이지 사용자 정보 조회 -> 주택 태그들을 가져오기 위한 서비스 -> 사용자 주소와 동호수로 주택 태그 찾기
     Optional<House> findByAddressAndNumber(String address, String number);
