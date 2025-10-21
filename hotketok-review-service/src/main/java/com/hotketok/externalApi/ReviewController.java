@@ -39,4 +39,11 @@ public class ReviewController {
     public void deleteReview(@RequestHeader("userId") Long userId, @RequestParam Long reviewId) {
         reviewService.deleteReview(userId, reviewId);
     }
+
+    // 리뷰 작성 가능 여부 확인
+//    @GetMapping("/status")
+//    public Boolean statusReview() {
+//        Long userId = 101L;
+//        reviewService.statusReview(userId);
+//    }
 }
