@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 
-@FeignClient(name = "user-service")
+@FeignClient(name = "user-service", url = "${client.user-service.url}")
 public interface UserServiceClient {
     @PostMapping("/internal/user-service/profiles") // 채팅방 목록 조회에서 프로필 정보 조회에 사용
     List<UserProfileResponse> getUserProfilesByIds(@RequestBody List<Long> userIds);

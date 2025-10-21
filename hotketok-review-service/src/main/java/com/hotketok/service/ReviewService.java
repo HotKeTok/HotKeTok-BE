@@ -112,4 +112,9 @@ public class ReviewService {
         }
         reviewRepository.delete(review);
     }
+
+    public int getReviewCountByVendorId(Long vendorId) {
+        long count = reviewRepository.countByVendorId(vendorId);
+        return (int) count;
+    }
 }

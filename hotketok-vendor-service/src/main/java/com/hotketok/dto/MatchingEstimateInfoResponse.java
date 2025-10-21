@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public record MatchingEstimateInfoResponse(
-        Long estimateId, ConstructCategory category, String address, LocalDateTime estimateTime,
+        Long estimateId, ConstructCategory category, String address, String estimateTime,
         BigDecimal estimatePrice, PayType payType, String payerName,
         String phoneNumber,
         String estimateComment

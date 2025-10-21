@@ -1,5 +1,6 @@
 package com.hotketok.domain;
 
+import com.hotketok.domain.enums.ChatRoomType;
 import com.hotketok.hotketokjpaservice.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -25,6 +26,13 @@ public class ChatRoom extends BaseTimeEntity {
     @Column(nullable = true)
     private String name;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private ChatRoomType roomType;
+
+    @Column(nullable = true)
+    private Long requestFormId;
+
     @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Participant> participants = new ArrayList<>();
 
@@ -34,13 +42,22 @@ public class ChatRoom extends BaseTimeEntity {
 
     // 채팅방 생성 시 기본 이름 부여
     @Builder(access = AccessLevel.PRIVATE)
-    private ChatRoom(String name) {
+    private ChatRoom(String name, ChatRoomType roomType, Long requestFormId) {
         this.name = name;
+        this.roomType = roomType;
+        this.requestFormId = requestFormId;
     }
 
-    public static ChatRoom createChatRoom() {
+    public static ChatRoom createChatRoom(ChatRoomType roomType, Long requestFormId) {
         return ChatRoom.builder()
                 .name("채팅방-" + UUID.randomUUID().toString().substring(0, 8))
+                .roomType(roomType)
+                .requestFormId(requestFormId)
                 .build();
+    }
+
+    public void addParticipant(Participant participant) {
+        this.participants.add(participant);
+        participant.setChatRoom(this);
     }
 }

@@ -1,0 +1,16 @@
+{
+  "introduction": "언제나 꼼꼼하고 완벽한 시공을 약속드립니다.",
+  "phoneNumber": "010-9876-5432",
+  "runningTime": {
+    "openingTime": "09:00",
+    "closingTime": "18:00",
+    "working_day_of_week": [
+      "월",
+      "화",
+      "수",
+      "목",
+      "금"
+    ]
+  },
+  "profileImage": null
+}

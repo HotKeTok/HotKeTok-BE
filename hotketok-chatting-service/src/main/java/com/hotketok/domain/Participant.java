@@ -54,4 +54,8 @@ public class Participant {
                 .senderType(senderType)
                 .build();
     }
+
+    void setChatRoom(ChatRoom chatRoom) {
+        this.chatRoom = chatRoom;
+    }
 }

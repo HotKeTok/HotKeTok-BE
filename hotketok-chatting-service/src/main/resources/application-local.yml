@@ -48,8 +48,8 @@ logging:
     org.hibernate.SQL: debug
 
 client:
-  user-service:
-    url: http://localhost:8088
+  requestform-service:
+    url: http://localhost:8093
   vendor-service:
     url: http://localhost:8099
   house-service:

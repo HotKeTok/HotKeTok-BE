@@ -67,4 +67,10 @@ public class RequestFormInternalController {
                 request.requestFormIds(), request.year(), request.month(), request.day()
         );
     }
+  
+    // 요청서 주소 및 상태 반환
+    @PostMapping("/address-status-list")
+    public List<RequestFormAddressStatusResponse> getRequestFormsAddressAndStatus(@RequestBody List<Long> requestFormIds) {
+        return requestFormService.getRequestFormsAddressAndStatusByIds(requestFormIds);
+    }
 }

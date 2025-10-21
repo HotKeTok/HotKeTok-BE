@@ -3,7 +3,7 @@ package com.hotketok.dto.internalApi;
 import com.hotketok.domain.Participant;
 import com.hotketok.domain.enums.Category;
 import com.hotketok.domain.enums.SenderType;
-import com.hotketok.dto.internalApi.UserProfileResponse;
+import com.hotketok.domain.enums.Status;
 
 import java.time.LocalDateTime;
 
