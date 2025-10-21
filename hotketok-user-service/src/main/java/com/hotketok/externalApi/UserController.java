@@ -27,8 +27,8 @@ public class UserController {
     @PostMapping(value = "/mypage/update", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Void> updateMyPageProfile(
             @RequestHeader("userId") Long userId,
-            @RequestPart(value = "data") UpdateMyPageInfoRequest updateMyPageInfoRequest,
-            @RequestPart(value = "image") MultipartFile image) {
+            @RequestPart(value = "data", required = false) UpdateMyPageInfoRequest updateMyPageInfoRequest,
+            @RequestPart(value = "image", required = false) MultipartFile image) {
         userService.UpdateMyPageInfo(userId,image,updateMyPageInfoRequest);
         return ResponseEntity.ok().build();
     }
