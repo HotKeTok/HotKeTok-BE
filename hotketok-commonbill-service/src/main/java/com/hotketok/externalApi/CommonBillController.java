@@ -1,11 +1,14 @@
 package com.hotketok.externalApi;
 
 import com.hotketok.dto.AddCommonBillDetailRequest;
+import com.hotketok.dto.GetCommonBillDuringYearResponse;
 import com.hotketok.dto.GetCommonBillResponse;
 import com.hotketok.service.CommonBillService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/commonbill-service")
@@ -29,5 +32,13 @@ public class CommonBillController {
                                       @RequestParam int month) {
         return commonBillService.getCommonBills(ownerId, year, month);
     }
+
+    // 입주민/집주인 - 연도별 내역 조회
+    @GetMapping("/view/year")
+    public List<GetCommonBillDuringYearResponse> viewDuringYear(@RequestHeader("userId") Long userId,
+                                                      @RequestParam int year) {
+        return commonBillService.getCommonBillDuringYear(userId, year);
+    }
+
 }
 
