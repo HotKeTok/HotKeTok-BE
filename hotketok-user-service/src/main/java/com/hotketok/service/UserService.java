@@ -91,11 +91,11 @@ public class UserService {
     @Transactional(readOnly = true)
     public MyPageInfoResponse GetMyPageInfo(Long userId, String role){
         User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
-        if (role.equals("NONE")) return new MyPageInfoResponse(user.getName(),user.getPhoneNumber(),user.getLogInId(),null, null,null);
-        else if (role.equals("OWNER")) return new MyPageInfoResponse(user.getName(), user.getPhoneNumber(), user.getLogInId(), user.getCurrentAddress(), null, null);
+        if (role.equals("NONE")) return new MyPageInfoResponse(null,user.getName(),user.getPhoneNumber(),user.getLogInId(),null, null,null);
+        else if (role.equals("OWNER")) return new MyPageInfoResponse(user.getProfileImage(),user.getName(), user.getPhoneNumber(), user.getLogInId(), user.getCurrentAddress(), null, null);
         else { // 입주민 인 경우
             List<String> houseTag = houseServiceClient.getHouseTag(user.getCurrentAddress(), user.getCurrentNumber());
-            return new MyPageInfoResponse(user.getName(), user.getPhoneNumber(), user.getLogInId(), user.getCurrentAddress(), user.getCurrentNumber(), houseTag);
+            return new MyPageInfoResponse(user.getProfileImage(),user.getName(), user.getPhoneNumber(), user.getLogInId(), user.getCurrentAddress(), user.getCurrentNumber(), houseTag);
         }
     }
 
