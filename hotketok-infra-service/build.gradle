@@ -15,6 +15,9 @@ ext {
 dependencies {
 	implementation project(':hotketok-common-service')
 
+	// Spring Cloud Eureka
+	implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+
 	// Spring Cloud Kubernetes Discovery Client
 	implementation 'org.springframework.cloud:spring-cloud-starter-kubernetes-client'
 
