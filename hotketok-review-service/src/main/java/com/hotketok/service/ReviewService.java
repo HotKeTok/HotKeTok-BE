@@ -7,6 +7,7 @@ import com.hotketok.dto.ReviewItemResponse;
 import com.hotketok.dto.ReviewListResponse;
 import com.hotketok.dto.ReviewStatusResponse;
 import com.hotketok.dto.internalApi.DeleteFileRequest;
+import com.hotketok.dto.internalApi.ReviewStatsResponse;
 import com.hotketok.dto.internalApi.UploadFileListResponse;
 import com.hotketok.dto.internalApi.UserProfileResponse;
 import com.hotketok.exception.ReviewErrorCode;
@@ -125,5 +126,15 @@ public class ReviewService {
     public ReviewStatusResponse statusReview(Long userId, Long vendorId) {
         boolean canWriteReview = estimateServiceClient.hasCompletedWork(userId, vendorId);
         return new ReviewStatusResponse(canWriteReview);
+    }
+
+    public ReviewStatsResponse getReviewStatsByVendorId(Long vendorId) {
+        List<Review> reviews = reviewRepository.findAllByVendorId(vendorId);
+        int reviewCount = reviews.size();
+        double averageRate = reviews.stream()
+                .mapToDouble(Review::getRate) // 각 리뷰 객체에서 평점(rate)을 double로 추출
+                .average() // 평균 계산
+                .orElse(0.0); // 리뷰가 없으면 0.0 반환
+        return new ReviewStatsResponse(reviewCount, averageRate);
     }
 }

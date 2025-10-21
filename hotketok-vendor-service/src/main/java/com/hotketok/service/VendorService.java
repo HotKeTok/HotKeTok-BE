@@ -121,13 +121,16 @@ public class VendorService {
                 .orElseThrow(() -> new CustomException(VendorErrorCode.VENDOR_NOT_FOUND));
 
         int reviewCount = 0;
+        double averageRate = 0.0;
         try {
-            reviewCount = reviewServiceClient.getReviewCountByVendorId(vendorId);
+            ReviewStatsResponse stats = reviewServiceClient.getReviewStatsByVendorId(vendorId);
+            reviewCount = stats.reviewCount();
+            averageRate = stats.averageRate();
         } catch (Exception e) {
             log.error("Failed to fetch review count for vendorId {}: {}", vendorId, e.getMessage());
         }
 
-        return VendorInfoAllResponse.from(vendor, reviewCount);
+        return VendorInfoAllResponse.from(vendor, reviewCount, averageRate);
     }
 
     // 업체 프로필 관리
@@ -180,7 +183,7 @@ public class VendorService {
 
         return newses.stream()
                 .map(news -> {
-                    VendorInfoAllResponse vendorProfile = VendorInfoAllResponse.from(vendor, 0);
+                    VendorInfoAllResponse vendorProfile = VendorInfoAllResponse.from(vendor, 0, 0.0);
                     return VendorNewsResponse.of(news, vendorProfile);
                 })
                 .collect(Collectors.toList());

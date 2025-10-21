@@ -19,12 +19,12 @@ public record VendorInfoAllResponse(
         String introduction,
         String image, // 대표 이미지
         List<String> introductionImage, // 소개 사진 목록
-        int rate,
+        double rate,
         int reviewCount,
         RunningTimeResponse runningTime,
         String phoneNumber
 ) {
-    public static VendorInfoAllResponse from(Vendor vendor, int reviewCount) {
+    public static VendorInfoAllResponse from(Vendor vendor, int reviewCount, double averageRate) {
         List<String> imageUrls = vendor.getIntroductionImages().stream()
                 .map(VendorIntroductionImage::getImageUrl)
                 .collect(Collectors.toList());
@@ -41,7 +41,7 @@ public record VendorInfoAllResponse(
                 vendor.getIntroduction(),
                 vendor.getImage(),
                 imageUrls, // 업체 소개 이미지들
-                vendor.getRate(),
+                averageRate,
                 reviewCount,
                 runningTimeDto,
                 vendor.getPhoneNumber()
