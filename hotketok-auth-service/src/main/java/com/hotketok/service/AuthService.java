@@ -66,7 +66,7 @@ public class AuthService {
 
         JwtToken jwtToken = jwtUtil.issue(user.id(), user.role());
         refreshTokenRepository.save(user.id(), jwtToken.refreshToken(), jwtUtil.getRefreshExpMs());
-        return new LoginResponse(jwtToken, user.role(), user.onBoardingStageFlag());
+        return new LoginResponse(user.id(),jwtToken, user.role(), user.onBoardingStageFlag());
     }
 
     public JwtToken refresh(String refreshToken) {
