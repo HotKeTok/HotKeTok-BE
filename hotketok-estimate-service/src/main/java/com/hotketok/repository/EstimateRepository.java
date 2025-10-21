@@ -12,4 +12,5 @@ public interface EstimateRepository extends JpaRepository<Estimate, Long> {
     List<Estimate> findAllByVendorIdAndStatus(Long vendorId, Status status);
     long countByVendorIdAndStatus(Long vendorId, Status status);
     long countByVendorIdAndStatusIn(Long vendorId, List<Status> statuses);
+    boolean existsByVendorIdAndStatusAndRequestFormIdIn(Long vendorId, Status status, List<Long> requestFormIds);
 }

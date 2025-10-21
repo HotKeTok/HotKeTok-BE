@@ -2,6 +2,7 @@ package com.hotketok.externalApi;
 
 import com.hotketok.dto.CreateReviewRequest;
 import com.hotketok.dto.ReviewListResponse;
+import com.hotketok.dto.ReviewStatusResponse;
 import com.hotketok.service.ReviewService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -38,5 +39,11 @@ public class ReviewController {
     @DeleteMapping
     public void deleteReview(@RequestHeader("userId") Long userId, @RequestParam Long reviewId) {
         reviewService.deleteReview(userId, reviewId);
+    }
+
+    // 리뷰 작성 가능 여부 확인
+    @GetMapping("/status")
+    public ReviewStatusResponse statusReview(@RequestHeader("userId") Long userId, @RequestParam Long vendorId) {
+        return reviewService.statusReview(userId, vendorId);
     }
 }

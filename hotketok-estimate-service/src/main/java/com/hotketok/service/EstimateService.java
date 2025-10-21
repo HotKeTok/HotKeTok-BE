@@ -163,4 +163,17 @@ public class EstimateService {
                 .map(SimpleEstimateResponse::from)
                 .collect(Collectors.toList());
     }
+
+    public boolean checkCompletedWork(Long userId, Long vendorId) {
+        List<Long> requestFormIds = requestFormClient.getRequestFormIdsByAuthorId(userId);
+
+        if (requestFormIds.isEmpty()) {
+            return false;
+        }
+        return estimateRepository.existsByVendorIdAndStatusAndRequestFormIdIn(
+                vendorId,
+                Status.COMPLETED,
+                requestFormIds
+        );
+    }
 }

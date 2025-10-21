@@ -46,4 +46,9 @@ public class EstimateInternalController {
             @RequestParam Long vendorId, @RequestParam Status status) {
         return estimateService.findSimpleEstimatesByVendorIdAndStatus(vendorId, status);
     }
+
+    @GetMapping("/check-completion")
+    public boolean checkReviewStatus(@RequestParam Long userId, @RequestParam Long vendorId) {
+        return estimateService.checkCompletedWork(userId, vendorId);
+    }
 }

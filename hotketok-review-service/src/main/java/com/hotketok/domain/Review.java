@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,6 +34,9 @@ public class Review {
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ReviewImage> reviewImages = new ArrayList<>();
 
+    @Column
+    private LocalDateTime createdAt;
+
     @Builder
     private Review(Long userId, Long vendorId, Category constructCategory, int rate, String review) {
         this.userId = userId;
@@ -40,6 +44,7 @@ public class Review {
         this.constructCategory = constructCategory;
         this.rate = rate;
         this.review = review;
+        this.createdAt = LocalDateTime.now();
     }
     public static Review createReview(Long userId, Long vendorId, Category constructCategory, int rate, String review, List<String> imageUrls) {
         Review newReview = Review.builder()
