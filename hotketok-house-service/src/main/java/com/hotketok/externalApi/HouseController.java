@@ -27,15 +27,15 @@ public class HouseController {
     }
 
     // 관리자 승인
-    @PostMapping("/admin-approve/{houseId}")
-    public ResponseEntity<Void> approveHouse(@PathVariable Long houseId) {
+    @PostMapping("/admin-approve")
+    public ResponseEntity<Void> approveHouse(@RequestParam List<Long> houseId) {
         houseService.approveHouse(houseId);
         return ResponseEntity.ok().build();
     }
 
     // 관리자 거절
-    @DeleteMapping("/admin-reject/{houseId}")
-    public ResponseEntity<Void> adminReject(@PathVariable Long houseId) {
+    @DeleteMapping("/admin-reject")
+    public ResponseEntity<Void> adminReject(@RequestParam List<Long> houseId) {
         houseService.rejectHouse(houseId);
         return ResponseEntity.ok().build();
     }

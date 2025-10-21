@@ -13,6 +13,7 @@ public interface HouseRepository extends JpaRepository<House, Long> {
     Optional<House> findFirstByAddressAndState(String address, HouseState state);
     Optional<House> findByTenantId(Long tenantId);
 
+    // 마이페이지 집주소 리스트 출력
     List<House> findAllByOwnerId(Long ownerId);
     List<House> findAllByTenantId(Long tenantId);
 

@@ -43,20 +43,25 @@ public class HouseService {
 
     // 관리자 승인 → OWNER로 승격
     @Transactional
-    public void approveHouse(Long houseId) {
-        House house = houseRepository.findById(houseId).orElseThrow(() -> new CustomException(HouseErrorCode.HOUSE_NOT_FOUND));
-        house.changeState(HouseState.REGISTERED);
-
-        userServiceClient.updateRole(house.getOwnerId(), Role.OWNER);
-        userServiceClient.changeCurrentAddressAndNumberFirst(house.getOwnerId(), house.getAddress(),house.getNumber());
+    public void approveHouse(List<Long> houseId) {
+        List<House> house = houseRepository.findAllById(houseId);
+        if (house.isEmpty()) {
+            throw new CustomException(HouseErrorCode.HOUSE_NOT_FOUND);
+        }
+        house.forEach(h -> h.changeState(HouseState.REGISTERED));
+        userServiceClient.updateRole(house.get(0).getOwnerId(),Role.OWNER);
+        userServiceClient.changeCurrentAddressAndNumberFirst(house.get(0).getOwnerId(), house.get(0).getAddress(), house.get(0).getNumber());
     }
 
     // 관리자 거절 -> 삭제
     @Transactional
-    public void rejectHouse(Long houseId) {
-        House house = houseRepository.findById(houseId).orElseThrow(() -> new CustomException(HouseErrorCode.HOUSE_NOT_FOUND));
-        userServiceClient.updateOnboardingStageFlag(house.getOwnerId(), false);
-        houseRepository.deleteById(houseId);
+    public void rejectHouse(List<Long> houseId) {
+        List<House> house = houseRepository.findAllById(houseId);
+        if (house.isEmpty()) {
+            throw new CustomException(HouseErrorCode.HOUSE_NOT_FOUND);
+        }
+        house.forEach(h -> houseRepository.deleteById(h.getHouseId()));
+        userServiceClient.updateOnboardingStageFlag(house.get(0).getOwnerId(), false);
     }
 
     // 입주민 요청 -> 주소/동/호수로 검색해서 state=2
@@ -209,7 +214,17 @@ public class HouseService {
 
         if (role.equals("OWNER")){ // 집주인 인 경우
             houseList = houseRepository.findAllByOwnerId(userId);
-            result = houseList.stream().distinct().map(h -> new MyPageHouseInfoResponse(
+            List<House> distinctByAddress = houseList.stream()
+                    .collect(Collectors.collectingAndThen(
+                            Collectors.toMap(
+                                    House::getAddress, // key: address
+                                    h -> h,            // value: house 객체
+                                    (existing, replacement) -> existing // 중복시 기존 값 유지
+                            ),
+                            m -> new ArrayList<>(m.values())
+                    ));
+
+            result = distinctByAddress.stream().distinct().map(h -> new MyPageHouseInfoResponse(
                     h.getAddress(),
                     h.getDetailAddress(), // 집주인 인 경우 동호수 대신 상세주소로 반환
                     null,
