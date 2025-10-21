@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface ReviewRepository extends JpaRepository<Review, Long> {
     List<Review> findAllByVendorId(Long vendorId);
+    long countByVendorId(Long vendorId);
 }

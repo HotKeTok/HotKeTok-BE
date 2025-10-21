@@ -61,3 +61,5 @@ client:
     url: http://localhost:8094 # estimate-service의 주소
   requestform-service:
     url: http://localhost:8093 # requestform-service의 주소
+  review-service:
+    url: http://localhost:8095 # review-service의 주소

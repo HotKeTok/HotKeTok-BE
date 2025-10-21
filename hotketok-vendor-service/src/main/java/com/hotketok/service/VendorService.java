@@ -17,10 +17,7 @@ import com.hotketok.dto.internalApi.UploadFileResponse;
 import com.hotketok.dto.internalApi.VendorInfoResponse;
 import com.hotketok.exception.VendorErrorCode;
 import com.hotketok.hotketokcommonservice.error.exception.CustomException;
-import com.hotketok.internalApi.EstimateServiceClient;
-import com.hotketok.internalApi.InfraServiceClient;
-import com.hotketok.internalApi.RequestFormServiceClient;
-import com.hotketok.internalApi.UserServiceClient;
+import com.hotketok.internalApi.*;
 import com.hotketok.repository.NewsRepository;
 import com.hotketok.repository.VendorIntroductionImageRepository;
 import com.hotketok.repository.VendorRepository;
@@ -47,6 +44,7 @@ public class VendorService {
     private final NewsRepository newsRepository;
     private final EstimateServiceClient estimateServiceClient;
     private final RequestFormServiceClient requestFormServiceClient;
+    private final ReviewServiceClient reviewServiceClient;
 
     // 공사업체 등록 (state=0)
     @Transactional
@@ -121,7 +119,15 @@ public class VendorService {
     public VendorInfoAllResponse getProfile(Long vendorId) {
         Vendor vendor = vendorRepository.findById(vendorId)
                 .orElseThrow(() -> new CustomException(VendorErrorCode.VENDOR_NOT_FOUND));
-        return VendorInfoAllResponse.from(vendor);
+
+        int reviewCount = 0;
+        try {
+            reviewCount = reviewServiceClient.getReviewCountByVendorId(vendorId);
+        } catch (Exception e) {
+            log.error("Failed to fetch review count for vendorId {}: {}", vendorId, e.getMessage());
+        }
+
+        return VendorInfoAllResponse.from(vendor, reviewCount);
     }
 
     // 업체 프로필 관리
@@ -174,7 +180,7 @@ public class VendorService {
 
         return newses.stream()
                 .map(news -> {
-                    VendorInfoAllResponse vendorProfile = VendorInfoAllResponse.from(vendor);
+                    VendorInfoAllResponse vendorProfile = VendorInfoAllResponse.from(vendor, 0);
                     return VendorNewsResponse.of(news, vendorProfile);
                 })
                 .collect(Collectors.toList());
