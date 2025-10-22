@@ -16,7 +16,8 @@ public record ReviewItemResponse(
         String writerName,
         String writerProfileImage,
         LocalDateTime date,
-        List<String> reviewImage
+        List<String> reviewImage,
+        Long authorId
 ) {
     public static ReviewItemResponse of(Review review, UserProfileResponse writerProfile) {
         String name = (writerProfile != null) ? writerProfile.userName() : "알 수 없는 사용자";
@@ -34,7 +35,8 @@ public record ReviewItemResponse(
                 name,
                 image,
                 review.getCreatedAt(),
-                imageUrls
+                imageUrls,
+                review.getUserId()
         );
     }
 }
