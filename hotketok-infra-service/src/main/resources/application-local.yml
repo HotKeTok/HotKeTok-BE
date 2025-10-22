@@ -13,7 +13,7 @@ spring:
 
 
 cloud:
-  provider: aws # aws,ncloud
+  provider: ncloud # aws,ncloud
 
 aws:
   s3:
@@ -23,10 +23,14 @@ aws:
       accessKey: ${S3_ACCESSKEY}
       secretKey: ${S3_SECRETKEY}
 
-#ncloud:
-# endpoint: https://kr.object.ncloudstorage.com
-# region: kr-standard
-# bucket-name: your-ncloud-bucket-name
+ncloud:
+  s3:
+    endpoint: https://kr.object.ncloudstorage.com
+    region: kr-standard
+    bucket-name: contest57-image
+    credentials:
+      accessKey: ${NCLOUD_ACCESS_KEY}
+      secretKey: ${NCLOUD_SECRET_KEY}
 
 eureka:
   instance:
