@@ -66,6 +66,13 @@ public class UserService {
     }
 
     @Transactional
+    public void updateCurrentAddressAndNumberFirst(Long id, String updateAddress, String updateNumber){
+        User user = userRepository.findById(id).orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
+        user.changeCurrentAddressAndNumber(updateAddress,updateNumber);
+    }
+
+    // 사용자 현재 설정된 주소와 동호수를 변경해주는 API 서비스
+    @Transactional
     public CurrentAddressAndNumberResponse updateCurrentAddressAndNumber(Long id, String updateAddress, String updateNumber){
         User user = userRepository.findById(id).orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
         GetHouseInfoByAddressResponse response;
@@ -87,19 +94,29 @@ public class UserService {
         return new CurrentAddressAndNumberResponse(updateAddress, updateNumber);
     }
 
+    // 마이페이지 회원 정보 조회 API 서비스
     @Transactional(readOnly = true)
     public MyPageInfoResponse GetMyPageInfo(Long userId, String role){
         User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
-        if (role.equals("NONE")) return new MyPageInfoResponse(user.getName(),user.getPhoneNumber(),user.getLogInId(),null);
-        return new MyPageInfoResponse(user.getName(), user.getPhoneNumber(), user.getLogInId(), user.getCurrentAddress());
+        if (role.equals("NONE")) return new MyPageInfoResponse(null,user.getName(),user.getPhoneNumber(),user.getLogInId(),null, null,null);
+        else if (role.equals("OWNER")) return new MyPageInfoResponse(user.getProfileImage(),user.getName(), user.getPhoneNumber(), user.getLogInId(), user.getCurrentAddress(), null, null);
+        else { // 입주민 인 경우
+            List<String> houseTag = houseServiceClient.getHouseTag(user.getCurrentAddress(), user.getCurrentNumber());
+            return new MyPageInfoResponse(user.getProfileImage(),user.getName(), user.getPhoneNumber(), user.getLogInId(), user.getCurrentAddress(), user.getCurrentNumber(), houseTag);
+        }
     }
 
+    // 마이페이지 회원 정보 수정 API 서비스
     @Transactional
     public void UpdateMyPageInfo(Long userId, MultipartFile image, UpdateMyPageInfoRequest updateMyPageInfoRequest){
         User user = userRepository.findById(userId).orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
-        UploadFileResponse uploadFileResponse = infraServiceClient.uploadFile(image, "user-profile/");
-        user.changeProfileImage(uploadFileResponse.fileUrl());
-        user.changeName(updateMyPageInfoRequest.name());
+        if (image != null){
+            UploadFileResponse uploadFileResponse = infraServiceClient.uploadFile(image, "user-profile/");
+            user.changeProfileImage(uploadFileResponse.fileUrl());
+        }
+        if (updateMyPageInfoRequest != null){
+            user.changeName(updateMyPageInfoRequest.name());
+        }
     }
 
     private UserInfo toDto(User u){

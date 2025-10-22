@@ -19,4 +19,7 @@ public interface HouseServiceClient {
 
     @GetMapping("/internal/house-service/residents")
     List<HouseInfoResponse> getResidentsByAddress(@RequestParam String address);
+
+    @GetMapping("/internal/house-service/get/houseTag")
+    List<String> getHouseTag(@RequestParam("address") String address, @RequestParam("number") String number);
 }

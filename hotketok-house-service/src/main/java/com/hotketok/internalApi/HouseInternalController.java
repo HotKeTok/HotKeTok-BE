@@ -52,4 +52,11 @@ public class HouseInternalController {
     public List<HouseUnitResponse> getUnitNumbersByUserIds(@RequestBody List<Long> userIds) {
         return houseService.findUnitNumbersByUserIds(userIds);
     }
+
+    // 마이페이지 사용자 정보 조회 -> 주택 태그들을 가져오기 위한 내부 API
+    @GetMapping("/get/houseTag")
+    public List<String> getHouseTag(@RequestParam("address") String address,
+                                    @RequestParam("number") String number){
+        return houseService.getHouseTag(address,number);
+    }
 }
