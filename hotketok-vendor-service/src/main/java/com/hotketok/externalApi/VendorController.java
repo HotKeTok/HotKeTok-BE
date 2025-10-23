@@ -117,13 +117,13 @@ public class VendorController {
 
     // 수리 일정 캘린더
     @GetMapping("/calendar")
-    public CalendarResponse getCalendarData(@RequestHeader("userId") Long userId, @RequestBody CalendarRequest request) {
-        return vendorService.getCalendarData(userId, request.year(), request.month());
+    public CalendarResponse getCalendarData(@RequestHeader("userId") Long userId, @RequestParam Integer year, @RequestParam Integer month) {
+        return vendorService.getCalendarData(userId, year, month);
     }
 
     // 특정 날짜 일정 조회
     @GetMapping("/day")
-    public DailyScheduleResponse getDailySchedule(@RequestHeader("userId") Long userId, @RequestBody ScheduleRequest request) {
-        return vendorService.getDailySchedule(userId, request);
+    public DailyScheduleResponse getDailySchedule(@RequestHeader("userId") Long userId, @RequestParam Integer year, @RequestParam Integer month, @RequestParam Integer day) {
+        return vendorService.getDailySchedule(userId, year, month, day);
     }
 }
