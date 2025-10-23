@@ -457,7 +457,7 @@ public class VendorService {
     }
 
     // 특정 날짜 일정 조회
-    public DailyScheduleResponse getDailySchedule(Long userId, ScheduleRequest request) {
+    public DailyScheduleResponse getDailySchedule(Long userId, Integer year, Integer month, Integer day) {
         Vendor vendor = vendorRepository.findByUserId(userId)
                 .orElseThrow(() -> new CustomException(VendorErrorCode.VENDOR_NOT_FOUND));
 
@@ -465,11 +465,11 @@ public class VendorService {
         List<SimpleEstimateResponse> allEstimates = estimateServiceClient.getEstimateInfoByStatus(vendor.getId(), Status.MATCHING);
 
         if (allEstimates.isEmpty()) {
-            return new DailyScheduleResponse(request.year(), request.month(), request.day(), 0, Collections.emptyList());
+            return new DailyScheduleResponse(year, month, day, 0, Collections.emptyList());
         }
 
         List<Long> allRequestFormIds = allEstimates.stream().map(SimpleEstimateResponse::requestFormId).toList();
-        var scheduledRequest = new ScheduledOnDateRequest(allRequestFormIds, request.year(), request.month(), request.day());
+        var scheduledRequest = new ScheduledOnDateRequest(allRequestFormIds, year, month, day);
         Map<Long, RequestFormDetailResponse> scheduledFormsMap = requestFormServiceClient.getScheduledRequestFormsOnDate(scheduledRequest).stream()
                 .collect(Collectors.toMap(RequestFormDetailResponse::requestFormId, form -> form));
 
@@ -507,7 +507,7 @@ public class VendorService {
                 })
                 .collect(Collectors.toList());
 
-        return new DailyScheduleResponse(request.year(), request.month(), request.day(), items.size(), items);
+        return new DailyScheduleResponse(year, month, day, items.size(), items);
     }
 
     // 카테고리 조회
