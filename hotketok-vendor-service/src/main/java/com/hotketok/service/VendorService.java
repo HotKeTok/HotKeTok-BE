@@ -115,7 +115,7 @@ public class VendorService {
                 .orElseThrow(() -> new CustomException(VendorErrorCode.VENDOR_NOT_FOUND));
     }
 
-    // 업체 정보 확인
+    // 업체 정보 확인 (토큰 사용 x)
     public VendorInfoAllResponse getProfile(Long vendorId) {
         Vendor vendor = vendorRepository.findById(vendorId)
                 .orElseThrow(() -> new CustomException(VendorErrorCode.VENDOR_NOT_FOUND));
@@ -128,6 +128,24 @@ public class VendorService {
             averageRate = stats.averageRate();
         } catch (Exception e) {
             log.error("Failed to fetch review count for vendorId {}: {}", vendorId, e.getMessage());
+        }
+
+        return VendorInfoAllResponse.from(vendor, reviewCount, averageRate);
+    }
+
+    // 업체 정보 확인 (토큰 사용 o)
+    public VendorInfoAllResponse getProfileMypage(Long userId) {
+        Vendor vendor = vendorRepository.findByUserId(userId)
+                .orElseThrow(() -> new CustomException(VendorErrorCode.VENDOR_NOT_FOUND));
+
+        int reviewCount = 0;
+        double averageRate = 0.0;
+        try {
+            ReviewStatsResponse stats = reviewServiceClient.getReviewStatsByVendorId(vendor.getId());
+            reviewCount = stats.reviewCount();
+            averageRate = stats.averageRate();
+        } catch (Exception e) {
+            log.error("Failed to fetch review count for vendorId {}: {}", vendor.getId(), e.getMessage());
         }
 
         return VendorInfoAllResponse.from(vendor, reviewCount, averageRate);

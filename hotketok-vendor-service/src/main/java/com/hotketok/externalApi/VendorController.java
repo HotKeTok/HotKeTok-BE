@@ -1,6 +1,7 @@
 package com.hotketok.externalApi;
 
 import com.hotketok.dto.*;
+import com.hotketok.dto.internalApi.VendorInfoResponse;
 import com.hotketok.service.VendorService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -43,6 +44,12 @@ public class VendorController {
     @GetMapping("/profile")
     public VendorInfoAllResponse getProfile(@RequestParam Long vendorId) {
         return vendorService.getProfile(vendorId);
+    }
+
+    // 업체 정보 확인 (토큰 사용 o)
+    @GetMapping("/profile/my")
+    public VendorInfoAllResponse getProfileMypage(@RequestHeader("userId") Long userId) {
+        return vendorService.getProfileMypage(userId);
     }
 
     // 업체 프로필 관리
