@@ -65,7 +65,7 @@ public class RequestFormService {
                 createRequestFormRequest.description(),
                 createRequestFormRequest.requestSchedule(),
                 createRequestFormRequest.category(),
-                Status.CHOOSING,
+                Status.SEARCHING,
                 createRequestFormRequest.address(),
                 createRequestFormRequest.number()
         );

@@ -44,6 +44,7 @@ public class EstimateService {
                 request.decisionLater(),
                 request.comment()
         );
+        requestFormClient.updateRequestFormStatus(request.requestFormId(), new UpdateStatusRequest(Status.CHOOSING));
         Estimate savedEstimate = estimateRepository.save(estimate);
 
         // 반환에는 주소, 카테고리 포함
