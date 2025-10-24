@@ -176,4 +176,10 @@ public class EstimateService {
                 requestFormIds
         );
     }
+
+    // 요청서 id를 통한 견적서 금액 확인 (지난 수리요청서 조회 API를 위한 내부 API)
+    public EstimatePriceResponse findEstimatePriceByRequestFormId(Long requestFormId) {
+        Estimate estimate = estimateRepository.findByRequestFormId(requestFormId).orElseThrow(() -> new CustomException(EstimateErrorCode.ESTIMATE_NOT_FOUND));
+        return new EstimatePriceResponse(estimate.getEstimatePrice());
+    }
 }

@@ -2,6 +2,7 @@ package com.hotketok.internalApi;
 
 import com.hotketok.domain.enums.Status;
 import com.hotketok.dto.internalApi.EstimateInfoResponse;
+import com.hotketok.dto.internalApi.EstimatePriceResponse;
 import com.hotketok.dto.internalApi.EstimateStatusCountResponse;
 import com.hotketok.dto.internalApi.SimpleEstimateResponse;
 import com.hotketok.service.EstimateService;
@@ -35,6 +36,12 @@ public class EstimateInternalController {
     public SimpleEstimateResponse getEstimateById(@PathVariable Long estimateId) {
         return estimateService.findSimpleEstimateById(estimateId);
     }
+
+    @GetMapping("/estimate-price/{requestFormId}")
+    public EstimatePriceResponse getEstimatePriceByRequestFormId(@PathVariable Long requestFormId){
+        return estimateService.findEstimatePriceByRequestFormId(requestFormId);
+    }
+
 
     @GetMapping("/counts")
     public EstimateStatusCountResponse getEstimateCounts(@RequestParam Long vendorId) {
