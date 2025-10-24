@@ -76,8 +76,7 @@ public class VendorController {
 
     // 업체 소식 수정
     @PatchMapping("/news")
-    public void patchNews(@RequestBody PatchNewsRequest request) {
-        Long userId = 103L;
+    public void patchNews(@RequestHeader("userId") Long userId, @RequestBody PatchNewsRequest request) {
         vendorService.patchNews(userId, request);
     }
 
