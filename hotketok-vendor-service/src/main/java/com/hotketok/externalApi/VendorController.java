@@ -74,6 +74,13 @@ public class VendorController {
         vendorService.postNews(userId, request);
     }
 
+    // 업체 소식 수정
+    @PatchMapping("/news")
+    public void patchNews(@RequestBody PatchNewsRequest request) {
+        Long userId = 103L;
+        vendorService.patchNews(userId, request);
+    }
+
     // 업체 소식 삭제
     @DeleteMapping("/news")
     public void deleteNews(@RequestHeader("userId") Long userId, @RequestParam Long newsId) {

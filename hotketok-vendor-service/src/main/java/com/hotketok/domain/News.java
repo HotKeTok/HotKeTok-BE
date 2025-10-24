@@ -41,6 +41,16 @@ public class News extends BaseTimeEntity {
                 .build();
     }
 
+    public void updateNews(String title, String content) {
+        if (title != null) {
+            this.title = title;
+        }
+        if (content != null) {
+            this.content = content;
+        }
+        // 수정 날짜 수정 보류
+    }
+
     void setVendor(Vendor vendor) {
         this.vendor = vendor;
     }
