@@ -13,14 +13,11 @@ import com.hotketok.hotketokcommonservice.error.exception.CustomException;
 import com.hotketok.domain.enums.PayType;
 import com.hotketok.dto.*;
 import com.hotketok.hotketokcommonservice.error.exception.GlobalErrorCode;
-import com.hotketok.internalApi.HouseServiceClient;
-import com.hotketok.internalApi.UserServiceClient;
+import com.hotketok.internalApi.*;
 import com.hotketok.parser.OpenAIResponseParser;
 import com.hotketok.domain.RequestForm;
 import com.hotketok.domain.RequestFormImage;
 import com.hotketok.domain.enums.Status;
-import com.hotketok.internalApi.InfraServiceClient;
-import com.hotketok.internalApi.OpenAiClient;
 import com.hotketok.repository.RequestFormImageRepository;
 import com.hotketok.repository.RequestFormRepository;
 import feign.FeignException;
@@ -51,6 +48,7 @@ public class RequestFormService {
     private final OpenAiClient openAiClient;
     private final UserServiceClient userServiceClient;
     private final HouseServiceClient houseServiceClient;
+    private final EstimateServiceClient estimateServiceClient;
 
     @Value("${openai.model}")
     private String model;
@@ -190,6 +188,47 @@ public class RequestFormService {
             throw new CustomException(GlobalErrorCode.BAD_REQUEST);
         }
     }
+
+    // 완료된 수리요청서 조회
+    public List<CompletedRequestFormResponse> getCompletedRequestForm(Long userId, String role, int year){
+        CurrentAddressAndNumberResponse addressAndNumber = userServiceClient.getCurrentAddressAndNumber(userId);
+        List<CompletedRequestFormResponse> result;
+        if (role.equals("OWNER")){
+            List<RequestForm> requestForms = requestFormRepository
+                    .findAllByAddressAndStatus(addressAndNumber.currentAddress(), Status.COMPLETED);
+            result = requestForms.stream().map(requestForm -> {
+                EstimatePriceResponse estimatePriceByRequestFormId =
+                        estimateServiceClient.getEstimatePriceByRequestFormId(requestForm.getId());
+                return new CompletedRequestFormResponse(
+                        requestForm.getId(),
+                        requestForm.getCategory(),
+                        requestForm.getRequestSchedule(),
+                        estimatePriceByRequestFormId.estimatePrice(),
+                        requestForm.getNumber());
+            }).collect(Collectors.toList());
+            return result;
+
+        } else if(role.equals("TENANT")){
+            List<RequestForm> requestForms = requestFormRepository
+                    .findAllByAddressAndNumberAndStatus(addressAndNumber.currentAddress(), addressAndNumber.currentNumber(), Status.COMPLETED);
+
+            result = requestForms.stream().map(requestForm -> {
+                EstimatePriceResponse estimatePriceByRequestFormId =
+                        estimateServiceClient.getEstimatePriceByRequestFormId(requestForm.getId());
+                return new CompletedRequestFormResponse(
+                        requestForm.getId(),
+                        requestForm.getCategory(),
+                        requestForm.getRequestSchedule(),
+                        estimatePriceByRequestFormId.estimatePrice(),
+                        null);
+            }).collect(Collectors.toList());
+            return result;
+        } else{
+            throw new CustomException(GlobalErrorCode.BAD_REQUEST);
+        }
+    }
+
+
     public RequestFormDataResponse getRequestFormDataById(Long requestFormId) {
         RequestForm requestForm = requestFormRepository.findById(requestFormId)
                 .orElseThrow(() -> new CustomException(RequestFormErrorCode.REQUEST_FORM_NOT_FOUND));
