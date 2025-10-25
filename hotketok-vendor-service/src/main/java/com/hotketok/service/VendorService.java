@@ -25,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.format.DateTimeFormatter;
@@ -153,19 +154,33 @@ public class VendorService {
 
     // 업체 프로필 관리
     @Transactional
-    public void updateProfile(Long userId, UpdateVendorProfileRequest request, List<MultipartFile> newImages) {
+    public void updateProfile(Long userId, UpdateVendorProfileRequest request, MultipartFile profileImage, List<MultipartFile> newImages) {
         Vendor vendor = vendorRepository.findByUserId(userId)
                 .orElseThrow(() -> new CustomException(VendorErrorCode.VENDOR_NOT_FOUND));
 
-        // 기존 소개 이미지 목록 조회
+        String oldProfileImageUrl = vendor.getImage();
         List<String> oldImageUrls = vendor.getIntroductionImages().stream()
                 .map(VendorIntroductionImage::getImageUrl)
                 .toList();
 
-        List<String> newImageUrls = new ArrayList<>();
-        if (newImages != null && !newImages.isEmpty()) {
-            UploadFileListResponse response = infraServiceClient.uploadImages(newImages, "vendor-introduction/");
-            newImageUrls = response.fileList();
+        // 프로필 이미지
+        String newProfileImageUrl = null;
+        if (profileImage != null && !profileImage.isEmpty()) {
+            UploadFileListResponse response = infraServiceClient.uploadImages(List.of(profileImage), "vendor-profile/");
+            if (response != null && response.fileList() != null && !response.fileList().isEmpty()) {
+                newProfileImageUrl = response.fileList().get(0);
+            }
+        }
+
+        // 소개 이미지
+        List<String> newImageUrls = null;
+
+        if (newImages != null) {
+            newImageUrls = new ArrayList<>();
+            if (!newImages.isEmpty()) {
+                UploadFileListResponse response = infraServiceClient.uploadImages(newImages, "vendor-introduction/");
+                newImageUrls = response.fileList();
+            }
         }
 
         RunningTime newRunningTime = null;
@@ -182,13 +197,24 @@ public class VendorService {
                 request.introduction(),
                 request.phoneNumber(),
                 newRunningTime,
-                request.profileImage(),
+                newProfileImageUrl,
                 newImageUrls
         );
 
         // 보상 트랜잭션
-        if (!oldImageUrls.isEmpty()) {
-            oldImageUrls.forEach(url -> infraServiceClient.deleteFile(new DeleteFileRequest(url)));
+        // 프로필 이미지 (null 아닌 경우)
+        if (newProfileImageUrl != null && StringUtils.hasText(oldProfileImageUrl)) {
+            infraServiceClient.deleteFile(new DeleteFileRequest(oldProfileImageUrl));
+        }
+
+        // 소개 이미지 (null 아닌 경우)
+        if (newImageUrls != null && !newImageUrls.isEmpty()) {
+            if (oldImageUrls != null && !oldImageUrls.isEmpty()) {
+
+                oldImageUrls.stream()
+                        .filter(StringUtils::hasText)
+                        .forEach(url -> infraServiceClient.deleteFile(new DeleteFileRequest(url)));
+            }
         }
     }
 
