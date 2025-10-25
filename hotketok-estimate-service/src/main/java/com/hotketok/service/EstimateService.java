@@ -44,6 +44,7 @@ public class EstimateService {
                 request.decisionLater(),
                 request.comment()
         );
+        estimate.changeStatus(Status.SEARCHING);
         requestFormClient.updateRequestFormStatus(request.requestFormId(), new UpdateStatusRequest(Status.CHOOSING));
         Estimate savedEstimate = estimateRepository.save(estimate);
 
