@@ -250,5 +250,26 @@ public class HouseService {
             return result;
         }
     }
+
+    // 집주인 -> 입주민 정보 조회
+    @Transactional(readOnly = true)
+    public HouseTenantInfoResponse getHouseTenantInfo(Long userId, String number){
+        CurrentAddressResponse currentAddress = userServiceClient.getCurrentAddress(userId);
+        House house = houseRepository.findByAddressAndNumber(currentAddress.currentAddress(), number)
+                .orElseThrow(() -> new CustomException(HouseErrorCode.HOUSE_NOT_FOUND));
+
+        TenantInfoResponse tenantInfo = userServiceClient.getTenantInfo(house.getTenantId());
+        return new HouseTenantInfoResponse(tenantInfo, house.getTenantMemo());
+    }
+
+    // 집주인 -> 입주민 메모 수정
+    @Transactional
+    public void updateHouseTenantInfo(Long userId, ChangeHouseTenantMemoRequest request){
+        CurrentAddressResponse currentAddress = userServiceClient.getCurrentAddress(userId);
+        House house = houseRepository.findByAddressAndNumber(currentAddress.currentAddress(), request.number())
+                .orElseThrow(() -> new CustomException(HouseErrorCode.HOUSE_NOT_FOUND));
+        house.changeTenantMemo(request.tenantMemo());
+    }
+
 }
 

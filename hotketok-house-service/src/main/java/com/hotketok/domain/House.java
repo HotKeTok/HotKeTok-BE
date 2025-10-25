@@ -36,6 +36,8 @@ public class House {
 
     private String proveFile; // 등기부등본 같은 증명자료
 
+    private String tenantMemo; // 입주민 메모
+
     @Enumerated(EnumType.STRING)
     private HouseState state; // 상태 enum (NONE, REGISTERED, TENANT_REQUEST, MATCHED)
 
@@ -43,7 +45,7 @@ public class House {
     private HouseType type; // 상태 enum (HOME, COMPANY, ETC)
 
     @Builder(access = AccessLevel.PRIVATE)
-    private House(Long tenantId, Long ownerId, String address, String detailAddress, String floor, String number,String alias, String proveFile, HouseState state, HouseType type, Boolean isCurrent) {
+    private House(Long tenantId, Long ownerId, String address, String detailAddress, String floor, String number,String alias, String proveFile, HouseState state, HouseType type, String tenantMemo) {
         this.tenantId = tenantId;
         this.ownerId = ownerId;
         this.address = address;
@@ -54,6 +56,7 @@ public class House {
         this.state = state;
         this.type = type;
         this.proveFile = proveFile;
+        this.tenantMemo = tenantMemo;
     }
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
@@ -72,10 +75,16 @@ public class House {
                 .state(HouseState.NONE)
                 .type(HouseType.NONE)
                 .proveFile(proveFile)
+                .tenantMemo(null)
                 .build();
     }
 
     public void addHouseTag(HouseTag tag) { this.houseTags.add(tag); }
+
+    public void changeTenantMemo(String tenantMemo) {
+        this.tenantMemo = tenantMemo;
+    }
+
     public void changeState(HouseState state) {
         this.state = state;
     }
