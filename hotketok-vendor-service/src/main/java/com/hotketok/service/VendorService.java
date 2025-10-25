@@ -426,7 +426,7 @@ public class VendorService {
         return new RequestDetailResponse(
                 formData.category(),
                 formData.address(),
-                formData.requestSchedule(),
+                formData.estimateTime(),
                 formData.payType(),
                 payerInfo.name(),
                 payerInfo.phoneNumber(),
