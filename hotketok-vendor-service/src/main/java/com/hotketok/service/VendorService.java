@@ -549,4 +549,19 @@ public class VendorService {
                 .map(vendor -> new VendorCategoryResponse(vendor.getId(), vendor.getCategory()))
                 .collect(Collectors.toList());
     }
+
+    // 공사업체 (다수) 프로필 조회
+    public List<VendorProfileResponse> getVendorProfilesByIds(List<Long> vendorIds) {
+        if (vendorIds == null || vendorIds.isEmpty()) {
+            return List.of();
+        }
+
+        return vendorRepository.findAllById(vendorIds).stream()
+                .map(vendor -> new VendorProfileResponse(
+                        vendor.getId(),
+                        vendor.getName(),
+                        vendor.getImage()
+                ))
+                .collect(Collectors.toList());
+    }
 }

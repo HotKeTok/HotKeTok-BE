@@ -1,6 +1,7 @@
 package com.hotketok.externalApi;
 
 import com.hotketok.dto.CreateReviewRequest;
+import com.hotketok.dto.ReviewHouseResponse;
 import com.hotketok.dto.ReviewListResponse;
 import com.hotketok.dto.ReviewStatusResponse;
 import com.hotketok.service.ReviewService;
@@ -45,5 +46,11 @@ public class ReviewController {
     @GetMapping("/status")
     public ReviewStatusResponse statusReview(@RequestHeader("userId") Long userId, @RequestParam Long vendorId) {
         return reviewService.statusReview(userId, vendorId);
+    }
+
+    // 지난 수리 후기 조회
+    @GetMapping("/address")
+    public List<ReviewHouseResponse> getHouseReview(@RequestHeader("userId") Long userId) {
+        return reviewService.getHouseReview(userId);
     }
 }

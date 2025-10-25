@@ -91,5 +91,10 @@ public class UserInternalController {
     public UserInfoDetailResponse getUserInfoById(@PathVariable Long userId) {
         return userService.findUserInfoById(userId);
     }
+
+    @GetMapping("/residents-by-address")
+    public List<Long> getUserIdsByAddress(@RequestParam("address") String address) {
+        return userService.getUserIdsByAddress(address);
+    }
 }
 

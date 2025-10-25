@@ -64,4 +64,6 @@ client:
     url: http://localhost:8088 # user-service의 주소
   estimate-service:
     url: http://localhost:8094 # estimate-service의 주소
+  vendor-service:
+    url: http://localhost:8099 # vendor-service의 주소
 

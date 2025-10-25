@@ -2,6 +2,7 @@ package com.hotketok.internalApi;
 
 import com.hotketok.dto.internalApi.VendorCategoryResponse;
 import com.hotketok.dto.internalApi.VendorInfoResponse;
+import com.hotketok.dto.internalApi.VendorProfileResponse;
 import com.hotketok.service.VendorService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -30,5 +31,11 @@ public class VendorInternalController {
     @PostMapping("/categories")
     public List<VendorCategoryResponse> getVendorCategoriesByIds(@RequestBody List<Long> vendorIds) {
         return vendorService.findCategoriesByVendorIds(vendorIds);
+    }
+
+    // 공사업체 (다수) 프로필 조회
+    @PostMapping("/profiles")
+    public List<VendorProfileResponse> getVendorProfilesByIds(@RequestBody List<Long> vendorIds) {
+        return vendorService.getVendorProfilesByIds(vendorIds);
     }
 }

@@ -165,4 +165,14 @@ public class UserService {
                 .map(UserInfoDetailResponse::from)
                 .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
     }
+
+    public List<Long> getUserIdsByAddress(String address) {
+        if (address == null || address.isEmpty()) {
+            return List.of();
+        }
+
+        return userRepository.findAllByCurrentAddress(address).stream()
+                .map(User::getId)
+                .collect(Collectors.toList());
+    }
 }
