@@ -2,6 +2,7 @@ package com.hotketok.externalApi;
 
 import com.hotketok.dto.*;
 import com.hotketok.dto.MyPageHouseInfoResponse;
+import com.hotketok.dto.internalApi.TenantInfoResponse;
 import com.hotketok.service.HouseService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -74,6 +75,20 @@ public class HouseController {
     public List<MyPageHouseInfoResponse> getHouseInfoListByUserId(@RequestHeader("userId") Long userId,
                                                                   @RequestHeader("role") String role){
         return houseService.findHouseInfoListByUserId(userId, role);
+    }
+
+    // 입주민 정보 조회
+    @GetMapping("/tenant-info")
+    public HouseTenantInfoResponse getHouseTenantInfo(@RequestHeader("userId") Long userId,
+                                                      @RequestParam("number") String number) {
+        return houseService.getHouseTenantInfo(userId, number);
+    }
+
+    // 입주민 정보 수정
+    @PatchMapping("/tenant-info/change")
+    public void updateHouseTenantInfo(@RequestHeader("userId") Long userId,
+                                      @RequestBody ChangeHouseTenantMemoRequest request){
+        houseService.updateHouseTenantInfo(userId, request);
     }
 }
 

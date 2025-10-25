@@ -216,6 +216,19 @@ public class VendorService {
         vendor.addNews(newNews);
     }
 
+    // 업체 소식 수정
+    @Transactional
+    public void patchNews(Long userId, PatchNewsRequest request) {
+        Long newsId = request.newsId();
+        News news = newsRepository.findById(newsId)
+                .orElseThrow(() -> new CustomException(VendorErrorCode.NEWS_NOT_FOUND));
+
+        if (!news.getVendor().getUserId().equals(userId)) {
+            throw new CustomException(VendorErrorCode.NO_AUTHORITY_TO_DELETE_NEWS);
+        }
+        news.updateNews(request.title(), request.content());
+    }
+
     // 업체 소식 삭제
     @Transactional
     public void deleteNews(Long userId, Long newsId) {
