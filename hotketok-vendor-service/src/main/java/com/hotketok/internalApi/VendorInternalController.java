@@ -38,4 +38,10 @@ public class VendorInternalController {
     public List<VendorProfileResponse> getVendorProfilesByIds(@RequestBody List<Long> vendorIds) {
         return vendorService.getVendorProfilesByIds(vendorIds);
     }
+
+    // 단일 유저 아이디로 공사업체 정보 조회
+    @GetMapping("/by-user/{userId}")
+    public VendorInfoResponse getVendorInfoByUserId(@PathVariable Long userId) {
+        return vendorService.findVendorInfoByUserId(userId);
+    }
 }

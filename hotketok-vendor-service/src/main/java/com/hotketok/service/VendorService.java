@@ -590,4 +590,12 @@ public class VendorService {
                 ))
                 .collect(Collectors.toList());
     }
+
+    // 단일 유저 아이디로 공사업체 정보 조회
+    public VendorInfoResponse findVendorInfoByUserId(Long userId) {
+        Vendor vendor = vendorRepository.findByUserId(userId)
+                .orElseThrow(() -> new CustomException(VendorErrorCode.VENDOR_NOT_FOUND));
+
+        return VendorInfoResponse.from(vendor);
+    }
 }
