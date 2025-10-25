@@ -162,6 +162,7 @@ public class RequestFormService {
                 .stream().map(RequestFormImage::getImageUrl).toList();
 
         return new RequestFormInfoResponse(
+                requestForm.getStatus(),
                 requestForm.getCategory(),
                 requestForm.getRequestSchedule(),
                 requestForm.getAddress(),
