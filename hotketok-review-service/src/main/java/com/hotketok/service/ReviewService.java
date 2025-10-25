@@ -2,19 +2,14 @@ package com.hotketok.service;
 
 import com.hotketok.domain.Review;
 import com.hotketok.domain.ReviewImage; // 👈 ReviewImage import
-import com.hotketok.dto.CreateReviewRequest;
-import com.hotketok.dto.ReviewItemResponse;
-import com.hotketok.dto.ReviewListResponse;
-import com.hotketok.dto.ReviewStatusResponse;
-import com.hotketok.dto.internalApi.DeleteFileRequest;
-import com.hotketok.dto.internalApi.ReviewStatsResponse;
-import com.hotketok.dto.internalApi.UploadFileListResponse;
-import com.hotketok.dto.internalApi.UserProfileResponse;
+import com.hotketok.dto.*;
+import com.hotketok.dto.internalApi.*;
 import com.hotketok.exception.ReviewErrorCode;
 import com.hotketok.hotketokcommonservice.error.exception.CustomException;
 import com.hotketok.internalApi.EstimateServiceClient;
 import com.hotketok.internalApi.InfraServiceClient;
 import com.hotketok.internalApi.UserServiceClient;
+import com.hotketok.internalApi.VendorServiceClient;
 import com.hotketok.repository.ReviewRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +33,7 @@ public class ReviewService {
     private final InfraServiceClient infraServiceClient;
     private final UserServiceClient userServiceClient;
     private final EstimateServiceClient estimateServiceClient;
+    private final VendorServiceClient vendorServiceClient;
 
     // 리뷰 작성
     public Review createReview(Long userId, CreateReviewRequest request, List<MultipartFile> images) {
@@ -136,5 +133,55 @@ public class ReviewService {
                 .average() // 평균 계산
                 .orElse(0.0); // 리뷰가 없으면 0.0 반환
         return new ReviewStatsResponse(reviewCount, averageRate);
+    }
+
+    // 지난 수리 후기 조회
+    public List<ReviewHouseResponse> getHouseReview(Long userId) {
+        CurrentAddressResponse currentAddressResponse = userServiceClient.getCurrentAddress(userId);
+        String currentAddress = currentAddressResponse.currentAddress();
+
+        // userService에 가서 같은 주소에 사는 이들의 입주민 목록을 가져와야 함
+        List<Long> residentIds = userServiceClient.getUserIdsByAddress(currentAddress);
+
+        if (residentIds.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        // 입주민 목록을 하나씩 돌면서 그들이 작성한 후기들을 가져와서 ReviewHouseResponse 반환
+        List<Review> reviews = reviewRepository.findAllByUserIdIn(residentIds);
+
+        if (reviews.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        // 리뷰 작성자 프로필
+        List<Long> writerIds = reviews.stream()
+                .map(Review::getUserId)
+                .distinct()
+                .toList();
+
+        List<UserProfileResponse> userProfiles = userServiceClient.getUserProfilesByIds(writerIds);
+        Map<Long, UserProfileResponse> userProfileMap = userProfiles.stream()
+                .collect(Collectors.toMap(UserProfileResponse::userId, profile -> profile));
+
+        // 해당 리뷰의 vendorId로 vendorProfile 가져옴
+        List<Long> vendorIds = reviews.stream()
+                .map(Review::getVendorId)
+                .distinct()
+                .toList();
+
+        List<VendorProfileResponse> vendorProfiles = vendorServiceClient.getVendorProfilesByIds(vendorIds);
+        Map<Long, VendorProfileResponse> vendorProfileMap = vendorProfiles.stream()
+                .collect(Collectors.toMap(VendorProfileResponse::vendorId, profile -> profile));
+
+        List<ReviewHouseResponse> houseReviews = new ArrayList<>();
+        for (Review review : reviews) {
+            UserProfileResponse writerProfile = userProfileMap.get(review.getUserId());
+            VendorProfileResponse vendorProfile = vendorProfileMap.get(review.getVendorId());
+
+            houseReviews.add(ReviewHouseResponse.of(review, writerProfile, vendorProfile));
+        }
+
+        return houseReviews;
     }
 }

@@ -9,4 +9,5 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findAllByIdIn(List<Long> userIds); // 여러 개의 ID로 사용자 목록 조회
     Optional<User> findByLogInId(String logInId);
+    List<User> findAllByCurrentAddress(String currentAddress);
 }
