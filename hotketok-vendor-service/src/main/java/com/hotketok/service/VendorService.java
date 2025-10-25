@@ -423,10 +423,12 @@ public class VendorService {
         RequestFormDetailResponse formData = requestFormServiceClient.getRequestFormDetail(requestId);
         UserInfoDetailResponse payerInfo = userServiceClient.getUserInfoById(formData.payerId());
 
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd / a hh:mm", Locale.KOREAN);
+
         return new RequestDetailResponse(
                 formData.category(),
                 formData.address(),
-                formData.requestSchedule(),
+                formData.requestSchedule().format(formatter),
                 formData.payType(),
                 payerInfo.name(),
                 payerInfo.phoneNumber(),

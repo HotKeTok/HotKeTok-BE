@@ -5,6 +5,7 @@ import com.hotketok.domain.RequestFormImage;
 import com.hotketok.domain.enums.ConstructCategory;
 import com.hotketok.domain.enums.PayType;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public record RequestFormDetailResponse(
@@ -14,7 +15,8 @@ public record RequestFormDetailResponse(
         PayType payType,
         Long payerId,
         List<String> requestImages,
-        String requestDescription
+        String requestDescription,
+        LocalDateTime estimateTime
 ) {
     public static RequestFormDetailResponse from(RequestForm requestForm) {
         List<String> imageUrls = requestForm.getImages().stream()
@@ -28,7 +30,8 @@ public record RequestFormDetailResponse(
                 requestForm.getPayType(),
                 requestForm.getPayerId(),
                 imageUrls,
-                requestForm.getDescription()
+                requestForm.getDescription(),
+                requestForm.getRequestSchedule()
         );
     }
 }
