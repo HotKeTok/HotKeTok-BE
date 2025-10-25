@@ -1,4 +1,4 @@
-FROM openjdk:17-slim
+FROM openjdk:17-alpine
 
 COPY build/libs/*SNAPSHOT.jar /app.jar
 
