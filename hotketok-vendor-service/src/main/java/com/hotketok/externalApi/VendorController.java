@@ -57,9 +57,10 @@ public class VendorController {
     public void updateProfile(
             @RequestHeader("userId") Long userId,
             @RequestPart("request") UpdateVendorProfileRequest request,
+            @RequestPart(value = "profileImage", required = false) MultipartFile profileImage,
             @RequestPart(value = "introductionImages", required = false) List<MultipartFile> introductionImages
     ) {
-        vendorService.updateProfile(userId, request, introductionImages);
+        vendorService.updateProfile(userId, request, profileImage, introductionImages);
     }
 
     // 업체 소식 확인 (토큰 사용 x)

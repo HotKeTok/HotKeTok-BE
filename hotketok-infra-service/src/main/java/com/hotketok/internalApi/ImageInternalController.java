@@ -8,6 +8,7 @@ import com.hotketok.dto.UploadFileResponse;
 import com.hotketok.service.ImageStorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
@@ -48,7 +49,11 @@ public class ImageInternalController {
 
     @DeleteMapping("/delete")
     public DeleteFileResponse deleteFile(@RequestBody DeleteFileRequest deleteFileRequest) throws IOException {
-        imageStorageService.deleteImage(deleteFileRequest.deletedFileUrl());
-        return new DeleteFileResponse(deleteFileRequest.deletedFileUrl());
+        String fileUrl = deleteFileRequest.deletedFileUrl();
+        if (StringUtils.hasText(fileUrl)) {
+            imageStorageService.deleteImage(fileUrl);
+            return new DeleteFileResponse(fileUrl);
+        }
+        return new DeleteFileResponse(null);
     }
 }

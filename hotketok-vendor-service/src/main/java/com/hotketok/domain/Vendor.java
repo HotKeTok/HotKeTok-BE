@@ -9,6 +9,7 @@ import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "vendor")
@@ -112,25 +113,33 @@ public class Vendor extends BaseTimeEntity {
                 .build();
     }
 
-    public void updateProfile(String introduction, String phoneNumber, RunningTime runningTime, String image, List<String> introductionImageUrls) {
+    public void updateProfile(String introduction, String phoneNumber, RunningTime runningTime, String newProfileImageUrl, List<String> newImageUrls) {
         if (introduction != null) {
             this.introduction = introduction;
         }
+
         if (phoneNumber != null) {
             this.phoneNumber = phoneNumber;
         }
+
         if (runningTime != null) {
             this.runningTime = runningTime;
         }
-        if (image != null) {
-            this.image = image;
+
+        if (newProfileImageUrl != null) {
+            this.image = newProfileImageUrl;
         }
-        if (introductionImageUrls != null) {
-            this.introductionImages.clear(); // 기존 이미지 목록 지우고
-            List<VendorIntroductionImage> newImages = introductionImageUrls.stream()
-                    .map(url -> VendorIntroductionImage.builder().imageUrl(url).build())
-                    .toList();
-            newImages.forEach(this::addIntroductionImage); // 새 이미지 목록을 추가
+
+        if (newImageUrls != null && !newImageUrls.isEmpty()) {
+            this.introductionImages.clear();
+
+            List<VendorIntroductionImage> newImages = newImageUrls.stream()
+                    .map(url -> VendorIntroductionImage.builder()
+                            .imageUrl(url)
+                            .build())
+                    .collect(Collectors.toList());
+
+            newImages.forEach(this::addIntroductionImage);
         }
     }
 
