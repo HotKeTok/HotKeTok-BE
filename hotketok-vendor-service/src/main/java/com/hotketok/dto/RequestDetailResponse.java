@@ -10,7 +10,7 @@ import java.util.List;
 public record RequestDetailResponse(
         ConstructCategory category,
         String address,
-        String estimateTime,
+        LocalDateTime estimateTime,
         PayType payerType,
         String payerName,
         String phoneNumber,
