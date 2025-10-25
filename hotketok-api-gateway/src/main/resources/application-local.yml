@@ -62,7 +62,7 @@ spring:
           uri: lb://house-service
           predicates:
             - Path=/api/house-service/**
-            - Method=GET,POST,PUT,DELETE
+            - Method=GET,POST,PUT,DELETE,PATCH
           filters:
             - JwtAuthFilter
             - name: RoleFilter
