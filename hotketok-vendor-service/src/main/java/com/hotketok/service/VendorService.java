@@ -159,9 +159,9 @@ public class VendorService {
                 .orElseThrow(() -> new CustomException(VendorErrorCode.VENDOR_NOT_FOUND));
 
         String oldProfileImageUrl = vendor.getImage();
-        List<String> oldImageUrls = vendor.getIntroductionImages().stream()
-                .map(VendorIntroductionImage::getImageUrl)
-                .toList();
+//        List<String> oldImageUrls = vendor.getIntroductionImages().stream()
+//                .map(VendorIntroductionImage::getImageUrl)
+//                .toList();
 
         // 프로필 이미지
         String newProfileImageUrl = null;
@@ -208,14 +208,14 @@ public class VendorService {
         }
 
         // 소개 이미지 (null 아닌 경우)
-        if (newImageUrls != null && !newImageUrls.isEmpty()) {
-            if (oldImageUrls != null && !oldImageUrls.isEmpty()) {
-
-                oldImageUrls.stream()
-                        .filter(StringUtils::hasText)
-                        .forEach(url -> infraServiceClient.deleteFile(new DeleteFileRequest(url)));
-            }
-        }
+//        if (newImageUrls != null && !newImageUrls.isEmpty()) {
+//            if (oldImageUrls != null && !oldImageUrls.isEmpty()) {
+//
+//                oldImageUrls.stream()
+//                        .filter(StringUtils::hasText)
+//                        .forEach(url -> infraServiceClient.deleteFile(new DeleteFileRequest(url)));
+//            }
+//        }
     }
 
     // 업체 소식 확인
