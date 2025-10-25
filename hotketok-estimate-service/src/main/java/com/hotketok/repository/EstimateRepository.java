@@ -5,9 +5,11 @@ import com.hotketok.domain.enums.Status;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface EstimateRepository extends JpaRepository<Estimate, Long> {
     List<Estimate> findAllByRequestFormId(Long requestFormId);
+    Optional<Estimate> findByRequestFormId(Long requestFormId);
     List<Estimate> findAllByVendorId(Long vendorId);
     List<Estimate> findAllByVendorIdAndStatus(Long vendorId, Status status);
     long countByVendorIdAndStatus(Long vendorId, Status status);

@@ -43,4 +43,12 @@ public class RequestFormController {
         return requestFormService.getInProgressRequestForm(userId,role);
     }
 
+    // 완료된 수리 확인
+    @GetMapping(value = "/completed")
+    List<CompletedRequestFormResponse> getCompletedRequestForm(@RequestHeader("userId") Long userId,
+                                                         @RequestHeader("role") String role,
+                                                         @RequestParam("year") int year){
+        return requestFormService.getCompletedRequestForm(userId, role, year);
+    }
+
 }
