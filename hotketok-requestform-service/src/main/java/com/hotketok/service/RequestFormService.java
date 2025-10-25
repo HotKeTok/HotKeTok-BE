@@ -278,7 +278,8 @@ public class RequestFormService {
                 requestForm.getPayType(),
                 requestForm.getPayerId(),
                 images,
-                requestForm.getDescription()
+                requestForm.getDescription(),
+                requestForm.getRequestSchedule()
         );
     }
 
