@@ -131,7 +131,6 @@ public class Vendor extends BaseTimeEntity {
         }
 
         if (newImageUrls != null && !newImageUrls.isEmpty()) {
-            this.introductionImages.clear();
 
             List<VendorIntroductionImage> newImages = newImageUrls.stream()
                     .map(url -> VendorIntroductionImage.builder()
