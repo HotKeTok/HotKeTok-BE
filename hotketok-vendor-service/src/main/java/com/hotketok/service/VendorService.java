@@ -398,7 +398,7 @@ public class VendorService {
         // 권한 확인 제외
         // 추후 요청서를 받은 로직이 추가 / 제외 될 수 있기에 일단 userId는 받는 걸로 설정
 
-        List<Status> activeStatuses = List.of(Status.SEARCHING, Status.CHOOSING);
+        List<Status> activeStatuses = List.of(Status.SEARCHING);
         List<RequestFormSimpleResponse> requests = requestFormServiceClient.getRequestFormsByStatus(activeStatuses);
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd / a hh:mm", Locale.KOREAN);

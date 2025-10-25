@@ -112,7 +112,8 @@ public class VendorController {
 
     // 받은 수리 요청 조회
     @GetMapping("/request")
-    public NewRequestListResponse getNewRequests(@RequestHeader("userId") Long userId) {
+    public NewRequestListResponse getNewRequests() {
+        Long userId = 103L;
         return vendorService.getNewRequests(userId);
     }
 
