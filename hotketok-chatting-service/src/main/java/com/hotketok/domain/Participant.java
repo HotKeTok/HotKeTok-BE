@@ -15,16 +15,18 @@ import java.time.LocalDateTime;
 @Table(name = "participants")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@IdClass(ParticipantId.class) // 복합 키
 @EntityListeners(AuditingEntityListener.class) // @CreatedDate 를 위함
 public class Participant {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "participant_id")
+    private Long id;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "chatroom_id")
     private ChatRoom chatRoom;
 
-    @Id
     @Column(name = "user_id")
     private Long userId;
 
@@ -35,6 +37,9 @@ public class Participant {
     @CreatedDate
     @Column(name = "joined_at", updatable = false, nullable = false)
     private LocalDateTime joinedAt;
+
+    @Column(name = "is_active", nullable = false)
+    private boolean isActive = true;
 
     // 마지막으로 읽은 시간을 기록하기 위함
     @Column(name = "last_read_at")
@@ -57,5 +62,13 @@ public class Participant {
 
     void setChatRoom(ChatRoom chatRoom) {
         this.chatRoom = chatRoom;
+    }
+
+    public void updateLastReadAt(LocalDateTime time) {
+        this.lastReadAt = time;
+    }
+
+    public void leaveRoom() {
+        this.isActive = false;
     }
 }

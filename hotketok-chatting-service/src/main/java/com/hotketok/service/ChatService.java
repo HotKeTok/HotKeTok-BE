@@ -6,6 +6,8 @@ import com.hotketok.domain.Participant;
 import com.hotketok.domain.enums.ChatRoomType;
 import com.hotketok.domain.enums.SenderType;
 import com.hotketok.dto.internalApi.*;
+import com.hotketok.exception.ChattingErrorCode;
+import com.hotketok.hotketokcommonservice.error.exception.CustomException;
 import com.hotketok.internalApi.RequestFormServiceClient;
 import com.hotketok.internalApi.HouseServiceClient;
 import com.hotketok.internalApi.UserServiceClient;
@@ -19,10 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
-import java.util.Optional;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -63,8 +62,26 @@ public class ChatService {
 
     // 특정 유저의 채팅방 목록 조회 
     public List<ChatRoomResponse> findChatRoomsByUserId(Long userId) {
-        List<Participant> participants = participantRepository.findByUserId(userId);
+        // 1. 참여자 정보 + 채팅방 정보 + 채팅방별 참여자 목록 한 번에 조회
+        List<Participant> participants = participantRepository.findByUserIdWithDetails(userId);
+        if (participants.isEmpty()) {
+            return List.of();
+        }
+
         List<ChatRoom> chatRooms = participants.stream().map(Participant::getChatRoom).toList();
+
+        // 2. 채팅방별 마지막 메시지를 Map으로 한 번에 조회
+        Map<Long, ChatMessage> lastMessageMap = chatMessageRepository.findLatestMessagesForRooms(chatRooms).stream()
+                .collect(Collectors.toMap(msg -> msg.getChatRoom().getId(), Function.identity()));
+
+        // 3. 안 읽은 메시지 수를 한 번에 조회 (두 쿼리 결과를 합침)
+        Map<Long, Long> unreadCountMap = new HashMap<>();
+
+        chatMessageRepository.getUnreadCountsForReadParticipants(participants, userId)
+                .forEach(dto -> unreadCountMap.put(dto.participantId(), dto.count()));
+
+        chatMessageRepository.getUnreadCountsForUnreadParticipants(participants, userId)
+                .forEach(dto -> unreadCountMap.put(dto.participantId(), dto.count()));
 
         // 주소, 상태 반환
         List<Long> requestFormIds = chatRooms.stream()
@@ -81,8 +98,6 @@ public class ChatService {
         }
         final Map<Long, RequestFormAddressStatusResponse> finalRequestFormMap = requestFormMap;
 
-
-        // 호수, 카테고리 반환
         List<Long> allUserIds = chatRooms.stream()
                 .flatMap(room -> room.getParticipants().stream().map(Participant::getUserId))
                 .distinct().toList();
@@ -99,8 +114,7 @@ public class ChatService {
 
         // 공사업체의 경우 카테고리 반환 추가
         List<Long> vendorIds = userProfiles.values().stream()
-                // 병합 수정: "VENDOR" 문자열 비교가 아닌 SenderType Enum으로 비교
-                .filter(p -> p.role() == SenderType.VENDOR) 
+                .filter(p -> p.role() == SenderType.VENDOR)
                 .map(UserProfileResponse::userId).toList();
 
         Map<Long, VendorCategoryResponse> vendorCategories = Map.of();
@@ -119,7 +133,6 @@ public class ChatService {
                 HouseUnitResponse unit = unitNumbers.get(p.getUserId());
                 VendorCategoryResponse category = finalVendorCategories.get(p.getUserId());
 
-                // ParticipantResponse 생성자
                 return new ParticipantResponse(
                         p.getUserId(),
                         profile != null ? profile.userName() : "알 수 없는 사용자",
@@ -130,9 +143,11 @@ public class ChatService {
                 );
             }).collect(Collectors.toList());
 
-            // develop: 마지막 메시지 및 안 읽은 수
-            Optional<ChatMessage> lastMsgOpt = chatMessageRepository.findTopByChatRoomOrderByCreatedAtDesc(chatRoom);
-            long unread = calculateUnreadCount(participant, chatRoom, userId);
+            // 마지막 메시지 조회
+            ChatMessage lastMsg = lastMessageMap.get(chatRoom.getId());
+
+            // 안 읽은 수 조회
+            long unread = unreadCountMap.getOrDefault(participant.getId(), 0L);
 
             // 주소 및 상태값 추출
             String address = null;
@@ -141,43 +156,40 @@ public class ChatService {
                 RequestFormAddressStatusResponse formData = finalRequestFormMap.get(chatRoom.getRequestFormId());
                 if (formData != null) {
                     address = formData.address();
-                    estimateStatus = formData.status().name(); // Enum을 String으로
+                    estimateStatus = formData.status().name();
                 }
             }
 
-            return new ChatRoomResponse(chatRoom, lastMsgOpt.orElse(null), unread, detailedParticipants, address, estimateStatus);
-            
+            return new ChatRoomResponse(chatRoom, lastMsg, unread, detailedParticipants, address, estimateStatus);
         }).collect(Collectors.toList());
-    }
-  
-    private long calculateUnreadCount(Participant p, ChatRoom cr, Long userId) {
-        return (p.getLastReadAt() == null)
-                ? chatMessageRepository.countByChatRoomAndSenderIdNot(cr, userId)
-                : chatMessageRepository.countByChatRoomAndCreatedAtAfterAndSenderIdNot(cr, p.getLastReadAt(), userId);
     }
 
     // 채팅방 삭제
     @Transactional
-    public void deleteChatRoom(Long userId, Long roomId) {
+    public void leaveChatRoom(Long userId, Long roomId) {
+        Participant participant = participantRepository.findByChatRoomIdAndUserId(roomId, userId)
+                .orElseThrow(() -> new CustomException(ChattingErrorCode.NOT_A_PARTICIPANT));
 
-        // 유저가 해당 채팅방의 참여자인지 확인
-        boolean isParticipant = participantRepository.existsByChatRoomIdAndUserId(roomId, userId);
-        if (!isParticipant) {
-            throw new IllegalArgumentException("사용자가 해당 채팅방에 참여하고 있지 않으므로 삭제할 권한이 없습니다.");
+        // 이미 나간 상태인지 확인
+        if (!participant.isActive()) {
+            log.warn("User {} already left chat room {}", userId, roomId);
+            return;
         }
-        chatRoomRepository.deleteById(roomId);
+        participant.leaveRoom();
     }
 
     // 채팅 내용 조회
+    @Transactional
     public ChatRoomDetailResponse findMessagesByRoomId(Long userId, Long roomId) {
-        boolean isParticipant = participantRepository.existsByChatRoomIdAndUserId(roomId, userId);
-        if (!isParticipant) {
-            throw new SecurityException("해당 채팅방에 접근할 권한이 없습니다.");
-        }
+
+        Participant participant = participantRepository.findByChatRoomIdAndUserId(roomId, userId)
+                .orElseThrow(() -> new CustomException(ChattingErrorCode.NOT_A_PARTICIPANT));
+
+        // 읽음 여부 갱신
+        participant.updateLastReadAt(LocalDateTime.now());
 
         ChatRoom chatRoom = chatRoomRepository.findById(roomId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 채팅방입니다. ID: " + roomId));
-
+                .orElseThrow(() -> new CustomException(ChattingErrorCode.CHAT_ROOM_NOT_FOUND));
         // 참여자 정보 반환 추가
         List<ChatParticipantResponse> participants = getDetailedParticipants(chatRoom);
 
@@ -215,11 +227,17 @@ public class ChatService {
 
     // 채팅을 보냈을 때 저장
     @Transactional
-    public ChatMessage saveMessage(MessageRequest request) {
+    public ChatMessage saveMessage(Long senderId, MessageRequest request) {
         ChatRoom chatRoom = chatRoomRepository.findById(request.roomId())
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 채팅방입니다. ID: " + request.roomId()));
+                .orElseThrow(() -> new CustomException(ChattingErrorCode.CHAT_ROOM_NOT_FOUND));
 
-        ChatMessage chatMessage = ChatMessage.createChatMessage(chatRoom, request.senderId(), request.content());
+        Participant participant = participantRepository.findByChatRoomIdAndUserId(request.roomId(), senderId)
+                .orElseThrow(() -> new CustomException(ChattingErrorCode.NOT_A_PARTICIPANT));
+        if (!participant.isActive()) {
+            throw new CustomException(ChattingErrorCode.NOT_A_PARTICIPANT);
+        }
+
+        ChatMessage chatMessage = ChatMessage.createChatMessage(chatRoom, senderId, request.content());
         return chatMessageRepository.save(chatMessage);
     }
 }
