@@ -101,8 +101,7 @@ public class VendorController {
 
     // 보낸 견적서 조회
     @GetMapping("/estimate")
-    public VendorEstimateListResponse getMyEstimates() {
-        Long userId = 103L;
+    public VendorEstimateListResponse getMyEstimates(@RequestHeader("userId") Long userId) {
         return vendorService.getMyEstimates(userId);
     }
 
