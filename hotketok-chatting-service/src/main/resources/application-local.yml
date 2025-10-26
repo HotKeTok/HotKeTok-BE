@@ -43,6 +43,9 @@ eureka:
     serviceUrl:
       defaultZone: http://localhost:8761/eureka
 
+jwt:
+  accessKey: ${JWT_SECRET}
+
 logging:
   level:
     org.hibernate.SQL: debug

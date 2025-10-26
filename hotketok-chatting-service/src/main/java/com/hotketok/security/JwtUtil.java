@@ -16,7 +16,7 @@ import java.util.Collections;
 @Component
 public class JwtUtil {
 
-    @Value("${jwt.secret-key}")
+    @Value("${jwt.accessKey}")
     private String secretKey;
 
     private Key getSigningKey() {
