@@ -11,5 +11,6 @@ public record EstimateInfoResponse(
         String estimateTime,
         Status status,
         BigDecimal estimatePrice,
-        String estimateComment
+        String estimateComment,
+        Boolean decisionLater
 ) {}

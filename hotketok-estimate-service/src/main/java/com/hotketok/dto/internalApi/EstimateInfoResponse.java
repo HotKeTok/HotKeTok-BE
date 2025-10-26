@@ -13,7 +13,8 @@ public record EstimateInfoResponse(
         String estimateTime,
         Status status,
         BigDecimal estimatePrice,
-        String estimateComment
+        String estimateComment,
+        Boolean decisionLater
 ) {
     public static EstimateInfoResponse from(Estimate estimate) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd / a hh:mm", Locale.KOREAN);
@@ -25,7 +26,8 @@ public record EstimateInfoResponse(
                 formattedTime,
                 estimate.getStatus(),
                 estimate.getEstimatePrice(),
-                estimate.getComment()
+                estimate.getComment(),
+                estimate.getDecisionLater()
         );
     }
 }

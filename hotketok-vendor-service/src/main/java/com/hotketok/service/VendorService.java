@@ -408,7 +408,8 @@ public class VendorService {
                     payerName,
                     //payerInfo.phoneNumber(),
                     phoneNumber,
-                    estimate.estimateComment()
+                    estimate.estimateComment(),
+                    estimate.decisionLater()
             );
         }).collect(Collectors.toList());
 
