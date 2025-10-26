@@ -4,8 +4,6 @@ import com.hotketok.constant.GPTPrompt;
 import com.hotketok.domain.enums.ConstructCategory;
 import com.hotketok.dto.CreateRequestFormResponse;
 import com.hotketok.dto.internalApi.*;
-import com.hotketok.dto.CreateRequestFormResponse;
-import com.hotketok.dto.internalApi.RequestFormAuthorResponse;
 import com.hotketok.dto.internalApi.RequestFormDataResponse;
 import com.hotketok.dto.internalApi.UploadFileListResponse;
 import com.hotketok.exception.RequestFormErrorCode;
@@ -239,12 +237,12 @@ public class RequestFormService {
         return new RequestFormDataResponse(addressAndNumber, category);
     }
 
-    // 요청서 작성자 확인
-    public RequestFormAuthorResponse getRequestFormAuthorById(Long requestFormId) {
+    // 요청서 부담자 확인
+    public RequestFormPayerResponse getRequestFormPayerById(Long requestFormId) {
         RequestForm requestForm = requestFormRepository.findById(requestFormId)
                 .orElseThrow(() -> new CustomException(RequestFormErrorCode.REQUEST_FORM_NOT_FOUND));
 
-        return RequestFormAuthorResponse.from(requestForm);
+        return RequestFormPayerResponse.from(requestForm);
     }
 
     // 요청서 상태 변경

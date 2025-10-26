@@ -6,7 +6,6 @@ import com.hotketok.dto.PostEstimateRequest;
 import com.hotketok.dto.PostEstimateResponse;
 import com.hotketok.dto.EstimateResponse;
 import com.hotketok.dto.internalApi.*;
-import com.hotketok.dto.internalApi.RequestFormAuthorResponse;
 import com.hotketok.dto.internalApi.RequestFormResponse;
 import com.hotketok.dto.internalApi.UpdateStatusRequest;
 import com.hotketok.dto.internalApi.VendorInfoResponse;
@@ -92,10 +91,10 @@ public class EstimateService {
         // 유저가 견적서 선택 권한있는지 확인
         Long requestFormId = selectedEstimate.getRequestFormId();
 
-        RequestFormAuthorResponse authorResponse = requestFormClient.getRequestFormAuthor(requestFormId);
-        Long authorId = authorResponse.authorId();
+        RequestFormPayerResponse authorResponse = requestFormClient.getRequestFormAuthor(requestFormId);
+        Long payerId = authorResponse.payerId();
 
-        if (!authorId.equals(userId)) {
+        if (!payerId.equals(userId)) {
             throw new CustomException(EstimateErrorCode.NO_AUTHORITY_TO_SELECT);
         }
 
