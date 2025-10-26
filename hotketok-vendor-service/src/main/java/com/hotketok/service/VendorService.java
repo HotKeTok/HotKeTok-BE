@@ -352,7 +352,8 @@ public class VendorService {
                             formData.category(),
                             formData.address(),
                             estimate.estimateTime(),
-                            estimate.status()
+                            estimate.status(),
+                            estimate.decisionLater()
                     );
                 })
                 .collect(Collectors.toList());
@@ -437,7 +438,8 @@ public class VendorService {
                     formData.category(),
                     formData.address(),
                     estimate.estimateTime(),
-                    estimate.status()
+                    estimate.status(),
+                    estimate.decisionLater()
             );
         }).collect(Collectors.toList());
 
