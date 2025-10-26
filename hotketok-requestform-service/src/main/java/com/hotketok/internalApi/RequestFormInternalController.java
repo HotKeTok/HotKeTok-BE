@@ -21,9 +21,9 @@ public class RequestFormInternalController {
     }
 
     // 요청서 작성자 확인
-    @GetMapping("/{requestFormId}/author")
-    public RequestFormAuthorResponse getRequestFormAuthor(@PathVariable Long requestFormId) {
-        return requestFormService.getRequestFormAuthorById(requestFormId);
+    @GetMapping("/{requestFormId}/payer")
+    public RequestFormPayerResponse getRequestFormAuthor(@PathVariable Long requestFormId) {
+        return requestFormService.getRequestFormPayerById(requestFormId);
     }
 
     // 요청서 상태 변경

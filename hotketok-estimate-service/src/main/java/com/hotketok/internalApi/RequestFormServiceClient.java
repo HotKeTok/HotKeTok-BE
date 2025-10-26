@@ -1,6 +1,6 @@
 package com.hotketok.internalApi;
 
-import com.hotketok.dto.internalApi.RequestFormAuthorResponse;
+import com.hotketok.dto.internalApi.RequestFormPayerResponse;
 import com.hotketok.dto.internalApi.RequestFormResponse;
 import com.hotketok.dto.internalApi.UpdateStatusRequest;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -14,8 +14,8 @@ public interface RequestFormServiceClient {
     RequestFormResponse getRequestFormData(@PathVariable("requestFormId") Long requestFormId);
 
     // 요청서의 작성자 확인
-    @GetMapping("/internal/requestform-service/{requestFormId}/author")
-    RequestFormAuthorResponse getRequestFormAuthor(@PathVariable("requestFormId") Long requestFormId);
+    @GetMapping("/internal/requestform-service/{requestFormId}/payer")
+    RequestFormPayerResponse getRequestFormAuthor(@PathVariable("requestFormId") Long requestFormId);
 
     @PutMapping("/internal/requestform-service/{requestFormId}/status")
     void updateRequestFormStatus(@PathVariable("requestFormId") Long requestFormId, @RequestBody UpdateStatusRequest request);

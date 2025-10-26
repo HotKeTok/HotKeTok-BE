@@ -352,7 +352,8 @@ public class VendorService {
                             formData.category(),
                             formData.address(),
                             estimate.estimateTime(),
-                            estimate.status()
+                            estimate.status(),
+                            estimate.decisionLater()
                     );
                 })
                 .collect(Collectors.toList());
@@ -408,7 +409,8 @@ public class VendorService {
                     payerName,
                     //payerInfo.phoneNumber(),
                     phoneNumber,
-                    estimate.estimateComment()
+                    estimate.estimateComment(),
+                    estimate.decisionLater()
             );
         }).collect(Collectors.toList());
 
@@ -436,7 +438,8 @@ public class VendorService {
                     formData.category(),
                     formData.address(),
                     estimate.estimateTime(),
-                    estimate.status()
+                    estimate.status(),
+                    estimate.decisionLater()
             );
         }).collect(Collectors.toList());
 
@@ -633,17 +636,20 @@ public class VendorService {
 
     // 공사업체 (다수) 프로필 조회
     public List<VendorProfileResponse> getVendorProfilesByIds(List<Long> vendorIds) {
+
         if (vendorIds == null || vendorIds.isEmpty()) {
             return List.of();
         }
 
-        return vendorRepository.findAllById(vendorIds).stream()
+        // DB 조회 후 DTO로 변환
+        List<VendorProfileResponse> profiles = vendorRepository.findAllById(vendorIds).stream()
                 .map(vendor -> new VendorProfileResponse(
                         vendor.getId(),
                         vendor.getName(),
                         vendor.getImage()
                 ))
                 .collect(Collectors.toList());
+        return profiles;
     }
 
     // 단일 유저 아이디로 공사업체 정보 조회

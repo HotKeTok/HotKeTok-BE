@@ -10,5 +10,6 @@ public record MatchingEstimateInfoResponse(
         Long estimateId, ConstructCategory category, String address, String estimateTime,
         BigDecimal estimatePrice, PayType payType, String payerName,
         String phoneNumber,
-        String estimateComment
+        String estimateComment,
+        Boolean decisionLater
 ) {}

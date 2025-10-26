@@ -1,7 +1,7 @@
 package com.hotketok.service;
 
 import com.hotketok.domain.Review;
-import com.hotketok.domain.ReviewImage; // 👈 ReviewImage import
+import com.hotketok.domain.ReviewImage;
 import com.hotketok.dto.*;
 import com.hotketok.dto.internalApi.*;
 import com.hotketok.exception.ReviewErrorCode;
@@ -17,10 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
