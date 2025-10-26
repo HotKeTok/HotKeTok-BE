@@ -185,4 +185,26 @@ public class EstimateService {
         Estimate estimate = estimateRepository.findByRequestFormId(requestFormId).orElseThrow(() -> new CustomException(EstimateErrorCode.ESTIMATE_NOT_FOUND));
         return new EstimatePriceResponse(estimate.getEstimatePrice());
     }
+
+    // 선택한 견적서 내용 조회
+    public EstimateResponse getEstimateInfo(Long userId, Long estimateId) {
+        Estimate estimate = estimateRepository.findById(estimateId)
+                .orElseThrow(() -> new CustomException(EstimateErrorCode.ESTIMATE_NOT_FOUND));
+
+        Long vendorId = estimate.getVendorId();
+
+        VendorInfoResponse vendorInfo = null;
+        try {
+            vendorInfo = vendorServiceClient.getVendorInfoById(vendorId);
+        } catch (Exception e) {
+            log.error("Failed to get vendor info for vendorId {}: {}", vendorId, e.getMessage());
+        }
+
+        // 상태 확인
+        if (estimate.getStatus() != Status.MATCHING) {
+            throw new CustomException(EstimateErrorCode.ESTIMATE_NOT_MATCHING);
+        }
+
+        return EstimateResponse.from(estimate, vendorInfo);
+    }
 }
