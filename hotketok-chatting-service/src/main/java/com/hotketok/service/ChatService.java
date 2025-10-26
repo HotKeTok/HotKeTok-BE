@@ -166,13 +166,16 @@ public class ChatService {
 
     // 채팅방 삭제
     @Transactional
-    public void deleteChatRoom(Long userId, Long roomId) {
+    public void leaveChatRoom(Long userId, Long roomId) {
+        Participant participant = participantRepository.findByChatRoomIdAndUserId(roomId, userId)
+                .orElseThrow(() -> new CustomException(ChattingErrorCode.NOT_A_PARTICIPANT));
 
-        // 유저가 해당 채팅방의 참여자인지 확인
-        boolean isParticipant = participantRepository.existsByChatRoomIdAndUserId(roomId, userId);
-        if (!isParticipant)
-            throw new CustomException(ChattingErrorCode.NOT_A_PARTICIPANT);
-        chatRoomRepository.deleteById(roomId);
+        // 이미 나간 상태인지 확인
+        if (!participant.isActive()) {
+            log.warn("User {} already left chat room {}", userId, roomId);
+            return;
+        }
+        participant.leaveRoom();
     }
 
     // 채팅 내용 조회
@@ -224,11 +227,17 @@ public class ChatService {
 
     // 채팅을 보냈을 때 저장
     @Transactional
-    public ChatMessage saveMessage(MessageRequest request) {
+    public ChatMessage saveMessage(Long senderId, MessageRequest request) {
         ChatRoom chatRoom = chatRoomRepository.findById(request.roomId())
                 .orElseThrow(() -> new CustomException(ChattingErrorCode.CHAT_ROOM_NOT_FOUND));
 
-        ChatMessage chatMessage = ChatMessage.createChatMessage(chatRoom, request.senderId(), request.content());
+        Participant participant = participantRepository.findByChatRoomIdAndUserId(request.roomId(), senderId)
+                .orElseThrow(() -> new CustomException(ChattingErrorCode.NOT_A_PARTICIPANT));
+        if (!participant.isActive()) {
+            throw new CustomException(ChattingErrorCode.NOT_A_PARTICIPANT);
+        }
+
+        ChatMessage chatMessage = ChatMessage.createChatMessage(chatRoom, senderId, request.content());
         return chatMessageRepository.save(chatMessage);
     }
 }

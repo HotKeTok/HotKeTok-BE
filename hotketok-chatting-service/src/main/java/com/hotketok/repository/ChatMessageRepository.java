@@ -31,7 +31,7 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> 
     List<ChatMessage> findLatestMessagesForRooms(@Param("chatRooms") List<ChatRoom> chatRooms);
 
     // lastReadAt이 있는 참여자들의 안 읽은 메시지 수를 한 번의 쿼리로 조회
-    @Query("SELECT new com.hotketok.dto.UnreadCountDTO(p.id, COUNT(cm.id)) " +
+    @Query("SELECT new com.hotketok.dto.internalApi.UnreadCountDTO(p.id, COUNT(cm.id)) " +
             "FROM Participant p " +
             "LEFT JOIN p.chatRoom cr ON cr = p.chatRoom " +
             "LEFT JOIN ChatMessage cm ON cm.chatRoom = cr " + // 해당 채팅방의 메시지
@@ -45,7 +45,7 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long> 
             @Param("userId") Long userId);
 
     // lastReadAt이 없는 참여자들의 안 읽은 메시지 수를 한 번의 쿼리로 조회
-    @Query("SELECT new com.hotketok.dto.UnreadCountDTO(p.id, COUNT(cm.id)) " +
+    @Query("SELECT new com.hotketok.dto.internalApi.UnreadCountDTO(p.id, COUNT(cm.id)) " +
             "FROM Participant p " +
             "LEFT JOIN p.chatRoom cr ON cr = p.chatRoom " +
             "LEFT JOIN ChatMessage cm ON cm.chatRoom = cr " +

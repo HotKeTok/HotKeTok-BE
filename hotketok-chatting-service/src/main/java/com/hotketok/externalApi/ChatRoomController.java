@@ -35,8 +35,8 @@ public class ChatRoomController {
     @DeleteMapping("/rooms")
     public ResponseEntity<Void> deleteChatRoom(@RequestHeader("userId") Long userId,
                                                @RequestParam Long roomId) {
-        chatService.deleteChatRoom(userId, roomId);
-        return ResponseEntity.noContent().build(); // 성공적으로 삭제되었으면 204 No Content
+        chatService.leaveChatRoom(userId, roomId);
+        return ResponseEntity.noContent().build();
     }
 
     // 특정 채팅방의 채팅 내용 조회

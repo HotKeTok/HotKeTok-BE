@@ -33,6 +33,9 @@ public class ChatRoom extends BaseTimeEntity {
     @Column(nullable = true)
     private Long requestFormId;
 
+    @Column(name = "is_active", nullable = false) // 채팅방 활성 여부 (삭제 시 false)
+    private boolean isActive = true;
+
     @OneToMany(mappedBy = "chatRoom", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Participant> participants = new ArrayList<>();
 
@@ -59,5 +62,9 @@ public class ChatRoom extends BaseTimeEntity {
     public void addParticipant(Participant participant) {
         this.participants.add(participant);
         participant.setChatRoom(this);
+    }
+
+    public void leaveRoom() {
+        this.isActive = false;
     }
 }

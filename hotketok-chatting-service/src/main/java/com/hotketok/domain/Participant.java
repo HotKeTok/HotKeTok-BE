@@ -38,6 +38,9 @@ public class Participant {
     @Column(name = "joined_at", updatable = false, nullable = false)
     private LocalDateTime joinedAt;
 
+    @Column(name = "is_active", nullable = false)
+    private boolean isActive = true;
+
     // 마지막으로 읽은 시간을 기록하기 위함
     @Column(name = "last_read_at")
     private LocalDateTime lastReadAt;
@@ -62,6 +65,10 @@ public class Participant {
     }
 
     public void updateLastReadAt(LocalDateTime time) {
-    this.lastReadAt = time;
- }
+        this.lastReadAt = time;
+    }
+
+    public void leaveRoom() {
+        this.isActive = false;
+    }
 }
