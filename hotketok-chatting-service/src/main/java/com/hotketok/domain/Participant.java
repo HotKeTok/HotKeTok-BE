@@ -58,4 +58,8 @@ public class Participant {
     void setChatRoom(ChatRoom chatRoom) {
         this.chatRoom = chatRoom;
     }
+
+    public void updateLastReadAt(LocalDateTime time) {
+    this.lastReadAt = time;
+ }
 }

@@ -6,6 +6,8 @@ import com.hotketok.domain.Participant;
 import com.hotketok.domain.enums.ChatRoomType;
 import com.hotketok.domain.enums.SenderType;
 import com.hotketok.dto.internalApi.*;
+import com.hotketok.exception.ChattingErrorCode;
+import com.hotketok.hotketokcommonservice.error.exception.CustomException;
 import com.hotketok.internalApi.RequestFormServiceClient;
 import com.hotketok.internalApi.HouseServiceClient;
 import com.hotketok.internalApi.UserServiceClient;
@@ -169,11 +171,14 @@ public class ChatService {
     }
 
     // 채팅 내용 조회
+    @Transactional
     public ChatRoomDetailResponse findMessagesByRoomId(Long userId, Long roomId) {
-        boolean isParticipant = participantRepository.existsByChatRoomIdAndUserId(roomId, userId);
-        if (!isParticipant) {
-            throw new SecurityException("해당 채팅방에 접근할 권한이 없습니다.");
-        }
+
+        Participant participant = participantRepository.findByChatRoomIdAndUserId(roomId, userId)
+                .orElseThrow(() -> new CustomException(ChattingErrorCode.NOT_A_PARTICIPANT));
+
+        // 읽음 여부 갱신
+        participant.updateLastReadAt(LocalDateTime.now());
 
         ChatRoom chatRoom = chatRoomRepository.findById(roomId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 채팅방입니다. ID: " + roomId));

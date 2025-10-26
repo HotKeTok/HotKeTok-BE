@@ -2,6 +2,7 @@ package com.hotketok.repository;
 
 import com.hotketok.domain.ChatMessage;
 import com.hotketok.domain.ChatRoom;
+import com.hotketok.domain.Participant;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.time.LocalDateTime;
