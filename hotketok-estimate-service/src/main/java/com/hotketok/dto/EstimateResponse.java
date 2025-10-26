@@ -15,7 +15,8 @@ public record EstimateResponse(
         String content,
         BigDecimal price,
         String estimateTime,
-        Boolean decisionLater
+        Boolean decisionLater,
+        Long vendorId
 ) {
     public static EstimateResponse from(Estimate estimate, VendorInfoResponse vendorInfo) {
         String name = (vendorInfo != null) ? vendorInfo.name() : "알 수 없는 업체";
@@ -33,7 +34,8 @@ public record EstimateResponse(
                 estimate.getComment(),
                 estimate.getEstimatePrice(),
                 formattedTime,
-                estimate.getDecisionLater()
+                estimate.getDecisionLater(),
+                estimate.getVendorId()
         );
     }
 }
