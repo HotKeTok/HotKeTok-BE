@@ -63,6 +63,12 @@ public class VendorController {
         vendorService.updateProfile(userId, request, profileImage, introductionImages);
     }
 
+    // 업체 관련 사진 삭제
+    @DeleteMapping("/profile")
+    public void deleteImages(@RequestHeader("userId") Long userId, @RequestBody DeleteImagesRequest request) {
+        vendorService.deleteImages(userId, request);
+    }
+
     // 업체 소식 확인 (토큰 사용 x)
     @GetMapping("/news")
     public List<VendorNewsResponse> getVendorNews(@RequestParam Long vendorId) {
