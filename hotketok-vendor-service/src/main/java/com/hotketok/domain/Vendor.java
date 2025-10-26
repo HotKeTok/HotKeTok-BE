@@ -45,7 +45,7 @@ public class Vendor extends BaseTimeEntity {
     @Column
     private String introduction;
 
-    @Column
+    @Column(nullable = true)
     private String image;
 
     @Column(nullable = false)
@@ -131,7 +131,6 @@ public class Vendor extends BaseTimeEntity {
         }
 
         if (newImageUrls != null && !newImageUrls.isEmpty()) {
-            this.introductionImages.clear();
 
             List<VendorIntroductionImage> newImages = newImageUrls.stream()
                     .map(url -> VendorIntroductionImage.builder()
@@ -154,5 +153,9 @@ public class Vendor extends BaseTimeEntity {
     public void addNews(News news) {
         this.newsList.add(news);
         news.setVendor(this);
+    }
+
+    public void setProfileImage(String imageUrl) {
+        this.image = imageUrl;
     }
 }

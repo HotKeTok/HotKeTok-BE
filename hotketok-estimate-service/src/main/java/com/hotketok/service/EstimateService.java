@@ -34,12 +34,13 @@ public class EstimateService {
     private final RequestFormServiceClient requestFormClient;
     private final VendorServiceClient vendorServiceClient;
 
-    public PostEstimateResponse postEstimate(Long vendorId, PostEstimateRequest request) {
+    public PostEstimateResponse postEstimate(Long userId, PostEstimateRequest request) {
         RequestFormResponse requestFormData = requestFormClient.getRequestFormData(request.requestFormId());
+        VendorInfoResponse vendorInfo = vendorServiceClient.getVendorInfoByUserId(userId);
 
         Estimate estimate = Estimate.createEstimate(
                 request.requestFormId(),
-                vendorId,
+                vendorInfo.vendorId(),
                 request.estimatePrice(),
                 request.decisionLater(),
                 request.comment()

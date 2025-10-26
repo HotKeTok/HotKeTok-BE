@@ -159,9 +159,9 @@ public class VendorService {
                 .orElseThrow(() -> new CustomException(VendorErrorCode.VENDOR_NOT_FOUND));
 
         String oldProfileImageUrl = vendor.getImage();
-        List<String> oldImageUrls = vendor.getIntroductionImages().stream()
-                .map(VendorIntroductionImage::getImageUrl)
-                .toList();
+//        List<String> oldImageUrls = vendor.getIntroductionImages().stream()
+//                .map(VendorIntroductionImage::getImageUrl)
+//                .toList();
 
         // 프로필 이미지
         String newProfileImageUrl = null;
@@ -208,13 +208,51 @@ public class VendorService {
         }
 
         // 소개 이미지 (null 아닌 경우)
-        if (newImageUrls != null && !newImageUrls.isEmpty()) {
-            if (oldImageUrls != null && !oldImageUrls.isEmpty()) {
+//        if (newImageUrls != null && !newImageUrls.isEmpty()) {
+//            if (oldImageUrls != null && !oldImageUrls.isEmpty()) {
+//
+//                oldImageUrls.stream()
+//                        .filter(StringUtils::hasText)
+//                        .forEach(url -> infraServiceClient.deleteFile(new DeleteFileRequest(url)));
+//            }
+//        }
+    }
 
-                oldImageUrls.stream()
-                        .filter(StringUtils::hasText)
-                        .forEach(url -> infraServiceClient.deleteFile(new DeleteFileRequest(url)));
-            }
+    // 업체 관련 사진 삭제
+    @Transactional
+    public void deleteImages(Long userId, DeleteImagesRequest request) {
+        Vendor vendor = vendorRepository.findByUserId(userId)
+                .orElseThrow(() -> new CustomException(VendorErrorCode.VENDOR_NOT_FOUND)); // 404 응답
+
+        // 프로필 이미지 삭제
+        String profileUrlToDelete = request.profileImage();
+
+        // 요청이 있는 경우 -> url 같은 것 비교
+        if (StringUtils.hasText(profileUrlToDelete) && profileUrlToDelete.equals(vendor.getImage())) {
+
+            vendor.setProfileImage(null); // 이미지 없는 상태
+
+            // 보상 트랜잭션
+            infraServiceClient.deleteFile(new DeleteFileRequest(profileUrlToDelete));
+        }
+
+        // 소개 이미지 삭제
+        List<String> introUrlsToDelete = request.introductionImages();
+
+        // 요청이 있는 경우 -> url 같은 것 비교
+        if (introUrlsToDelete != null && !introUrlsToDelete.isEmpty()) {
+
+            List<VendorIntroductionImage> imagesToRemove = vendor.getIntroductionImages().stream()
+                    .filter(img -> introUrlsToDelete.contains(img.getImageUrl()))
+                    .toList();
+
+            vendor.getIntroductionImages().removeAll(imagesToRemove);
+
+            // 보상 트랜잭션
+            imagesToRemove.stream()
+                    .map(VendorIntroductionImage::getImageUrl)
+                    .filter(StringUtils::hasText) 
+                    .forEach(url -> infraServiceClient.deleteFile(new DeleteFileRequest(url)));
         }
     }
 
@@ -589,5 +627,13 @@ public class VendorService {
                         vendor.getImage()
                 ))
                 .collect(Collectors.toList());
+    }
+
+    // 단일 유저 아이디로 공사업체 정보 조회
+    public VendorInfoResponse findVendorInfoByUserId(Long userId) {
+        Vendor vendor = vendorRepository.findByUserId(userId)
+                .orElseThrow(() -> new CustomException(VendorErrorCode.VENDOR_NOT_FOUND));
+
+        return VendorInfoResponse.from(vendor);
     }
 }

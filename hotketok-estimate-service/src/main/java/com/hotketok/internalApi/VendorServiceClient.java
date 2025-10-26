@@ -17,4 +17,8 @@ public interface VendorServiceClient {
     // 단일 업체 정보 조회
     @GetMapping("/internal/vendor-service/{vendorId}")
     VendorInfoResponse getVendorInfoById(@PathVariable("vendorId") Long vendorId);
+
+    // 유저 id로 단일 업체 정보 조회
+    @GetMapping("/internal/vendor-service/by-user/{userId}")
+    VendorInfoResponse getVendorInfoByUserId(@PathVariable("userId") Long userId);
 }
