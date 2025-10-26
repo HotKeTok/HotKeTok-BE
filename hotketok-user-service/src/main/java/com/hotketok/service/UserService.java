@@ -6,6 +6,7 @@ import com.hotketok.internalApi.HouseServiceClient;
 import com.hotketok.internalApi.InfraServiceClient;
 import com.hotketok.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.checkerframework.checker.units.qual.Current;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.hotketok.domain.User;
@@ -134,10 +135,10 @@ public class UserService {
         return responses;
     }
 
-    public String getCurrentAddressByUserId(Long userId) {
+    public CurrentAddressResponse getCurrentAddressByUserId(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
-        return user.getCurrentAddress();
+        return new CurrentAddressResponse(user.getCurrentAddress());
     }
 
     public UserProfileResponse findUserProfileById(Long userId) {

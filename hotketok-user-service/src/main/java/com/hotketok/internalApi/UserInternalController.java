@@ -56,8 +56,7 @@ public class UserInternalController {
 
     @GetMapping("/{userId}/current-address")
     public CurrentAddressResponse getCurrentAddress(@PathVariable Long userId) {
-        String address = userService.getCurrentAddressByUserId(userId);
-        return new CurrentAddressResponse(address);
+        return userService.getCurrentAddressByUserId(userId);
     }
 
     @GetMapping ("/current-address-and-number/{userId}")
