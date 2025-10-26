@@ -39,4 +39,10 @@ public class EstimateController {
     public void deleteEstimate(@RequestHeader("userId") Long userId, @RequestParam Long estimateId) {
         estimateService.deleteEstimate(userId, estimateId);
     }
+
+    // 선택한 견적서 내용 조회
+    @GetMapping("/info")
+    public EstimateResponse getEstimateInfo(@RequestHeader("userId") Long userId, @RequestParam Long estimateId) {
+        return estimateService.getEstimateInfo(userId, estimateId);
+    }
 }
