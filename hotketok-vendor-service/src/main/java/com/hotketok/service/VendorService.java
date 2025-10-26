@@ -47,6 +47,14 @@ public class VendorService {
     private final RequestFormServiceClient requestFormServiceClient;
     private final ReviewServiceClient reviewServiceClient;
 
+
+    // 등록 전 공사업체 정보 조회
+    @Transactional(readOnly = true)
+    public BeforeRegisterVendorInfoResponse getBeforeRegisterVendorInfo(Long userId){
+        Vendor vendor = vendorRepository.findByUserId(userId).orElseThrow(() -> new CustomException(VendorErrorCode.VENDOR_NOT_FOUND));
+        return BeforeRegisterVendorInfoResponse.from(vendor);
+    }
+
     // 공사업체 등록 (state=0)
     @Transactional
     public RegisterVendorResponse registerVendor(Long userId, List<MultipartFile> images, MultipartFile file, RegisterVendorRequest request) {

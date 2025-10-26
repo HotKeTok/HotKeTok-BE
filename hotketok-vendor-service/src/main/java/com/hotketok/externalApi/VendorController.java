@@ -17,6 +17,12 @@ import java.util.List;
 public class VendorController {
     private final VendorService vendorService;
 
+    // 인증 전 공사업체 정보 조회
+    @GetMapping("/before-register")
+    public BeforeRegisterVendorInfoResponse getBeforeRegisterVendorInfo(@RequestHeader("userId") Long userId){
+        return vendorService.getBeforeRegisterVendorInfo(userId);
+    }
+
     // 공사업체 등록
     @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public RegisterVendorResponse registerVendor(@RequestHeader("userId") Long vendorId,
