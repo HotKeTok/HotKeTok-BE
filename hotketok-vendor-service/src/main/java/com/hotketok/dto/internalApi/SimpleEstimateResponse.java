@@ -12,6 +12,7 @@ public record SimpleEstimateResponse(
         BigDecimal estimatePrice,
         String estimateComment,
         String estimateTime,
-        Status status
+        Status status,
+        Boolean decisionLater
 ) {
 }

@@ -461,7 +461,8 @@ public class VendorService {
                 formData.requestImages(),
                 formData.requestDescription(),
                 estimate.estimateComment(),
-                estimate.status()
+                estimate.status(),
+                estimate.decisionLater()
         );
     }
 

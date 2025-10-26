@@ -9,7 +9,17 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public record EstimateDetailResponse(
-        Long estimateId, ConstructCategory category, String address, String estimateTime,
-        BigDecimal estimatePrice, PayType payType, String payerName, String phoneNumber,
-        List<String> requestImage, String requestDescription, String estimateComment, Status status
+        Long estimateId,
+        ConstructCategory category,
+        String address,
+        String estimateTime,
+        BigDecimal estimatePrice,
+        PayType payType,
+        String payerName,
+        String phoneNumber,
+        List<String> requestImage,
+        String requestDescription,
+        String estimateComment,
+        Status status,
+        Boolean decisionLater
 ) {}
