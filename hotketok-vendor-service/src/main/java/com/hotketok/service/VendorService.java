@@ -321,13 +321,21 @@ public class VendorService {
         Long vendorId = vendor.getId();
 
         // 보낸 견적서 정보 받아옴
-        List<EstimateInfoResponse> estimates = estimateServiceClient.getEstimatesByVendorId(vendorId);
-        if (estimates.isEmpty()) {
+        List<EstimateInfoResponse> allEstimates = estimateServiceClient.getEstimatesByVendorId(vendorId);
+        if (allEstimates.isEmpty()) {
+            return new VendorEstimateListResponse(0, Collections.emptyList());
+        }
+
+        List<EstimateInfoResponse> filteredEstimates = allEstimates.stream()
+                .filter(estimate -> estimate.status() != Status.MATCHING && estimate.status() != Status.COMPLETED)
+                .toList();
+
+        if (filteredEstimates.isEmpty()) {
             return new VendorEstimateListResponse(0, Collections.emptyList());
         }
 
         // 견적서에서 요청서 id 모음
-        List<Long> requestFormIds = estimates.stream()
+        List<Long> requestFormIds = filteredEstimates.stream()
                 .map(EstimateInfoResponse::requestFormId)
                 .distinct()
                 .toList();
@@ -336,7 +344,7 @@ public class VendorService {
         Map<Long, RequestFormDetailResponse> requestFormMap = requestFormServiceClient.getRequestFormsByIds(requestFormIds).stream()
                 .collect(Collectors.toMap(RequestFormDetailResponse::requestFormId, data -> data));
 
-        List<VendorEstimateResponse> resultList = estimates.stream()
+        List<VendorEstimateResponse> resultList = filteredEstimates.stream()
                 .map(estimate -> {
                     RequestFormDetailResponse formData = requestFormMap.get(estimate.requestFormId());
                     return new VendorEstimateResponse(
@@ -461,7 +469,8 @@ public class VendorService {
                 formData.requestImages(),
                 formData.requestDescription(),
                 estimate.estimateComment(),
-                estimate.status()
+                estimate.status(),
+                estimate.decisionLater()
         );
     }
 
