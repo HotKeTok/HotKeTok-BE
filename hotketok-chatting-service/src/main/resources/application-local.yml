@@ -12,11 +12,11 @@ spring:
       path: /h2-console
 
   # ===== 데이터소스 =====
-#  datasource:
-#    url: jdbc:h2:tcp://localhost/~/chatting
-#    username: sa
-#    password:
-#    driver-class-name: org.h2.Driver
+  #  datasource:
+  #    url: jdbc:h2:tcp://localhost/~/chatting
+  #    username: sa
+  #    password:
+  #    driver-class-name: org.h2.Driver
   datasource:
     url: jdbc:h2:file:~/chatting
     username: sa
@@ -42,9 +42,6 @@ eureka:
     fetchRegistry: true
     serviceUrl:
       defaultZone: http://localhost:8761/eureka
-
-jwt:
-  secret: ${JWT_SECRET}
 
 logging:
   level:
