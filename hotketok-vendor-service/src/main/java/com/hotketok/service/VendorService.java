@@ -344,6 +344,8 @@ public class VendorService {
         Map<Long, RequestFormDetailResponse> requestFormMap = requestFormServiceClient.getRequestFormsByIds(requestFormIds).stream()
                 .collect(Collectors.toMap(RequestFormDetailResponse::requestFormId, data -> data));
 
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd / a hh:mm", Locale.KOREAN);
+
         List<VendorEstimateResponse> resultList = filteredEstimates.stream()
                 .map(estimate -> {
                     RequestFormDetailResponse formData = requestFormMap.get(estimate.requestFormId());
@@ -351,7 +353,7 @@ public class VendorService {
                             estimate.estimateId(),
                             formData.category(),
                             formData.address(),
-                            estimate.estimateTime(),
+                            formData.estimateTime(),
                             estimate.status(),
                             estimate.decisionLater()
                     );
@@ -402,7 +404,7 @@ public class VendorService {
                     estimate.estimateId(),
                     formData.category(),
                     formData.address(),
-                    estimate.estimateTime(),
+                    formData.estimateTime(),
                     estimate.estimatePrice(),
                     formData.payType(),
                     //payerInfo.name(),
@@ -437,7 +439,7 @@ public class VendorService {
                     estimate.estimateId(),
                     formData.category(),
                     formData.address(),
-                    estimate.estimateTime(),
+                    formData.estimateTime(),
                     estimate.status(),
                     estimate.decisionLater()
             );
@@ -464,7 +466,7 @@ public class VendorService {
                 estimate.estimateId(),
                 formData.category(),
                 formData.address(),
-                estimate.estimateTime(),
+                formData.estimateTime(),
                 estimate.estimatePrice(),
                 formData.payType(),
                 payerInfo.name(),
