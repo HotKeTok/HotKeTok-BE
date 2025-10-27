@@ -393,6 +393,8 @@ public class VendorService {
             RequestFormDetailResponse formData = requestFormMap.get(estimate.requestFormId());
             UserInfoDetailResponse payerInfo = userInfoMap.get(formData.payerId());
 
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd / a hh:mm", Locale.KOREAN);
+
             String payerName = "(알 수 없는 사용자)";
             String phoneNumber = null;
             if (payerInfo != null) {
@@ -404,7 +406,7 @@ public class VendorService {
                     estimate.estimateId(),
                     formData.category(),
                     formData.address(),
-                    formData.estimateTime(),
+                    formData.estimateTime().format(formatter),
                     estimate.estimatePrice(),
                     formData.payType(),
                     //payerInfo.name(),
