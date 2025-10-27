@@ -39,7 +39,8 @@ public class ChatMessageController {
         ChatMessage savedMessage = chatService.saveMessage(senderId, message);
         ChatMessageResponse messageResponse = new ChatMessageResponse(savedMessage);
 
-        messagingTemplate.convertAndSend("/sub/chat/room/" + messageResponse.roomId(), messageResponse);
+//        messagingTemplate.convertAndSend("/sub/chat/room/" + messageResponse.roomId(), messageResponse);
+        messagingTemplate.convertAndSend("/topic/chat/room/" + messageResponse.roomId(), messageResponse);
     }
 }
 
