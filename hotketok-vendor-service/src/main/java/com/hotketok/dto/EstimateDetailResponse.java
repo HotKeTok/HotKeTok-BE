@@ -12,7 +12,7 @@ public record EstimateDetailResponse(
         Long estimateId,
         ConstructCategory category,
         String address,
-        String estimateTime,
+        LocalDateTime estimateTime,
         BigDecimal estimatePrice,
         PayType payType,
         String payerName,

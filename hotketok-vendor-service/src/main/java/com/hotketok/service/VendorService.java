@@ -344,6 +344,8 @@ public class VendorService {
         Map<Long, RequestFormDetailResponse> requestFormMap = requestFormServiceClient.getRequestFormsByIds(requestFormIds).stream()
                 .collect(Collectors.toMap(RequestFormDetailResponse::requestFormId, data -> data));
 
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd / a hh:mm", Locale.KOREAN);
+
         List<VendorEstimateResponse> resultList = filteredEstimates.stream()
                 .map(estimate -> {
                     RequestFormDetailResponse formData = requestFormMap.get(estimate.requestFormId());
@@ -351,7 +353,7 @@ public class VendorService {
                             estimate.estimateId(),
                             formData.category(),
                             formData.address(),
-                            estimate.estimateTime(),
+                            formData.estimateTime(),
                             estimate.status(),
                             estimate.decisionLater()
                     );
@@ -391,6 +393,8 @@ public class VendorService {
             RequestFormDetailResponse formData = requestFormMap.get(estimate.requestFormId());
             UserInfoDetailResponse payerInfo = userInfoMap.get(formData.payerId());
 
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd / a hh:mm", Locale.KOREAN);
+
             String payerName = "(알 수 없는 사용자)";
             String phoneNumber = null;
             if (payerInfo != null) {
@@ -402,7 +406,7 @@ public class VendorService {
                     estimate.estimateId(),
                     formData.category(),
                     formData.address(),
-                    estimate.estimateTime(),
+                    formData.estimateTime().format(formatter),
                     estimate.estimatePrice(),
                     formData.payType(),
                     //payerInfo.name(),
@@ -437,7 +441,7 @@ public class VendorService {
                     estimate.estimateId(),
                     formData.category(),
                     formData.address(),
-                    estimate.estimateTime(),
+                    formData.estimateTime(),
                     estimate.status(),
                     estimate.decisionLater()
             );
@@ -464,7 +468,7 @@ public class VendorService {
                 estimate.estimateId(),
                 formData.category(),
                 formData.address(),
-                estimate.estimateTime(),
+                formData.estimateTime(),
                 estimate.estimatePrice(),
                 formData.payType(),
                 payerInfo.name(),
