@@ -18,6 +18,7 @@ public class SecurityConfig {
 
                 // HTTP 요청별 접근 제어
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/ws-stomp/info/**").permitAll()
                         // WebSocket 핸드셰이크 허용
                         .requestMatchers("/ws-stomp/**").permitAll()
                         // STOMP 메시지 경로 (브로커 경로)
