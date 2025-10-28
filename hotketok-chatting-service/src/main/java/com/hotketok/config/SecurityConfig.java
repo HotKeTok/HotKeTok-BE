@@ -22,7 +22,7 @@ public class SecurityConfig {
                 .addFilterBefore(corsFilter(), SecurityContextHolderFilter.class)
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/ws-stomp/**").permitAll() // ← handshake 허용
+                        .requestMatchers("/ws-stomp/**").permitAll() // handshake 허용
                         .requestMatchers("/sub/**", "/pub/**").permitAll()
                         .requestMatchers("/h2-console/**").permitAll()
                         .requestMatchers("/api/chatting-service/users/rooms").permitAll()
@@ -46,7 +46,6 @@ public class SecurityConfig {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        // 패턴을 사용하되, Spring Security 필터에 의해 모든 요청에 대해 강제 적용됩니다.
         config.setAllowedOriginPatterns(List.of("http://localhost:*", "https://*.shop", "*"));
         config.setAllowedMethods(List.of("*"));
         config.setAllowedHeaders(List.of("*"));
