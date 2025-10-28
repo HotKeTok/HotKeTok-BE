@@ -44,7 +44,7 @@ public class SecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
         // 패턴을 사용하되, Spring Security 필터에 의해 모든 요청에 대해 강제 적용됩니다.
-        config.setAllowedOriginPatterns(List.of("http://localhost:*", "https://*.shop"));
+        config.setAllowedOriginPatterns(List.of("http://localhost:*", "https://*.shop", "*"));
         config.setAllowedMethods(List.of("*"));
         config.setAllowedHeaders(List.of("*"));
         source.registerCorsConfiguration("/**", config); // 모든 경로에 CORS 설정 적용
