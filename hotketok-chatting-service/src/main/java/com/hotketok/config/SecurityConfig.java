@@ -25,6 +25,9 @@ public class SecurityConfig {
                         .requestMatchers("/ws-stomp/**").permitAll() // ← handshake 허용
                         .requestMatchers("/sub/**", "/pub/**").permitAll()
                         .requestMatchers("/h2-console/**").permitAll()
+                        .requestMatchers("/api/chatting-service/users/rooms").permitAll()
+                        .requestMatchers("/api/chatting-service/rooms").permitAll()
+                        .requestMatchers("/api/chatting-service/rooms/messages").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.disable())
