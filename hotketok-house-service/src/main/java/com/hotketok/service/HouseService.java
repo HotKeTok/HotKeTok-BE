@@ -200,7 +200,7 @@ public class HouseService {
     public List<HouseUnitResponse> findUnitNumbersByUserIds(List<Long> userIds) {
         List<House> houses = houseRepository.findAllByTenantIdIn(userIds);
         return houses.stream()
-                .map(house -> new HouseUnitResponse(house.getTenantId(), house.getNumber()))
+                .map(house -> new HouseUnitResponse(house.getTenantId(), house.getNumber(), house.getAddress()))
                 .collect(Collectors.toList());
     }
 
