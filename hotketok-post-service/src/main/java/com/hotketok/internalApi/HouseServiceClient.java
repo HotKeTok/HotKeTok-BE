@@ -12,7 +12,7 @@ import java.util.List;
 public interface HouseServiceClient {
 
     @GetMapping("/internal/house-service/user/{userId}")
-    HouseInfoResponse getHouseInfoByUserId(@PathVariable("userId") Long userId);
+    HouseInfoResponse getHouseInfoByUserId(@PathVariable("userId") Long userId, @RequestParam("address") String currentAddress);
 
     @GetMapping("/internal/house-service/residents")
     List<HouseInfoResponse> getResidentsByAddress(@RequestParam String address);
@@ -21,6 +21,13 @@ public interface HouseServiceClient {
     List<HouseInfoResponse> getMatchedHousesByTenantAndAddress(
             @RequestParam("tenantId") Long tenantId,
             @RequestParam("address") String address
+    );
+
+    @GetMapping("/internal/house-service/houses-number")
+    HouseInfoResponse getMatchedHousesByTenantAndAddressAndNumber(
+            @RequestParam("tenantId") Long tenantId,
+            @RequestParam("address") String address,
+            @RequestParam("number") String number
     );
 }
 
