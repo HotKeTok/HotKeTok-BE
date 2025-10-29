@@ -16,9 +16,10 @@ public record EstimateResponse(
         BigDecimal price,
         String estimateTime,
         Boolean decisionLater,
-        Long vendorId
+        Long vendorId,
+        Long roomId
 ) {
-    public static EstimateResponse from(Estimate estimate, VendorInfoResponse vendorInfo) {
+    public static EstimateResponse from(Estimate estimate, VendorInfoResponse vendorInfo, Long roomId) {
         String name = (vendorInfo != null) ? vendorInfo.name() : "알 수 없는 업체";
         String image = (vendorInfo != null) ? vendorInfo.image() : null;
         String phone = (vendorInfo != null) ? vendorInfo.vendorNumber() : null;
@@ -35,7 +36,8 @@ public record EstimateResponse(
                 estimate.getEstimatePrice(),
                 formattedTime,
                 estimate.getDecisionLater(),
-                estimate.getVendorId()
+                estimate.getVendorId(),
+                roomId
         );
     }
 }
