@@ -1,5 +1,7 @@
 package com.hotketok.internalApi;
 
+import com.hotketok.dto.internalApi.CreateChatRoomRequest;
+import com.hotketok.dto.internalApi.CreateChatRoomResponse;
 import com.hotketok.dto.internalApi.MessageRequest;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,5 +16,8 @@ public interface ChatServiceClient {
 
     @PostMapping("/internal/chatting-service/messages")
     void sendMessage(@RequestBody MessageRequest request);
+
+    @PostMapping("/internal/chatting-service/rooms")
+    CreateChatRoomResponse createChatRoom(@RequestBody CreateChatRoomRequest request);
 }
 

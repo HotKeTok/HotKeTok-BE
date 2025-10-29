@@ -362,4 +362,26 @@ public class RequestFormService {
 
         return new EstimateChatInfoResponse(roomId, imageUrls);
     }
+
+    @Transactional(readOnly = true)
+    public RequestFormDetailInfoResponse getRequestFormDetail(Long requestFormId) {
+        RequestForm requestForm = requestFormRepository.findById(requestFormId)
+                .orElseThrow(() -> new CustomException(RequestFormErrorCode.REQUEST_FORM_NOT_FOUND));
+
+        List<String> images = requestForm.getImages().stream()
+                .map(RequestFormImage::getImageUrl)
+                .collect(Collectors.toList());
+
+        return new RequestFormDetailInfoResponse(
+                requestForm.getId(),
+                requestForm.getAuthorId(),
+                requestForm.getPayerId(),
+                requestForm.getPayType(),
+                requestForm.getCategory(),
+                requestForm.getAddress(),
+                requestForm.getRequestSchedule(),
+                requestForm.getDescription(),
+                images
+        );
+    }
 }

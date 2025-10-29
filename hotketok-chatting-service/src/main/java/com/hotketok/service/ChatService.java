@@ -56,6 +56,7 @@ public class ChatService {
             Participant participant = Participant.createParticipant(chatRoom, userId, userRole);
             chatRoom.addParticipant(participant);
         });
+
         chatRoomRepository.save(chatRoom);
         return new CreateChatRoomResponse(chatRoom.getId());
     }
