@@ -3,7 +3,9 @@ package com.hotketok.internalApi;
 import com.hotketok.dto.internalApi.HouseInfoResponse;
 import com.hotketok.dto.internalApi.HouseUnitResponse;
 import com.hotketok.service.HouseService;
+import feign.Request;
 import lombok.RequiredArgsConstructor;
+import org.bouncycastle.cert.ocsp.Req;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,14 +25,21 @@ public class HouseInternalController {
             @RequestParam String address) {
         return houseService.getMatchedHousesByTenantAndAddress(tenantId, address);
     }
+    @GetMapping("/houses-number")
+    public HouseInfoResponse getMatchedHousesByTenantAndAddressAndNumber(
+            @RequestParam Long tenantId,
+            @RequestParam String address,
+            @RequestParam String number) {
+        return houseService.getMatchedHousesByTenantAndAddressNumber(tenantId, address, number);
+    }
     @GetMapping("/residents")
     public List<HouseInfoResponse> getResidentsByUserId(@RequestParam String address) {
         return houseService.findResidentsByAddress(address);
     }
 
     @GetMapping("/user/{userId}")
-    public HouseInfoResponse getHouseInfoByUserId(@PathVariable("userId") Long userId) {
-        return houseService.findHouseInfoByUserId(userId);
+    public HouseInfoResponse getHouseInfoByUserId(@PathVariable("userId") Long userId, @RequestParam("address") String currentAddress) {
+        return houseService.findHouseInfoByUserId(userId, currentAddress);
     }
 
     @GetMapping("/find-house-by-address")
