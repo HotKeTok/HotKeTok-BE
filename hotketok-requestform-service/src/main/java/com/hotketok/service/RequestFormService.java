@@ -47,6 +47,7 @@ public class RequestFormService {
     private final UserServiceClient userServiceClient;
     private final HouseServiceClient houseServiceClient;
     private final EstimateServiceClient estimateServiceClient;
+    private final ChatServiceClient chatServiceClient;
 
     @Value("${openai.model}")
     private String model;
@@ -330,5 +331,20 @@ public class RequestFormService {
         return requestFormRepository.findAllByAuthorId(authorId).stream()
                 .map(RequestForm::getId)
                 .collect(Collectors.toList());
+    }
+
+    // 견적서 선택 시 요청서 정보로 채팅 추가
+    public EstimateChatInfoResponse getEstimateChatInfo(Long requestFormId, Long estimateId) {
+        RequestForm requestForm = requestFormRepository.findById(requestFormId)
+                .orElseThrow(() -> new CustomException(RequestFormErrorCode.REQUEST_FORM_NOT_FOUND));
+
+        List<String> imageUrls = requestForm.getImages().stream()
+                .map(RequestFormImage::getImageUrl)
+                .collect(Collectors.toList());
+
+        // 채팅방 id 조회
+        Long roomId = chatServiceClient.getRoomIdByRequestFormId(requestFormId);
+
+        return new EstimateChatInfoResponse(roomId, imageUrls);
     }
 }

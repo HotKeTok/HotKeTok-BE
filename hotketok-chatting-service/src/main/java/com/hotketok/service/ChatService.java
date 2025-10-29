@@ -271,4 +271,12 @@ public class ChatService {
         ChatMessage chatMessage = ChatMessage.createChatMessage(chatRoom, senderId, request.content());
         return chatMessageRepository.save(chatMessage);
     }
+
+    // 요청서로 채팅방 정보 조회
+    @Transactional(readOnly = true)
+    public Long findRoomIdByRequestFormId(Long requestFormId) {
+        return chatRoomRepository.findByRequestFormId(requestFormId)
+                .map(ChatRoom::getId)
+                .orElse(null);
+    }
 }

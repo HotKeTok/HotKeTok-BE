@@ -54,3 +54,5 @@ client:
     url: http://localhost:8093
   vendor-service:
     url: http://localhost:8099
+  chatting-service:
+    url: http://localhost:8096

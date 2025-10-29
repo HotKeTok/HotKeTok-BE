@@ -11,6 +11,7 @@ import com.hotketok.dto.internalApi.UpdateStatusRequest;
 import com.hotketok.dto.internalApi.VendorInfoResponse;
 import com.hotketok.exception.EstimateErrorCode;
 import com.hotketok.hotketokcommonservice.error.exception.CustomException;
+import com.hotketok.internalApi.ChatServiceClient;
 import com.hotketok.internalApi.RequestFormServiceClient;
 import com.hotketok.internalApi.VendorServiceClient;
 import com.hotketok.repository.EstimateRepository;
@@ -32,6 +33,7 @@ public class EstimateService {
     private final EstimateRepository estimateRepository;
     private final RequestFormServiceClient requestFormClient;
     private final VendorServiceClient vendorServiceClient;
+    private final ChatServiceClient chatServiceClient;
 
     public PostEstimateResponse postEstimate(Long userId, PostEstimateRequest request) {
         RequestFormResponse requestFormData = requestFormClient.getRequestFormData(request.requestFormId());
@@ -109,6 +111,38 @@ public class EstimateService {
         });
 
         requestFormClient.updateRequestFormStatus(requestFormId, new UpdateStatusRequest(Status.MATCHING));
+
+        // 채팅방 전송
+        try {
+            EstimateChatInfoResponse chatInfo = requestFormClient.getEstimateChatInfo(requestFormId, estimateId);
+
+            String jsonContent = createEstimateSelectedMessage(
+                    requestFormId,
+                    estimateId,
+                    chatInfo.imageUrls()
+            );
+
+            MessageRequest messageRequest = new MessageRequest(chatInfo.roomId(), jsonContent);
+
+            chatServiceClient.sendMessage(userId, messageRequest);
+            log.info("Estimate selected message sent to chat room {}. estimateId: {}, requestFormId: {}",
+                    chatInfo.roomId(), estimateId, requestFormId);
+        } catch (Exception e) {
+            log.error("Failed to send estimate selected message. estimateId: {}, error: {}", estimateId, e.getMessage());
+        }
+    }
+
+    private String createEstimateSelectedMessage(Long requestFormId, Long estimateId, List<String> imageUrls) {
+        String imageUrlsJson = imageUrls.stream()
+                .map(url -> "\"" + url + "\"")
+                .collect(Collectors.joining(","));
+
+        return String.format(
+                "{\"type\":\"ESTIMATE_SELECTED\", \"requestFormId\":%d, \"estimateId\":%d, \"imageUrls\":[%s]}",
+                requestFormId,
+                estimateId,
+                imageUrlsJson
+        );
     }
 
     // 견적서 삭제

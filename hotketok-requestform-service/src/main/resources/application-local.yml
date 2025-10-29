@@ -73,3 +73,5 @@ client:
     url: http://localhost:8090 # house-service의 주소
   estimate-service:
     url: http://localhost:8094 # estimate-service의 주소
+  chatting-service:
+    url: http://localhost:8096 # chatting-service의 주소

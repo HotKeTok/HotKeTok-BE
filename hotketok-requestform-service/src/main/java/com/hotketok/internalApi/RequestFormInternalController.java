@@ -4,6 +4,7 @@ import com.hotketok.domain.enums.Status;
 import com.hotketok.dto.internalApi.*;
 import com.hotketok.service.RequestFormService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,6 +12,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/internal/requestform-service")
 @RequiredArgsConstructor
+@Slf4j
 public class RequestFormInternalController {
 
     private final RequestFormService requestFormService;
@@ -78,5 +80,15 @@ public class RequestFormInternalController {
     @GetMapping("/by-author")
     public List<Long> getRequestFormIdsByAuthorId(@RequestParam Long authorId) {
         return requestFormService.findRequestFormIdsByAuthorId(authorId);
+    }
+
+    // 요청서로 이미지 및 채팅방 정보 조회
+    @GetMapping("/chat-info")
+    public EstimateChatInfoResponse getEstimateChatInfo(
+            @RequestParam Long requestFormId,
+            @RequestParam Long estimateId
+    ) {
+        log.info("Internal API call received: getEstimateChatInfo for requestFormId: {}, estimateId: {}", requestFormId, estimateId);
+        return requestFormService.getEstimateChatInfo(requestFormId, estimateId);
     }
 }
