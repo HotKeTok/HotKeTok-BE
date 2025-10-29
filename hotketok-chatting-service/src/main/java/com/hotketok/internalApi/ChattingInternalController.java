@@ -1,6 +1,7 @@
 package com.hotketok.internalApi;
 
 import com.hotketok.dto.internalApi.CreateChatRoomRequest;
+import com.hotketok.dto.internalApi.CreateChatRoomResponse;
 import com.hotketok.dto.internalApi.MessageRequest;
 import com.hotketok.service.ChatService;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +17,7 @@ public class ChattingInternalController {
     private final ChatService chatService;
 
     @PostMapping("/rooms")
-    public Long createChatRoom(@RequestBody CreateChatRoomRequest request) {
+    public CreateChatRoomResponse createChatRoom(@RequestBody CreateChatRoomRequest request) {
         log.info("Internal API call received: createChatRoom with participants: {}", request.participantUserIds());
         return chatService.createChatRoom(request);
     }

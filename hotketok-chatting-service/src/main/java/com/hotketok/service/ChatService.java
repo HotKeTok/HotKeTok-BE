@@ -42,7 +42,7 @@ public class ChatService {
 
     // 채팅방 생성 요청
     @Transactional
-    public Long createChatRoom(CreateChatRoomRequest request) {
+    public CreateChatRoomResponse createChatRoom(CreateChatRoomRequest request) {
         List<Long> userIds = request.participantUserIds();
         ChatRoomType roomType = request.roomType();
 
@@ -57,7 +57,7 @@ public class ChatService {
             chatRoom.addParticipant(participant);
         });
         chatRoomRepository.save(chatRoom);
-        return chatRoom.getId();
+        return new CreateChatRoomResponse(chatRoom.getId());
     }
 
     // 특정 유저의 채팅방 목록 조회 
