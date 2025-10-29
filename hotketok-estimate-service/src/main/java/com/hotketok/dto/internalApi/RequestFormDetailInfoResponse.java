@@ -6,15 +6,15 @@ import com.hotketok.domain.enums.PayType;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public record RequestFormDetailResponse(
+public record RequestFormDetailInfoResponse(
         Long requestFormId,
-        String address,
-        ConstructCategory category,
-        PayType payType,
+        Long authorId,
         Long payerId,
-        List<String> requestImages,
-        String requestDescription,
+        PayType payType,
+        ConstructCategory category,
+        String address,
         LocalDateTime estimateTime,
-        Long authorId
+        String requestDescription,
+        List<String> requestImages
 ) {
 }

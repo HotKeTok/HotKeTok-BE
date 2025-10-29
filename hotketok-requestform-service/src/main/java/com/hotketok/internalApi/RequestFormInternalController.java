@@ -91,4 +91,10 @@ public class RequestFormInternalController {
         log.info("Internal API call received: getEstimateChatInfo for requestFormId: {}, estimateId: {}", requestFormId, estimateId);
         return requestFormService.getEstimateChatInfo(requestFormId, estimateId);
     }
+
+    @GetMapping("/forms/{requestFormId}/detail")
+    public RequestFormDetailInfoResponse getRequestFormDetailInfo(@PathVariable("requestFormId") Long requestFormId) {
+        log.info("Internal API call received: getRequestFormDetail for ID: {}", requestFormId);
+        return requestFormService.getRequestFormDetail(requestFormId);
+    }
 }

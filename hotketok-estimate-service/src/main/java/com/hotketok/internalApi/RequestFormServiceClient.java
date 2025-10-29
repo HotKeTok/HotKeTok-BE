@@ -1,9 +1,6 @@
 package com.hotketok.internalApi;
 
-import com.hotketok.dto.internalApi.EstimateChatInfoResponse;
-import com.hotketok.dto.internalApi.RequestFormPayerResponse;
-import com.hotketok.dto.internalApi.RequestFormResponse;
-import com.hotketok.dto.internalApi.UpdateStatusRequest;
+import com.hotketok.dto.internalApi.*;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,4 +26,8 @@ public interface RequestFormServiceClient {
             @RequestParam Long requestFormId,
             @RequestParam Long estimateId
     );
+
+
+    @GetMapping("/internal/requestform-service/forms/{requestFormId}/detail")
+    RequestFormDetailInfoResponse getRequestFormDetail(@PathVariable("requestFormId") Long requestFormId);
 }

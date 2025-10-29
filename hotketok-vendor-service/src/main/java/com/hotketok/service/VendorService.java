@@ -21,6 +21,7 @@ import com.hotketok.internalApi.*;
 import com.hotketok.repository.NewsRepository;
 import com.hotketok.repository.VendorIntroductionImageRepository;
 import com.hotketok.repository.VendorRepository;
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -46,6 +47,7 @@ public class VendorService {
     private final EstimateServiceClient estimateServiceClient;
     private final RequestFormServiceClient requestFormServiceClient;
     private final ReviewServiceClient reviewServiceClient;
+    private final ChatServiceClient chatServiceClient;
 
 
     // 등록 전 공사업체 정보 조회
@@ -464,6 +466,15 @@ public class VendorService {
         RequestFormDetailResponse formData = requestFormServiceClient.getRequestFormDetail(estimate.requestFormId());
         UserInfoDetailResponse payerInfo = userServiceClient.getUserInfoById(formData.payerId());
 
+        // 채팅방 존재 확인
+        Long roomId = null;
+        try {
+            Long requestFormId = estimate.requestFormId();
+            roomId = chatServiceClient.getRoomIdByRequestFormId(requestFormId);
+        } catch (FeignException e) {
+            log.error("Failed to get roomId from ChatService for RF {}: {}", estimate.requestFormId(), e.getMessage());
+        }
+
         return new EstimateDetailResponse(
                 estimate.estimateId(),
                 formData.category(),
@@ -478,8 +489,10 @@ public class VendorService {
                 estimate.estimateComment(),
                 estimate.status(),
                 estimate.decisionLater(),
-                userId,
-                estimate.vendorId()
+                formData.payerId(),
+                formData.authorId(),
+                estimate.vendorId(),
+                roomId
         );
     }
 

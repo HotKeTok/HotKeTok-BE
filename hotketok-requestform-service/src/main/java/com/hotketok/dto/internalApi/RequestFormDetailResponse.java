@@ -16,7 +16,8 @@ public record RequestFormDetailResponse(
         Long payerId,
         List<String> requestImages,
         String requestDescription,
-        LocalDateTime estimateTime
+        LocalDateTime estimateTime,
+        Long authorId
 ) {
     public static RequestFormDetailResponse from(RequestForm requestForm) {
         List<String> imageUrls = requestForm.getImages().stream()
@@ -31,7 +32,8 @@ public record RequestFormDetailResponse(
                 requestForm.getPayerId(),
                 imageUrls,
                 requestForm.getDescription(),
-                requestForm.getRequestSchedule()
+                requestForm.getRequestSchedule(),
+                requestForm.getAuthorId()
         );
     }
 }

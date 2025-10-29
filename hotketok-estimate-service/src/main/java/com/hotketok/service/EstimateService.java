@@ -1,6 +1,8 @@
 package com.hotketok.service;
 
 import com.hotketok.domain.Estimate;
+import com.hotketok.domain.enums.ChatRoomType;
+import com.hotketok.domain.enums.PayType;
 import com.hotketok.domain.enums.Status;
 import com.hotketok.dto.PostEstimateRequest;
 import com.hotketok.dto.PostEstimateResponse;
@@ -20,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -93,14 +96,16 @@ public class EstimateService {
         // 유저가 견적서 선택 권한있는지 확인
         Long requestFormId = selectedEstimate.getRequestFormId();
 
-        RequestFormPayerResponse authorResponse = requestFormClient.getRequestFormAuthor(requestFormId);
-        Long payerId = authorResponse.payerId();
-
-        if (!payerId.equals(userId)) {
-            throw new CustomException(EstimateErrorCode.NO_AUTHORITY_TO_SELECT);
-        }
-
+        //RequestFormPayerResponse authorResponse = requestFormClient.getRequestFormAuthor(requestFormId);
+        //Long payerId = authorResponse.payerId();
         selectedEstimate.changeStatus(Status.MATCHING);
+
+        RequestFormDetailInfoResponse formData = requestFormClient.getRequestFormDetail(requestFormId);
+        PayType payType = formData.payType();
+        Long vendorId = selectedEstimate.getVendorId();
+        Long authorId = formData.authorId();
+        Long payerId = formData.payerId();
+        log.info(">>>payerId: {}", payerId);
 
         List<Estimate> otherEstimates = estimateRepository.findAllByRequestFormId(requestFormId);
 
@@ -114,6 +119,34 @@ public class EstimateService {
 
         // 채팅방 전송
         try {
+            Long roomId = chatServiceClient.getRoomIdByRequestFormId(requestFormId);
+
+            // 채팅방이 없으면 (null이면) PayType에 따라 생성
+            if (roomId == null) {
+                List<Long> participantUserIds = new ArrayList<>();
+                participantUserIds.add(authorId); // 요청서 작성자 (authorId)는 항상 포함
+                participantUserIds.add(vendorServiceClient.getVendorInfoById(vendorId).userId()); // Vendor User ID 포함
+
+                if (payType == PayType.PROPRIETORSHIP) {
+                    participantUserIds.add(payerId);
+                } else {
+                    // RESIDENT
+                }
+
+                participantUserIds = participantUserIds.stream().distinct().toList();
+
+                CreateChatRoomRequest createRequest = new CreateChatRoomRequest(
+                        participantUserIds,
+                        ChatRoomType.VENDOR_ESTIMATE, // 견적 채팅방 타입 사용
+                        requestFormId
+                );
+
+                CreateChatRoomResponse createResponse = chatServiceClient.createChatRoom(createRequest);
+                roomId = createResponse.roomId();
+                log.info("New chat room created for RF {}. Room ID: {}", requestFormId, roomId);
+            }
+
+            // 채팅방 정보 조회 및 메시지 전송
             EstimateChatInfoResponse chatInfo = requestFormClient.getEstimateChatInfo(requestFormId, estimateId);
 
             String jsonContent = createEstimateSelectedMessage(
@@ -122,13 +155,14 @@ public class EstimateService {
                     chatInfo.imageUrls()
             );
 
-            MessageRequest messageRequest = new MessageRequest(chatInfo.roomId(), userId, jsonContent);
+            MessageRequest messageRequest = new MessageRequest(roomId, userId, jsonContent);
 
             chatServiceClient.sendMessage(messageRequest);
             log.info("Estimate selected message sent to chat room {}. estimateId: {}, requestFormId: {}",
-                    chatInfo.roomId(), estimateId, requestFormId);
+                    roomId, estimateId, requestFormId);
+
         } catch (Exception e) {
-            log.error("Failed to send estimate selected message. estimateId: {}, error: {}", estimateId, e.getMessage());
+            log.error("Failed to process chat for estimate ID {}: {}", estimateId, e.getMessage());
         }
     }
 

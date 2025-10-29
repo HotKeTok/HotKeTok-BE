@@ -1,9 +1,6 @@
 package com.hotketok.externalApi;
 
-import com.hotketok.dto.internalApi.ChatMessageResponse;
-import com.hotketok.dto.internalApi.ChatRoomDetailResponse;
-import com.hotketok.dto.internalApi.ChatRoomResponse;
-import com.hotketok.dto.internalApi.CreateChatRoomRequest;
+import com.hotketok.dto.internalApi.*;
 // import com.hotketok.security.UserPrincipal; // 토큰 적용 후 도입
 import com.hotketok.service.ChatService;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +18,7 @@ public class ChatRoomController {
 
     // 채팅방 생성
     @PostMapping("/rooms")
-    public Long createChatRoom(@RequestBody CreateChatRoomRequest request) {
+    public CreateChatRoomResponse createChatRoom(@RequestBody CreateChatRoomRequest request) {
         return chatService.createChatRoom(request);
     }
 
