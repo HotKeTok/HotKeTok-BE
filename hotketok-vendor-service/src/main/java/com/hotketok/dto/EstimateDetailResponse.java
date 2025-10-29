@@ -23,5 +23,6 @@ public record EstimateDetailResponse(
         Status status,
         Boolean decisionLater,
         Long userId,
-        Long vendorId
+        Long vendorId,
+        Long roomId
 ) {}
