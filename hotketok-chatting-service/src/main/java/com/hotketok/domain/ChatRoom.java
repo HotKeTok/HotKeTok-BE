@@ -23,7 +23,7 @@ public class ChatRoom extends BaseTimeEntity {
     @Column(name = "chatroom_id")
     private Long id;
 
-    @Column(nullable = true)
+    @Column(nullable = true, name = "room_name")
     private String name;
 
     @Enumerated(EnumType.STRING)

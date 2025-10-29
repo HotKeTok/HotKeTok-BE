@@ -58,3 +58,5 @@ client:
     url: http://localhost:8088 # user-service의 주소
   infra-service:
     url: http://localhost:8089 # infra-service의 주소
+  chatting-service:
+    url: http://localhost:8096 # chatting-service의 주소

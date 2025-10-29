@@ -28,6 +28,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/chatting-service/users/rooms").permitAll()
                         .requestMatchers("/api/chatting-service/rooms").permitAll()
                         .requestMatchers("/api/chatting-service/rooms/messages").permitAll()
+                        .requestMatchers("/internal/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session.disable())
