@@ -82,18 +82,8 @@ public class PostService {
         }
 
         // 주소까지 기반으로 해서 필터링
-        CurrentAddressResponse currentAddressResponse = userServiceClient.getCurrentAddress(userId);
-        String currentAddress = currentAddressResponse.currentAddress();
-        List<HouseInfoResponse> residents = houseServiceClient.getResidentsByAddress(currentAddress);
+        // 같은 주소에 사는 유저만 접근 가능
 
-        // 이웃들 id
-        Set<Long> residentIds = residents.stream()
-                .map(HouseInfoResponse::userId)
-                .collect(Collectors.toSet());
-
-        if (!residentIds.contains(post.getSenderId()) || !residentIds.contains(post.getReceiverId())) {
-            throw new CustomException(PostErrorCode.POST_ACCESS_DENIED);
-        }
         HouseInfoResponse houseInfo = houseServiceClient.getHouseInfoByUserId(post.getSenderId());
         return PostDetailResponse.of(post, houseInfo);
     }
