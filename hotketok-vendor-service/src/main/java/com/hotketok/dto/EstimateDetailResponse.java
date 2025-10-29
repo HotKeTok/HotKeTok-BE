@@ -21,5 +21,7 @@ public record EstimateDetailResponse(
         String requestDescription,
         String estimateComment,
         Status status,
-        Boolean decisionLater
+        Boolean decisionLater,
+        Long userId,
+        Long vendorId
 ) {}
