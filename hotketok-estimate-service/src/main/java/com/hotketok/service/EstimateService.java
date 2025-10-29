@@ -17,6 +17,7 @@ import com.hotketok.internalApi.ChatServiceClient;
 import com.hotketok.internalApi.RequestFormServiceClient;
 import com.hotketok.internalApi.VendorServiceClient;
 import com.hotketok.repository.EstimateRepository;
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -82,7 +83,7 @@ public class EstimateService {
         return estimates.stream()
                 .map(estimate -> {
                     VendorInfoResponse vendorInfo = vendorInfoMap.get(estimate.getVendorId());
-                    return EstimateResponse.from(estimate, vendorInfo);
+                    return EstimateResponse.from(estimate, vendorInfo, null);
                 })
                 .collect(Collectors.toList());
     }
@@ -272,6 +273,15 @@ public class EstimateService {
             throw new CustomException(EstimateErrorCode.ESTIMATE_NOT_MATCHING);
         }
 
-        return EstimateResponse.from(estimate, vendorInfo);
+        // 채팅방 존재 확인
+        Long roomId = null;
+        try {
+            Long requestFormId = estimate.getRequestFormId();
+            roomId = chatServiceClient.getRoomIdByRequestFormId(requestFormId);
+        } catch (FeignException e) {
+            log.error("Failed to get roomId from ChatService for RF {}: {}", estimate.getRequestFormId(), e.getMessage());
+        }
+
+        return EstimateResponse.from(estimate, vendorInfo, roomId);
     }
 }
