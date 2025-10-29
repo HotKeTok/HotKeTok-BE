@@ -31,6 +31,10 @@ dependencies {
 	// Jakarta Servlet API 추가
 	implementation 'jakarta.servlet:jakarta.servlet-api:6.0.0'
 
+	// Spring Security
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.security:spring-security-test'
+
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }

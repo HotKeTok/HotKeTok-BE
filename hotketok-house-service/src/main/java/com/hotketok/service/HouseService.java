@@ -141,8 +141,25 @@ public class HouseService {
         house.changeState(HouseState.REGISTERED);
     }
 
-    public HouseInfoResponse findHouseInfoByUserId(Long userId) {
-        return houseRepository.findByTenantId(userId)
+    public HouseInfoResponse findHouseInfoByUserId(Long userId, String currentAddress) {
+        return houseRepository.findByTenantIdAndAddress(userId, currentAddress)
+                .map(house -> {
+                    List<String> tagContents = house.getHouseTags().stream()
+                            .map(HouseTag::getContent)
+                            .collect(Collectors.toList());
+
+                    return new HouseInfoResponse(
+                            userId,
+                            house.getFloor(),
+                            house.getNumber(),
+                            tagContents
+                    );
+                })
+                .orElseThrow(() -> new CustomException(HouseErrorCode.HOUSE_NOT_FOUND));
+    }
+
+    public HouseInfoResponse getMatchedHousesByTenantAndAddressNumber(Long userId, String currentAddress, String currentNumber) {
+        return houseRepository.findByTenantIdAndAddressAndNumber(userId, currentAddress, currentNumber)
                 .map(house -> {
                     List<String> tagContents = house.getHouseTags().stream()
                             .map(HouseTag::getContent)

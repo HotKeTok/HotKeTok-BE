@@ -24,6 +24,12 @@ public class JwtAuthFilter extends AbstractGatewayFilterFactory<JwtAuthFilter.Co
     @Override
     public GatewayFilter apply(Config config){
         return (exchange, chain) -> {
+            String path = exchange.getRequest().getURI().getPath();
+
+            // ✅ WebSocket handshake 경로는 필터 제외
+            if (path.startsWith("/ws-stomp")) {
+                return chain.filter(exchange);
+            }
             String token = extract(exchange.getRequest());
             if (token == null) {
                 log.info("Token이 비어있습니다.");

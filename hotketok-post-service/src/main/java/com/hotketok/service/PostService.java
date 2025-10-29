@@ -10,6 +10,7 @@ import com.hotketok.internalApi.HouseServiceClient;
 import com.hotketok.internalApi.UserServiceClient;
 import com.hotketok.repository.PostRepository;
 import com.hotketok.repository.PostTagRepository;
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -82,19 +83,15 @@ public class PostService {
         }
 
         // 주소까지 기반으로 해서 필터링
-        CurrentAddressResponse currentAddressResponse = userServiceClient.getCurrentAddress(userId);
-        String currentAddress = currentAddressResponse.currentAddress();
-        List<HouseInfoResponse> residents = houseServiceClient.getResidentsByAddress(currentAddress);
+        // 같은 주소에 사는 유저만 접근 가능
+        CurrentAddressAndNumberResponse addressAndNumber = userServiceClient.getCurrentAddressAndNumber(userId);
 
-        // 이웃들 id
-        Set<Long> residentIds = residents.stream()
-                .map(HouseInfoResponse::userId)
-                .collect(Collectors.toSet());
+        HouseInfoResponse houseInfo = houseServiceClient.getMatchedHousesByTenantAndAddressAndNumber(
+                post.getSenderId(),
+                addressAndNumber.currentAddress(),
+                addressAndNumber.currentNumber()
+        );
 
-        if (!residentIds.contains(post.getSenderId()) || !residentIds.contains(post.getReceiverId())) {
-            throw new CustomException(PostErrorCode.POST_ACCESS_DENIED);
-        }
-        HouseInfoResponse houseInfo = houseServiceClient.getHouseInfoByUserId(post.getSenderId());
         return PostDetailResponse.of(post, houseInfo);
     }
 
