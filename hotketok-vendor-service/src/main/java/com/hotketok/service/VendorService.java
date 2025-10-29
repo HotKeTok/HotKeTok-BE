@@ -477,7 +477,9 @@ public class VendorService {
                 formData.requestDescription(),
                 estimate.estimateComment(),
                 estimate.status(),
-                estimate.decisionLater()
+                estimate.decisionLater(),
+                userId,
+                estimate.vendorId()
         );
     }
 
