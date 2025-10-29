@@ -14,6 +14,7 @@ public record RequestFormDetailResponse(
         Long payerId,
         List<String> requestImages,
         String requestDescription,
-        LocalDateTime estimateTime
+        LocalDateTime estimateTime,
+        Long authorId
 ) {
 }

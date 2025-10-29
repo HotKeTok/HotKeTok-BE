@@ -489,7 +489,8 @@ public class VendorService {
                 estimate.estimateComment(),
                 estimate.status(),
                 estimate.decisionLater(),
-                userId,
+                formData.payerId(),
+                formData.authorId(),
                 estimate.vendorId(),
                 roomId
         );
