@@ -1,5 +1,6 @@
 package com.hotketok.internalApi;
 
+import com.hotketok.dto.internalApi.EstimateChatInfoResponse;
 import com.hotketok.dto.internalApi.RequestFormPayerResponse;
 import com.hotketok.dto.internalApi.RequestFormResponse;
 import com.hotketok.dto.internalApi.UpdateStatusRequest;
@@ -22,4 +23,10 @@ public interface RequestFormServiceClient {
 
     @GetMapping("/internal/requestform-service/by-author")
     List<Long> getRequestFormIdsByAuthorId(@RequestParam("authorId") Long authorId);
+
+    @GetMapping("/internal/requestform-service/chat-info")
+    EstimateChatInfoResponse getEstimateChatInfo(
+            @RequestParam Long requestFormId,
+            @RequestParam Long estimateId
+    );
 }

@@ -342,8 +342,22 @@ public class RequestFormService {
                 .map(RequestFormImage::getImageUrl)
                 .collect(Collectors.toList());
 
-        // 채팅방 id 조회
-        Long roomId = chatServiceClient.getRoomIdByRequestFormId(requestFormId);
+        Long roomId = null;
+        try {
+            // 채팅방 id 조회
+            roomId = chatServiceClient.getRoomIdByRequestFormId(requestFormId);
+        } catch (FeignException e) {
+            log.error("Failed to get roomId from ChatService for requestFormId {}: Status={}, Message={}",
+                    requestFormId, e.status(), e.contentUTF8());
+
+            // 챗 서비스 통신 오류 시, 챗 서비스가 다운되었거나 잘못된 설정을 알림
+            throw new CustomException(RequestFormErrorCode.CHAT_SERVICE_UNAVAILABLE);
+        }
+
+        if (roomId == null) {
+            // ChatService에서 채팅방을 찾았지만 null을 반환한 경우 (채팅방이 생성되지 않음)
+            throw new CustomException(RequestFormErrorCode.CHAT_ROOM_NOT_FOUND);
+        }
 
         return new EstimateChatInfoResponse(roomId, imageUrls);
     }

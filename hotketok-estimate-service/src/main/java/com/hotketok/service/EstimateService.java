@@ -122,9 +122,9 @@ public class EstimateService {
                     chatInfo.imageUrls()
             );
 
-            MessageRequest messageRequest = new MessageRequest(chatInfo.roomId(), jsonContent);
+            MessageRequest messageRequest = new MessageRequest(chatInfo.roomId(), userId, jsonContent);
 
-            chatServiceClient.sendMessage(userId, messageRequest);
+            chatServiceClient.sendMessage(messageRequest);
             log.info("Estimate selected message sent to chat room {}. estimateId: {}, requestFormId: {}",
                     chatInfo.roomId(), estimateId, requestFormId);
         } catch (Exception e) {
