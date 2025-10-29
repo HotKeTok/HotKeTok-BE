@@ -106,11 +106,16 @@ public class ChatService {
             return List.of();
         }
 
+        CurrentAddressAndNumberResponse addressAndNumber = userServiceClient.getCurrentAddressAndNumber(userId);
+        final String currentAddress = addressAndNumber.currentAddress();
+        final String currentUnitNumber = addressAndNumber.currentNumber();
+
         Map<Long, UserProfileResponse> userProfiles = userServiceClient.getUserProfilesByIds(allUserIds).stream()
                 .collect(Collectors.toMap(UserProfileResponse::userId, profile -> profile));
 
-        Map<Long, HouseUnitResponse> unitNumbers = houseServiceClient.getUnitNumbersByUserIds(allUserIds).stream()
-                .collect(Collectors.toMap(HouseUnitResponse::userId, info -> info));
+        List<HouseUnitResponse> allUnits = houseServiceClient.getUnitNumbersByUserIds(allUserIds);
+        Map<Long, List<HouseUnitResponse>> unitListMap = allUnits.stream()
+                .collect(Collectors.groupingBy(HouseUnitResponse::userId));
 
         // 공사업체의 경우 카테고리 반환 추가
         List<Long> vendorIds = userProfiles.values().stream()
@@ -127,18 +132,44 @@ public class ChatService {
         return participants.stream().map(participant -> {
             ChatRoom chatRoom = participant.getChatRoom();
 
+            String chatRoomAddress = null;
+            if (chatRoom.getRoomType() == ChatRoomType.VENDOR_ESTIMATE && finalRequestFormMap != null) {
+                RequestFormAddressStatusResponse formData = finalRequestFormMap.get(chatRoom.getRequestFormId());
+                if (formData != null) {
+                    chatRoomAddress = formData.address();
+                }
+            }
+            final String addressToFilter = chatRoomAddress;
+
             // 상세 참여자 목록 생성
             List<ParticipantResponse> detailedParticipants = chatRoom.getParticipants().stream().map(p -> {
                 UserProfileResponse profile = userProfiles.get(p.getUserId());
-                HouseUnitResponse unit = unitNumbers.get(p.getUserId());
                 VendorCategoryResponse category = finalVendorCategories.get(p.getUserId());
+
+                String unitNumber = null;
+
+                // 현재 참여자가 로그인 유저 본인인 경우
+                if (p.getUserId().equals(userId)) {
+                    unitNumber = currentUnitNumber;
+                }
+                // 현재 참여자가 다른 유저인 경우 (견적 채팅방에서)
+                else if (chatRoom.getRoomType() == ChatRoomType.VENDOR_ESTIMATE && addressToFilter != null) {
+                    List<HouseUnitResponse> unitsForUser = unitListMap.get(p.getUserId());
+                    if (unitsForUser != null) {
+                        unitNumber = unitsForUser.stream()
+                                .filter(unit -> addressToFilter.equals(unit.address()))
+                                .map(HouseUnitResponse::unitNumber)
+                                .findFirst()
+                                .orElse(null);
+                    }
+                }
 
                 return new ParticipantResponse(
                         p.getUserId(),
                         profile != null ? profile.userName() : "알 수 없는 사용자",
                         profile != null ? profile.profileImageUrl() : null,
                         p.getSenderType(), p.getJoinedAt(),
-                        unit != null ? unit.unitNumber() : null,
+                        unitNumber,
                         category != null ? category.category() : null
                 );
             }).collect(Collectors.toList());
@@ -239,5 +270,13 @@ public class ChatService {
 
         ChatMessage chatMessage = ChatMessage.createChatMessage(chatRoom, senderId, request.content());
         return chatMessageRepository.save(chatMessage);
+    }
+
+    // 요청서로 채팅방 정보 조회
+    @Transactional(readOnly = true)
+    public Long findRoomIdByRequestFormId(Long requestFormId) {
+        return chatRoomRepository.findByRequestFormId(requestFormId)
+                .map(ChatRoom::getId)
+                .orElse(null);
     }
 }

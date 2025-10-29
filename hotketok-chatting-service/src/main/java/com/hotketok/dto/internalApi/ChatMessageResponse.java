@@ -1,6 +1,8 @@
 package com.hotketok.dto.internalApi;
 
 import com.hotketok.domain.ChatMessage;
+import com.hotketok.util.TimeUtil;
+
 import java.time.LocalDateTime;
 
 public record ChatMessageResponse(
@@ -8,7 +10,8 @@ public record ChatMessageResponse(
         Long roomId,
         Long senderId,
         String content,
-        LocalDateTime createdAt
+        LocalDateTime createdAt,
+        String displayTime
 ) {
     public ChatMessageResponse(ChatMessage chatMessage) {
         this(
@@ -16,7 +19,8 @@ public record ChatMessageResponse(
                 chatMessage.getChatRoom().getId(),
                 chatMessage.getSenderId(),
                 chatMessage.getContent(),
-                chatMessage.getCreatedAt()
+                chatMessage.getCreatedAt(),
+                TimeUtil.formatTimeAgo(chatMessage.getCreatedAt())
         );
     }
 }

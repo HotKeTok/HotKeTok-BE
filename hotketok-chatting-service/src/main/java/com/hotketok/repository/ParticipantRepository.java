@@ -19,7 +19,7 @@ public interface ParticipantRepository extends JpaRepository<Participant, Long> 
 
     @Query("SELECT p FROM Participant p " +
             "JOIN FETCH p.chatRoom cr " +
-            "LEFT JOIN FETCH cr.participants " +
-            "WHERE p.userId = :userId")
+            "LEFT JOIN FETCH cr.participants p2 " +
+            "WHERE p.userId = :userId AND p.isActive = TRUE AND cr.isActive = TRUE")
     List<Participant> findByUserIdWithDetails(@Param("userId") Long userId);
 }

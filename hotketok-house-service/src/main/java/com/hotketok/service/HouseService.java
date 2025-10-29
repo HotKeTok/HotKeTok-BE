@@ -2,11 +2,13 @@ package com.hotketok.service;
 
 import com.hotketok.domain.House;
 import com.hotketok.domain.HouseTag;
+import com.hotketok.domain.enums.ChatRoomType;
 import com.hotketok.domain.enums.HouseState;
 import com.hotketok.dto.*;
 import com.hotketok.dto.internalApi.*;
 import com.hotketok.exception.HouseErrorCode;
 import com.hotketok.hotketokcommonservice.error.exception.CustomException;
+import com.hotketok.internalApi.ChatServiceClient;
 import com.hotketok.internalApi.InfraServiceClient;
 import com.hotketok.internalApi.UserServiceClient;
 import com.hotketok.repository.HouseRepository;
@@ -26,6 +28,7 @@ public class HouseService {
     private final HouseRepository houseRepository;
     private final UserServiceClient userServiceClient;
     private final InfraServiceClient infraServiceClient;
+    private final ChatServiceClient chatServiceClient;
     // 집주인 등록 (state=0)
     @Transactional
     public RegisterHouseResponse registerHouse(Long ownerId, MultipartFile file, RegisterHouseRequest request) {
@@ -104,8 +107,25 @@ public class HouseService {
         }
         house.changeState(HouseState.MATCHED);
 
-        userServiceClient.updateRole(house.getTenantId(), Role.TENANT);
-        userServiceClient.changeCurrentAddressAndNumberFirst(house.getTenantId(), house.getAddress(), house.getNumber());
+        Long tenantId = house.getTenantId();
+        //userServiceClient.updateRole(house.getTenantId(), Role.TENANT);
+        //userServiceClient.changeCurrentAddressAndNumberFirst(house.getTenantId(), house.getAddress(), house.getNumber());
+
+        // 집주인과 입주민 사이 채팅방 생성
+        try {
+            List<Long> participantUserIds = List.of(ownerId, tenantId);
+            CreateChatRoomRequest chatRequest = new CreateChatRoomRequest(
+                    participantUserIds,
+                    ChatRoomType.GENERAL,
+                    null // 요청서 없음
+            );
+
+            Long newRoomId = chatServiceClient.createChatRoom(chatRequest);
+            log.info("Successfully created chat room {} for owner {} and tenant {}", newRoomId, ownerId, tenantId);
+
+        } catch (Exception e) {
+            log.error("Failed to create chat room for houseId: {}, ownerId: {}, tenantId: {}", houseId, ownerId, tenantId, e);
+        }
     }
 
     // 집주인 거절 -> tenantId null, state=1
@@ -217,7 +237,7 @@ public class HouseService {
     public List<HouseUnitResponse> findUnitNumbersByUserIds(List<Long> userIds) {
         List<House> houses = houseRepository.findAllByTenantIdIn(userIds);
         return houses.stream()
-                .map(house -> new HouseUnitResponse(house.getTenantId(), house.getNumber()))
+                .map(house -> new HouseUnitResponse(house.getTenantId(), house.getNumber(), house.getAddress()))
                 .collect(Collectors.toList());
     }
 
