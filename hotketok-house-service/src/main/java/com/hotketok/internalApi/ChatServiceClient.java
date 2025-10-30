@@ -8,5 +8,5 @@ import org.springframework.web.bind.annotation.RequestBody;
 @FeignClient(name = "chatting-service",  url = "${client.chatting-service.url}")
 public interface ChatServiceClient {
     @PostMapping("/internal/chatting-service/rooms")
-    Long createChatRoom(@RequestBody CreateChatRoomRequest request);
+    CreateChatRoomRequest createChatRoom(@RequestBody CreateChatRoomRequest request);
 }

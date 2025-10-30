@@ -108,8 +108,8 @@ public class HouseService {
         house.changeState(HouseState.MATCHED);
 
         Long tenantId = house.getTenantId();
-        //userServiceClient.updateRole(house.getTenantId(), Role.TENANT);
-        //userServiceClient.changeCurrentAddressAndNumberFirst(house.getTenantId(), house.getAddress(), house.getNumber());
+        userServiceClient.updateRole(house.getTenantId(), Role.TENANT);
+        userServiceClient.changeCurrentAddressAndNumberFirst(house.getTenantId(), house.getAddress(), house.getNumber());
 
         // 집주인과 입주민 사이 채팅방 생성
         try {
@@ -120,7 +120,7 @@ public class HouseService {
                     null // 요청서 없음
             );
 
-            Long newRoomId = chatServiceClient.createChatRoom(chatRequest);
+            Long newRoomId = chatServiceClient.createChatRoom(chatRequest).requestFormId();
             log.info("Successfully created chat room {} for owner {} and tenant {}", newRoomId, ownerId, tenantId);
 
         } catch (Exception e) {
