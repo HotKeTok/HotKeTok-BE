@@ -84,7 +84,7 @@ public class PostService {
 
         // 주소까지 기반으로 해서 필터링
         // 같은 주소에 사는 유저만 접근 가능
-        CurrentAddressAndNumberResponse addressAndNumber = userServiceClient.getCurrentAddressAndNumber(userId);
+        CurrentAddressAndNumberResponse addressAndNumber = userServiceClient.getCurrentAddressAndNumber(post.getSenderId());
 
         HouseInfoResponse houseInfo = houseServiceClient.getMatchedHousesByTenantAndAddressAndNumber(
                 post.getSenderId(),
